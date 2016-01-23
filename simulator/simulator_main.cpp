@@ -3,7 +3,7 @@
 #include <FL/Fl_Box.H>
 #include <random>
 #include "NetworkSim.h"
-#include "Router.h"
+#include "../Router.h"
 
 #include "NetworkWidget.h"
 
@@ -14,7 +14,11 @@ int canSend;
 
 void update(void*) {
 
-    simulator->updateSimulation(1);
+    float simulation_speed = 0.2f;
+
+    simulator->updateSimulation((1000.f/60.f)*simulation_speed);
+
+
 
     std::random_device rdev;
     std::mt19937 rgen(rdev());
@@ -28,7 +32,7 @@ void update(void*) {
 
     if (canSend <= 0) {
         simulator->sendMessage(message, node1, node2);
-        canSend = 20;
+        canSend = 50;
     } else {
         canSend--;
     }

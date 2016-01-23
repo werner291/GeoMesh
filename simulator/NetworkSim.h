@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <memory>
-#include "SimulatorInterface.h"
+#include "../SimulatorInterface.h"
 
 class NetworkWidget;
 

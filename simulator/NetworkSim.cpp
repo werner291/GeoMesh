@@ -4,9 +4,9 @@
 #include <iostream>
 #include <random>
 #include "NetworkSim.h"
-#include "Location.h"
-#include "Router.h"
-#include "constants.h"
+#include "../Location.h"
+#include "../Router.h"
+#include "../constants.h"
 
 void NetworkSim::updateSimulation(long timeDeltaMilliseconds) {
 
@@ -63,21 +63,23 @@ void NetworkSim::createRandomNetwork(int numNodes, int fieldSizeX, int fieldSize
 
     int routerID = 0;
 
-    int cols = fieldSizeX / 20;
-    int rows = fieldSizeY / 20;
+    int spacing = 100;
+
+    int cols = fieldSizeX / spacing - 1;
+    int rows = fieldSizeY / spacing - 1;
 
     for (int x=0; x < cols; x ++) {
-        for (int y=0; y < rows / 20; y++ ) {
+        for (int y=0; y < rows; y++ ) {
 
-            std::shared_ptr<Router> newRouter(new Router(routerID++,Location(x*20,y*20)));
+            std::shared_ptr<Router> newRouter(new Router(routerID++,Location(x*spacing + spacing/2,y*spacing + spacing/2)));
 
             nodes.push_back(newRouter);
 
-            if (x != 0) {
-                linkRouters(newRouter, nodes[(x-1) * (cols) + y]);
+            if (x > 0) {
+                linkRouters(newRouter, nodes[(x-1) * rows + y]);
             }
-            if (y != 0) {
-                linkRouters(newRouter, nodes[x * (cols) + y - 1]);
+            if (y > 0) {
+                linkRouters(newRouter, nodes[x * rows + y - 1]);
             }
         }
     }
@@ -124,8 +126,6 @@ void NetworkSim::linkRouters(std::shared_ptr<Router> &a, std::shared_ptr<Router>
     lnk.length = lnk.a->getRouter()->getLocation().distanceTo(lnk.b->getRouter()->getLocation());
 
     links.emplace_back(lnk);
-
-    nodes.emplace_back(a);
 }
 
 bool NetworkSim::sendMessage(std::string message, int startNodeID, int endNodeID) {

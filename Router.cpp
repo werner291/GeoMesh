@@ -49,9 +49,14 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
 
             if (bestCandidate == mRoutingTable.end()) {
                 std::stringstream message;
-                message << "Router (" << this->uniqueaddress <<
-                                         "): No known interface that routes message closer to " <<
-                destination.getDescription();
+                message << "Router " << this->getLocation().getDescription() << ": No known interface that routes message closer to " <<
+                destination.getDescription() << std::endl;
+
+                message << "Known routes:";
+
+                for (auto route : mRoutingTable) {
+                    message << route.target.getDescription() << "@" << route.iFaceID;
+                }
 
                 Logger::log(LogLevel::WARN, message.str());
 
@@ -115,7 +120,7 @@ void Router::broadcastLocationInfo() {
     *reinterpret_cast<int32_t*>(messageBuffer->data() + PEERINFO_NUMENTRIES_POS) = infoEntries;
 
     *reinterpret_cast<double*>(messageBuffer->data() + PEERINFO_ENTRIES_START + PEERINFO_ENTRY_LOCATION_X) = this->mLocation.X;
-    *reinterpret_cast<double*>(messageBuffer->data() + PEERINFO_ENTRIES_START + PEERINFO_ENTRY_LOCATION_Y) = this->mLocation.X;
+    *reinterpret_cast<double*>(messageBuffer->data() + PEERINFO_ENTRIES_START + PEERINFO_ENTRY_LOCATION_Y) = this->mLocation.Y;
     *reinterpret_cast<int64_t*>(messageBuffer->data() + PEERINFO_ENTRIES_START + PEERINFO_ENTRY_UID) = this->uniqueaddress;
 
     /*for (int entry=0; entry < mInterfaces.size(); entry++) {

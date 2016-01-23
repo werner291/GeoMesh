@@ -4,11 +4,10 @@
 
 #include "NetworkWidget.h"
 
-#include "Router.h"
-
 #include <iostream>
 
-#include "constants.h"
+#include "../constants.h"
+#include "../Router.h"
 
 template<typename T> T getPacketData(int charposition, DataBufferPtr data) {
     return *(reinterpret_cast<T *>(data->data() + charposition));
@@ -50,9 +49,12 @@ void NetworkWidget::draw() {
 
     fl_color(FL_BLACK);
 
+    fl_font(fl_font(), 10);
+
     for (const std::shared_ptr<Router> node : netSim.getNodes()) {
         fl_circle(node->getLocation().X,node->getLocation().Y, 1);
         fl_circle(node->getLocation().X,node->getLocation().Y, 3);
+        fl_draw(node->getLocation().getDescription().c_str(),node->getLocation().X,node->getLocation().Y);
         //fl_circle(node->getLocation().X,node->getLocation().Y, 5);
     }
 }

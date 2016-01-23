@@ -19,7 +19,7 @@ public:
 
     Location(double X, double Y) : X(X), Y(Y) {}
 
-    const std::string getDescription() {
+    const std::string getDescription() const {
         std::stringstream ss;
 
         ss << "(" << X << "," << Y << ")";

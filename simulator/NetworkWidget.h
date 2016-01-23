@@ -5,7 +5,7 @@
 #ifndef MESHNETSIM_NETWORKWIDGET_H
 #define MESHNETSIM_NETWORKWIDGET_H
 
-#include <FL/FL_Widget.h>
+#include <FL/Fl_Widget.H>
 #include <FL/fl_draw.H>
 #include "NetworkSim.h"
 
