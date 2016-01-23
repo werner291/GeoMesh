@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.1)
+project(MeshnetSim)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+set(SOURCE_FILES main.cpp AbstractInterface.cpp NetworkSim.cpp SimulatorInterface.cpp Router.cpp Location.cpp Logger.cpp NetworkWidget.cpp)
+add_executable(MeshnetSim ${SOURCE_FILES})
+
+include_directories(/opt/local/include)
+
+FIND_LIBRARY(FLTK_LIBRARY fltk /opt/local/lib)
+TARGET_LINK_LIBRARIES(MeshnetSim ${FLTK_LIBRARY})
