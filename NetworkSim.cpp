@@ -61,6 +61,28 @@ void NetworkSim::createRandomNetwork(int numNodes, int fieldSizeX, int fieldSize
     nodes.clear();
     links.clear();
 
+    int routerID = 0;
+
+    int cols = fieldSizeX / 20;
+    int rows = fieldSizeY / 20;
+
+    for (int x=0; x < cols; x ++) {
+        for (int y=0; y < rows / 20; y++ ) {
+
+            std::shared_ptr<Router> newRouter(new Router(routerID++,Location(x*20,y*20)));
+
+            nodes.push_back(newRouter);
+
+            if (x != 0) {
+                linkRouters(newRouter, nodes[(x-1) * (cols) + y]);
+            }
+            if (y != 0) {
+                linkRouters(newRouter, nodes[x * (cols) + y - 1]);
+            }
+        }
+    }
+
+/*
     std::random_device rdev;
     std::mt19937 rgen(rdev());
 
@@ -89,7 +111,21 @@ void NetworkSim::createRandomNetwork(int numNodes, int fieldSizeX, int fieldSize
 
         nodes.emplace_back(newRouter);
     }
+*/
+}
 
+void NetworkSim::linkRouters(std::shared_ptr<Router> &a, std::shared_ptr<Router> &b) {
+    Link lnk(std::__1::make_shared<SimulatorInterface>(a.get()),
+             std::__1::make_shared<SimulatorInterface>(b.get()));
+
+    lnk.a->getRouter()->connectInterface(lnk.a);
+    lnk.b->getRouter()->connectInterface(lnk.b);
+
+    lnk.length = lnk.a->getRouter()->getLocation().distanceTo(lnk.b->getRouter()->getLocation());
+
+    links.emplace_back(lnk);
+
+    nodes.emplace_back(a);
 }
 
 bool NetworkSim::sendMessage(std::string message, int startNodeID, int endNodeID) {

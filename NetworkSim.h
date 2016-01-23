@@ -60,6 +60,8 @@ public:
     void createRandomNetwork(int numNodes, int fieldSizeX, int fieldSizeY);
 
     void updateSimulation(long timeDeltaMilliseconds);
+
+    void linkRouters(std::shared_ptr<Router> &a, std::shared_ptr<Router> &b);
 };
 
 

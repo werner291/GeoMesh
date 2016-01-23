@@ -35,11 +35,13 @@ To create a network that focuses on:
 
 1. Openness: Anyone is allowed on the network. Find a nearby peer, and you're in.
 
-1. Freedom: All nodes should be free to do exchange information, as long as they do not prevent other nodes from doing the same.
+1. Freedom: All nodes should be free to exchange information, as long as they do not prevent other nodes from doing the same.
 
 1. Open source: The more eyes on the codebase, the more mistakes are spotted and the more ideas are applied.
 
 1. Re-use of as much as possible of what is already there: the routing software should work on existing routing hardware, if possible even on low-end hardware with limited computing power and memory. The protocol avoids touching other layers than layer 3 of the OSI model as much as possible. Requiring the installation of special software on the nodes is permitted, but it should be possible to bridge the network over other existing networks.
+
+1. Automation and ease of use: The network should be able to automatically route packets to any destination
 
 ## What about anonymity?
 
@@ -59,3 +61,7 @@ correct packet routing or cause excessive unneccesary load.
 
 Use tools like SSL or SSH if you want to send any kind of sensitive information. This is encouraged, even, but not
 appropriate as a fundamental part of GeoMesh.
+
+## What's the current status?
+
+It only works in a simulator, and completely mis-routes many packets. Hey, gotta start small right?
