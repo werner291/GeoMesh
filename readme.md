@@ -64,4 +64,13 @@ appropriate as a fundamental part of GeoMesh.
 
 ## What's the current status?
 
-It only works in a simulator, and completely mis-routes many packets. Hey, gotta start small right?
+Packet delivery is now guaranteed in a planar graph. Non-planar graphs are still going to be compicated though.
+
+## Sources
+
+* (Virtual Coordinates (Not yet implemented)): A. Rao et al, Geographic Routing without Location Information, University of California - Berkeley
+ Retrieved from https://www.eecs.berkeley.edu/~sylvia/papers/p327-rao.pdf on 23rd January 2016
+
+* (GOAFR+ routing (NYI)) F. Kuhn et al., Geometric Ad-Hoc Routing: Of Theory and Practice*, http://www.inf.usi.ch/faculty/kuhn/publications/podc03b.pdf
+
+* (Non-planar routing) http://vega.cs.kent.edu/~mikhail/Research/voids.pdf

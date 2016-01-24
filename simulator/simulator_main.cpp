@@ -14,11 +14,9 @@ int canSend;
 
 void update(void*) {
 
-    float simulation_speed = 0.2f;
+    float simulation_speed = 0.1f;
 
     simulator->updateSimulation((1000.f/60.f)*simulation_speed);
-
-
 
     std::random_device rdev;
     std::mt19937 rgen(rdev());

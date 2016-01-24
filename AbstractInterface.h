@@ -14,6 +14,14 @@ class AbstractInterface;
 
 typedef std::function<void(DataBufferPtr, int)> DataCallback;
 
+template<typename T> T getPacketData(int charposition, DataBufferPtr data) {
+    return *(reinterpret_cast<T *>(data->data() + charposition));
+}
+
+template<typename T> void setPacketData(int charposition, DataBufferPtr data, T value) {
+    *(reinterpret_cast<T *>(data->data() + charposition)) = value;
+}
+
 class Router;
 
 class AbstractInterface {

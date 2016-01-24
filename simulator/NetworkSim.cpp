@@ -61,59 +61,37 @@ void NetworkSim::createRandomNetwork(int numNodes, int fieldSizeX, int fieldSize
     nodes.clear();
     links.clear();
 
+    std::random_device rdev;
+    std::mt19937 rgen(rdev());
+
+    std::uniform_int_distribution<int> displacement(-20,20);
+
+    std::uniform_int_distribution<int> link(0,5);
+
     int routerID = 0;
 
-    int spacing = 100;
+    int spacing = 50;
 
-    int cols = fieldSizeX / spacing - 1;
-    int rows = fieldSizeY / spacing - 1;
+    int cols = fieldSizeX / spacing;
+    int rows = fieldSizeY / spacing;
 
     for (int x=0; x < cols; x ++) {
         for (int y=0; y < rows; y++ ) {
 
-            std::shared_ptr<Router> newRouter(new Router(routerID++,Location(x*spacing + spacing/2,y*spacing + spacing/2)));
+            std::shared_ptr<Router> newRouter(new Router(routerID++,
+                                                         Location(x*spacing + spacing/2 + displacement(rgen),
+                                                                  y*spacing + spacing/2 + displacement(rgen))));
 
             nodes.push_back(newRouter);
 
-            if (x > 0) {
+            if (x > 0 && link(rgen) != 0) {
                 linkRouters(newRouter, nodes[(x-1) * rows + y]);
             }
-            if (y > 0) {
+            if (y > 0 && link(rgen) != 0) {
                 linkRouters(newRouter, nodes[x * rows + y - 1]);
             }
         }
     }
-
-/*
-    std::random_device rdev;
-    std::mt19937 rgen(rdev());
-
-    std::uniform_int_distribution<int> displacement(-200,200);
-
-    nodes.emplace_back(std::shared_ptr<Router>(new Router(0,Location(fieldSizeX / 2, fieldSizeY / 2))));
-
-    for (int i=1; i< numNodes; i++) {
-        std::uniform_int_distribution<int> idist(0,nodes.size()-1); //(inclusive, inclusive)
-
-        std::shared_ptr<Router> connectTo = nodes[idist(rgen)];
-
-        std::shared_ptr<Router> newRouter(new Router(i,Location(clip<double>(connectTo->getLocation().X + displacement(rgen), 0, fieldSizeX),
-                                                                clip<double>(connectTo->getLocation().Y + displacement(rgen), 0, fieldSizeY))));
-
-        // TODO make the action of linking an interface to a router more explicit.
-        Link lnk(std::make_shared<SimulatorInterface>(connectTo.get()),
-                 std::make_shared<SimulatorInterface>(newRouter.get()));
-
-        lnk.a->getRouter()->connectInterface(lnk.a);
-        lnk.b->getRouter()->connectInterface(lnk.b);
-
-        lnk.length = lnk.a->getRouter()->getLocation().distanceTo(lnk.b->getRouter()->getLocation());
-
-        links.emplace_back(lnk);
-
-        nodes.emplace_back(newRouter);
-    }
-*/
 }
 
 void NetworkSim::linkRouters(std::shared_ptr<Router> &a, std::shared_ptr<Router> &b) {
@@ -144,7 +122,7 @@ bool NetworkSim::sendMessage(std::string message, int startNodeID, int endNodeID
     *reinterpret_cast<double*>(msg->data() + LOCATION_COORDINATE_X) = end->getLocation().X;
     *reinterpret_cast<double*>(msg->data() + LOCATION_COORDINATE_Y) = end->getLocation().Y;
     *reinterpret_cast<int32_t*>(msg->data() + DESTINATION_ID) = endNodeID;
-    *reinterpret_cast<int32_t*>(msg->data() + TTL) = 10;
+    *reinterpret_cast<int32_t*>(msg->data() + TTL) = 100;
 
     std::memcpy(msg->data() + PAYLOAD_START, message.c_str(), message.length());
 

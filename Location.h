@@ -5,7 +5,7 @@
 #ifndef MESHNETSIM_LOCATION_H
 #define MESHNETSIM_LOCATION_H
 
-
+#include <cmath>
 #include <string>
 #include <sstream>
 
@@ -25,6 +25,14 @@ public:
         ss << "(" << X << "," << Y << ")";
 
         return ss.str();
+    }
+
+    const double getDirectionTo(const Location& target) {
+        return atan2(target.Y - Y, target.X - X);
+    }
+
+    const bool operator==(const Location& other) {
+        return X == other.X && Y == other.Y;
     }
 };
 
