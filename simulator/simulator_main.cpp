@@ -14,7 +14,7 @@ int canSend;
 
 void update(void*) {
 
-    float simulation_speed = 0.1f;
+    float simulation_speed = 0.3f;
 
     simulator->updateSimulation((1000.f/60.f)*simulation_speed);
 
@@ -30,7 +30,7 @@ void update(void*) {
 
     if (canSend <= 0) {
         simulator->sendMessage(message, node1, node2);
-        canSend = 50;
+        canSend = 1;
     } else {
         canSend--;
     }
@@ -44,9 +44,11 @@ int main(int argc, char **argv) {
 
     simulator = new NetworkSim();
 
-    simulator->createRandomNetwork(50, 700, 500);
+    //simulator->createRandomGridNetwork(50, 800, 600);
 
-    Fl_Window *window = new Fl_Window(800,600);
+    simulator->createRelayHubNetwork(3, 1100, 900);
+
+    Fl_Window *window = new Fl_Window(1100, 900);
     Fl_Box *box = new Fl_Box(20,40,260,100,"Hello, World!");
     box->box(FL_UP_BOX);
     box->labelsize(36);
@@ -54,7 +56,7 @@ int main(int argc, char **argv) {
     box->labeltype(FL_SHADOW_LABEL);
 
 
-    nw = new NetworkWidget(10, 10, 800, 600, "?", *simulator);
+    nw = new NetworkWidget(10, 10, 1100, 900, "?", *simulator);
     window->resizable(nw);
 
     window->end();

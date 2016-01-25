@@ -7,9 +7,12 @@
 
 #include "Location.h"
 #include "AbstractInterface.h"
+#include "constants.h"
+#include "LocalInterface.h"
+#include "LinkManager.h"
 
 #include <set>
-#include <map>
+#include <queue>
 
 struct RoutingTableEntry {
     Location target;
@@ -32,38 +35,65 @@ struct DirectionalEntry {
 
 class Router {
 
-    long uniqueaddress;
+    std::vector<char> uniqueaddress;
 
 private:
     Location mLocation;
 
-    std::map<int, std::shared_ptr<AbstractInterface> > mInterfaces;
+    LocalInterface *localIface;
 
-    std::set<DirectionalEntry> mDirectNeighbours; // TODO combine "interfaces" and "direct neighbours"
+    LinkManager *linkMgr;
 
-    std::vector<RoutingTableEntry> mRoutingTable;
+    std::set<DirectionalEntry> mFaceRoutingTable; // TODO combine "interfaces" and "direct neighbours"
+
+    std::vector<RoutingTableEntry> mGreedyRoutingTable;
+
+    std::queue<DataBufferPtr> routingQueue;
 
 public:
+    LocalInterface *getLocalIface() const {
+        return localIface;
+    }
 
-    Router(long uniqueaddress, Location location): uniqueaddress(uniqueaddress), mLocation(location) {};
+    const std::vector<RoutingTableEntry> &getRoutingTable() {
+        return mGreedyRoutingTable;
+    }
+
+    LinkManager *getLinkManager() const {
+        return linkMgr;
+    }
+
+    const std::vector<char> &getAddress() {
+        return uniqueaddress;
+    }
+
+    // TODO make the allocation of the local interface and link manager a bit more elegant
+    Router(std::vector<char> uniqueaddress, Location location) : uniqueaddress(uniqueaddress), mLocation(location),
+                                                                 localIface(new LocalInterface(this)),
+                                                                 linkMgr(new LinkManager(this)) { };
+
+    ~Router() {
+        delete localIface;
+        delete linkMgr;
+    }
 
     bool handleMessage(std::shared_ptr<std::vector<char> > data, int fromIface);
-
-    void connectInterface(std::shared_ptr<AbstractInterface> iFace);
 
     const Location& getLocation() const {
         return mLocation;
     }
 
     const int getNumNeighbours() const {
-        return mDirectNeighbours.size();
+        return mFaceRoutingTable.size();
     }
 
-    void broadcastLocationInfo();
+    void sendLocationInfo(int iFace);
 
-    void processRoutingSuggestion(int fromIface, const Location &peerLocation, int hops);
+    bool processRoutingSuggestion(int fromIface, const Location &peerLocation, int hops);
 
     bool routeGreedy(DataBufferPtr data, int fromIface, Location destination);
+
+    int getGreedyInterface(int fromInterface, const Location &destination);
 
     void greedyToFace(DataBufferPtr data);
 
@@ -73,7 +103,7 @@ public:
 
     bool routeFaceRelay(DataBufferPtr data, int fromIface, Location destination);
 
-    bool sendMessageToInterface(const DataBufferPtr &data, int fromIface);
+
 };
 
 

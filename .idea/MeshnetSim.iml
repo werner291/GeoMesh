@@ -5,21 +5,23 @@
       <sourceFolder url="file://$MODULE_DIR$/Logger.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/SimulatorInterface.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Logger.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/AbstractInterface.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/LinkManager.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Router.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/AbstractInterface.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/LinkManager.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/LocalInterface.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/SimulatorInterface.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Location.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/simulator/NetworkSim.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/simulator/NetworkWidget.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/simulator/NetworkSim.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/simulator/NetworkWidget.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/simulator/simulator_main.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Location.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Router.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Location.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/InterfaceManager.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/InterfaceManager.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Router.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/LocalInterface.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/AbstractInterface.cpp" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">

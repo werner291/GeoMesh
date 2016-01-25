@@ -64,7 +64,18 @@ appropriate as a fundamental part of GeoMesh.
 
 ## What's the current status?
 
-Packet delivery is now guaranteed in a planar graph. Non-planar graphs are still going to be compicated though.
+Packet delivery is now guaranteed in a planar graph, and the greedy algorithm is already quite smart.
+
+The smart location advertisement relay / retention seems to work quite well in simple cases.
+
+## How does routing work?
+
+It's mainly based on greedy routing, with Face routing as a backup. This guarantees delivery in planar graphs.
+
+However, I'm currently working on making the greedy routing a while lot smarter, where nodes
+relay and store location adversiting in an intelligent selective way, instead of simply routing
+to the nearest neigbour. Face routing will therfore mostly be used as a last resort if the greedy 
+routing fails despite best efforts.
 
 ## Sources
 

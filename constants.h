@@ -9,6 +9,7 @@
 // using the C++ preprocessor. This manual process is going to lead to mistakes.
 
 const int PROTOCOL_VERSION = 0;
+const int DEFAULT_TTL = 100;
 
 typedef double location_scalar;
 const int ADDRESS_LENGTH_OCTETS = 16; // 128-bit addresses, we're optimistic.

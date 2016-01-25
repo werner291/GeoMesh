@@ -57,7 +57,9 @@ private:
     std::vector<Link> links;
 
 public:
-    void createRandomNetwork(int numNodes, int fieldSizeX, int fieldSizeY);
+    void createRandomGridNetwork(int fieldSizeX, int fieldSizeY);
+
+    void createRelayHubNetwork(int numNodes, int fieldSizeX, int fieldSizeY);
 
     void updateSimulation(long timeDeltaMilliseconds);
 

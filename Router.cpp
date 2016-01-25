@@ -28,15 +28,16 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
 
             if (destination == mLocation) {
                 // Received packet. TODO use UID, don't assume locations are unique.
-                // TODO: Send it to an output of some kind.
+
+                localIface->dataReceived(data);
+
             } else {
 
-                int hopsLeft = *(reinterpret_cast<int32_t *>(data->data() + TTL));
+                int hopsLeft = getPacketData<int32_t>(TTL, data);
 
                 if (hopsLeft <= 0) {
                     std::stringstream message;
-                    message << "Router (" << this->uniqueaddress <<
-                    "): TTL exceeded, dropping packet. " <<
+                    message << "TTL exceeded, dropping packet destined to: " <<
                     destination.getDescription();
 
                     Logger::log(LogLevel::WARN, message.str());
@@ -87,14 +88,14 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
 
             int hops = getPacketData<int32_t>(PEERINFO_HOPS, data);
 
-            processRoutingSuggestion(fromIface, peerLocation, hops);
+            bool isGoodSuggestion = processRoutingSuggestion(fromIface, peerLocation, hops);
 
-            if (hops < 1) {
+            if (isGoodSuggestion && hops < 5) {
                 setPacketData<int32_t>(PEERINFO_HOPS, data, hops + 1);
 
-                for (auto pair : mInterfaces) {
-                    if (pair.first != fromIface)
-                        pair.second->sendData(data);
+                for (auto neighbour : linkMgr->mInterfaces) {
+                    if (neighbour.second->getIFaceID() != fromIface)
+                        linkMgr->sendPacket(data, neighbour.second->getIFaceID());
                 }
 
             }
@@ -108,42 +109,58 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
 
 }
 
-void Router::processRoutingSuggestion(int fromIface, const Location &peerLocation, int hops) {
+bool Router::processRoutingSuggestion(int fromIface, const Location &peerLocation, int hops) {
 
     if (hops == 1) {
 
-        mDirectNeighbours.insert(DirectionalEntry {
-            fromIface, this->mLocation.getDirectionTo(peerLocation)
-        });
-        Logger::log(LogLevel::DEBUG, std::to_string(mDirectNeighbours.size()));
+        int before = mFaceRoutingTable.size();
+
+        DirectionalEntry entry{
+                fromIface, this->mLocation.getDirectionTo(peerLocation)
+        };
+
+        mFaceRoutingTable.insert(entry);
+
     }
 
-    for (auto itr = mRoutingTable.begin(); itr < mRoutingTable.end(); itr++) {
+    for (auto itr = mGreedyRoutingTable.begin(); itr < mGreedyRoutingTable.end(); itr++) {
         if (itr->target.X == peerLocation.X && itr->target.Y == peerLocation.Y) {
             if (itr->hops > hops) {
                 itr->iFaceID = fromIface;
-                return;
+                return true;
             } else {
-                return;
+                return false;
             }
         }
     }
 
-    mRoutingTable.push_back(RoutingTableEntry {
-                    peerLocation, fromIface, hops
-            });
+    // How would a packet headed for the specified location be routed now?
+    // Found the routing rule that most closely matches the suggestion.
+    auto bestCandidate = mGreedyRoutingTable.end();
+    double bestDistance = mLocation.distanceTo(peerLocation);
+
+    for (auto itr = mGreedyRoutingTable.begin(); itr != mGreedyRoutingTable.end(); itr++) {
+        double distance = itr->target.distanceTo(peerLocation);
+        if (distance < bestDistance) {
+            bestCandidate = itr;
+            bestDistance = distance;
+        }
+    }
+
+    if (bestCandidate == mGreedyRoutingTable.end() || bestCandidate->iFaceID != fromIface) {
+        // It would be routed differently, this is new information.
+        mGreedyRoutingTable.push_back(RoutingTableEntry {
+                peerLocation, fromIface, hops
+        });
+
+        return true;
+    }
+
+    // This new rule would not affect how routing was done at the moment.
+    return false;
 }
 
-void Router::connectInterface(std::shared_ptr<AbstractInterface> iFace) {
-
-    mInterfaces.insert(std::make_pair(iFace->getIFaceID(), iFace));
-    iFace->setDataReceivedCallback(std::bind(&Router::handleMessage,
-                                             this, std::placeholders::_1, std::placeholders::_2));
-
-    broadcastLocationInfo();
-}
-
-void Router::broadcastLocationInfo() {
+void Router::sendLocationInfo(int interface) {
 
     std::shared_ptr<std::vector<char> > messageBuffer(new std::vector<char>(PEERINFO_ENTRY_UID + ADDRESS_LENGTH_OCTETS));
 
@@ -159,35 +176,24 @@ void Router::broadcastLocationInfo() {
     //*reinterpret_cast<int64_t *>(messageBuffer->data() + PEERINFO_ENTRIES_START +
       //                           PEERINFO_ENTRY_UID) = this->uniqueaddress;
 
-    for (auto pair : mInterfaces) {
-        pair.second->sendData(messageBuffer);
-    }
+    linkMgr->sendPacket(messageBuffer, interface);
 
 }
 
 bool Router::routeGreedy(DataBufferPtr data, int fromIface, Location destination) {
 
-    auto bestCandidate = mRoutingTable.end();
-    double bestDistance = mLocation.distanceTo(destination);
+    int outInteface = getGreedyInterface(fromIface, destination);
 
-    for (auto itr = mRoutingTable.begin(); itr != mRoutingTable.end(); itr++) {
-        double distance = itr->target.distanceTo(destination);
-        if (distance < bestDistance) {
-            bestCandidate = itr;
-            bestDistance = distance;
-        }
-    }
+    if (outInteface != -1) {
+        *(reinterpret_cast<int32_t *>(data->data() + TTL)) = getPacketData<int32_t>(TTL, data) - 1;
 
-    if (bestCandidate == mRoutingTable.end()) {
 
+        linkMgr->sendPacket(data, outInteface);
+
+        return true;
+    } else {
         return false;
     }
-
-    *(reinterpret_cast<int32_t *>(data->data() + TTL)) = getPacketData<int32_t>(TTL,data) - 1;
-
-    sendMessageToInterface(data,bestCandidate->iFaceID);
-
-    return true;
 }
 
 template <typename T> int sgn(T val) {
@@ -196,11 +202,17 @@ template <typename T> int sgn(T val) {
 
 bool Router::canSwitchFaceToGreedy(DataBufferPtr data, Location destination) {
 
-    double destinationDistance = destination.distanceTo(mLocation);
     double bestDistance = Location(getPacketData<double>(ROUTING_FACE_START_X, data),
                                    getPacketData<double>(ROUTING_FACE_START_Y, data)).distanceTo(destination);
 
-    return destinationDistance < bestDistance;
+    if (destination.distanceTo(mLocation) < bestDistance) return true;
+
+    for (auto itr = mGreedyRoutingTable.begin(); itr != mGreedyRoutingTable.end(); itr++) {
+        if (destination.distanceTo(itr->target) < bestDistance) return true;
+    }
+
+
+    return false;
 
 }
 
@@ -218,15 +230,15 @@ bool Router::routeFaceBegin(DataBufferPtr data, int fromIface, Location destinat
     // Direction in trigonometric space of the vector from the current node to the destination
     double directionToDestination = mLocation.getDirectionTo(destination);
 
-    if (mDirectNeighbours.size() == 1) { // Just send it back.
-        return sendMessageToInterface(data, fromIface);
-    } else if (mDirectNeighbours.size() >= 2){ // Need to choose one
+    if (mFaceRoutingTable.size() == 1) { // Just send it back.
+        return linkMgr->sendPacket(data, fromIface);
+    } else if (mFaceRoutingTable.size() >= 2) { // Need to choose one
 
         // Need to choose a range between two directions
-        auto before = mDirectNeighbours.begin();
-        auto after = std::next(before); // Safe since mDirectNeighbours.size() >= 2
+        auto before = mFaceRoutingTable.begin();
+        auto after = std::next(before); // Safe since mFaceRoutingTable.size() >= 2
 
-        while (before != mDirectNeighbours.end()) {
+        while (before != mFaceRoutingTable.end()) {
 
             bool foundRange = false;
 
@@ -237,33 +249,43 @@ bool Router::routeFaceBegin(DataBufferPtr data, int fromIface, Location destinat
             }
 
             if (foundRange) {
-                return sendMessageToInterface(data, routing_start_direction != FACE_ROUTE_RHL ? before->iFaceID : after->iFaceID);
+                return linkMgr->sendPacket(data, routing_start_direction != FACE_ROUTE_RHL ? before->iFaceID
+                                                                                           : after->iFaceID);
             }
 
             before++;
 
             after++;
-            if (after == mDirectNeighbours.end()) after = mDirectNeighbours.begin();
+            if (after == mFaceRoutingTable.end()) after = mFaceRoutingTable.begin();
 
         }
 
 
     }
 
-    Logger::log(LogLevel::WARN, "Could not find a suitable neighbour to relay face routing packet to.");
+    //Logger::log(LogLevel::WARN, "Could not find a suitable neighbour to relay face routing packet to.");
     return false; // Drop packet. (Better suggestions?)
 
 }
 
-bool Router::sendMessageToInterface(const DataBufferPtr &data, int iFace) {
-    auto itr = mInterfaces.find(iFace);
+int Router::getGreedyInterface(int fromInterface, const Location &destination) {
+    auto bestCandidate = mGreedyRoutingTable.end();
+    double bestDistance = mLocation.distanceTo(destination);
 
-    if (itr != mInterfaces.end()) {
-        return itr->second->sendData(data);
-    } else {
-        Logger::log(LogLevel::WARN, "Trying to send data to non-existent interface " + std::to_string(iFace));
-        return false;
+    for (auto itr = mGreedyRoutingTable.begin(); itr != mGreedyRoutingTable.end(); itr++) {
+        double distance = itr->target.distanceTo(destination);
+        if (distance < bestDistance) {
+            bestCandidate = itr;
+            bestDistance = distance;
+        }
     }
+
+    if (bestCandidate == mGreedyRoutingTable.end()) {
+
+        return -1;
+    }
+
+    return bestCandidate->iFaceID;
 }
 
 bool Router::routeFaceRelay(DataBufferPtr data, int fromIface, Location destination) {
@@ -279,25 +301,29 @@ bool Router::routeFaceRelay(DataBufferPtr data, int fromIface, Location destinat
         setPacketData<int32_t>(ROUTING_FACE_DIRECTION, data,
                               getPacketData<int32_t>(ROUTING_FACE_DIRECTION, data) == FACE_ROUTE_RHL ? FACE_ROUTE_LHR : FACE_ROUTE_RHL);
 
-        return sendMessageToInterface(data, fromIface);
+        return linkMgr->sendPacket(data, fromIface);
 
     } else {
 
-        auto itr = mDirectNeighbours.begin();
-        while (itr->iFaceID != fromIface) itr++;
+        auto itr = mFaceRoutingTable.begin();
+        while (itr->iFaceID != fromIface && itr != mFaceRoutingTable.end()) itr++;
+        if (itr == mFaceRoutingTable.end()) {
+            Logger::log(LogLevel::WARN, "Received message from unknown direct peer.");
+            return false; // Drop.
+        }
 
         int DIRECTION = getPacketData<int32_t>(ROUTING_FACE_DIRECTION, data);
 
         // Neighbours are sorted counter-clickwise. Right-hand routing thus means selecting a previous neigbour
         if (DIRECTION == FACE_ROUTE_RHL) {
             itr++;
-            if (itr == mDirectNeighbours.end()) itr = mDirectNeighbours.begin();
+            if (itr == mFaceRoutingTable.end()) itr = mFaceRoutingTable.begin();
         } else {
             // Left hand routing, step one interface down.
-            if (itr == mDirectNeighbours.begin()) itr = mDirectNeighbours.end();
+            if (itr == mFaceRoutingTable.begin()) itr = mFaceRoutingTable.end();
             itr--;
         }
 
-        return sendMessageToInterface(data, itr->iFaceID);
+        return linkMgr->sendPacket(data, itr->iFaceID);
     }
 }
