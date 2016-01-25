@@ -77,6 +77,15 @@ relay and store location adversiting in an intelligent selective way, instead of
 to the nearest neigbour. Face routing will therfore mostly be used as a last resort if the greedy 
 routing fails despite best efforts.
 
+## Can I get in?
+
+You may have noticed the "Openness" bit in the project ideals.
+
+At the moment, there isn't really a network to speak of, it only runs in a simulator. The code is there, though,
+and it's GPL-licenced, so grab a copy and start playing!
+
+By the way, if you manage to get it to compile on your system, please tell me!
+
 ## Sources
 
 * (Virtual Coordinates (Not yet implemented)): A. Rao et al, Geographic Routing without Location Information, University of California - Berkeley
