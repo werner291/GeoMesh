@@ -90,7 +90,7 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
 
             bool isGoodSuggestion = processRoutingSuggestion(fromIface, peerLocation, hops);
 
-            if (isGoodSuggestion && hops < 5) {
+            if (isGoodSuggestion || hops < 3) {
                 setPacketData<int32_t>(PEERINFO_HOPS, data, hops + 1);
 
                 for (auto neighbour : linkMgr->mInterfaces) {
@@ -123,32 +123,7 @@ bool Router::processRoutingSuggestion(int fromIface, const Location &peerLocatio
 
     }
 
-    for (auto itr = mGreedyRoutingTable.begin(); itr < mGreedyRoutingTable.end(); itr++) {
-        if (itr->target.X == peerLocation.X && itr->target.Y == peerLocation.Y) {
-            if (itr->hops > hops) {
-                itr->iFaceID = fromIface;
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-
-    // How would a packet headed for the specified location be routed now?
-    // Found the routing rule that most closely matches the suggestion.
-    auto bestCandidate = mGreedyRoutingTable.end();
-    double bestDistance = mLocation.distanceTo(peerLocation);
-
-    for (auto itr = mGreedyRoutingTable.begin(); itr != mGreedyRoutingTable.end(); itr++) {
-        double distance = itr->target.distanceTo(peerLocation);
-        if (distance < bestDistance) {
-            bestCandidate = itr;
-            bestDistance = distance;
-        }
-    }
-
-    if (bestCandidate == mGreedyRoutingTable.end() || bestCandidate->iFaceID != fromIface) {
-        // It would be routed differently, this is new information.
+    if (mGreedyRoutingTable.empty()) {
         mGreedyRoutingTable.push_back(RoutingTableEntry {
                 peerLocation, fromIface, hops
         });
@@ -156,7 +131,29 @@ bool Router::processRoutingSuggestion(int fromIface, const Location &peerLocatio
         return true;
     }
 
-    // This new rule would not affect how routing was done at the moment.
+    // How would a packet headed for the specified location be routed now?
+    // Found the routing rule that most closely matches the suggestion.
+    auto closestRule = mGreedyRoutingTable.end();
+    double closestRuleDistance = INFINITY;
+
+    for (auto itr = mGreedyRoutingTable.begin(); itr != mGreedyRoutingTable.end(); itr++) {
+            double distance = itr->target.distanceTo(peerLocation);
+            if (distance < closestRuleDistance) {
+                closestRule = itr;
+                closestRuleDistance = distance;
+            }
+    }
+
+    double suggestionDistanceFromMe = mLocation.distanceTo(peerLocation);
+
+    if (closestRuleDistance > suggestionDistanceFromMe / 2) {
+        mGreedyRoutingTable.push_back(RoutingTableEntry {
+                peerLocation, fromIface, hops
+        });
+
+        return true;
+    }
+
     return false;
 }
 

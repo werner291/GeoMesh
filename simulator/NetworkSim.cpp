@@ -2,11 +2,12 @@
 // Created by Werner Kroneman on 22-01-16.
 //
 #include <iostream>
-#include <random>
+#include <algorithm>
 #include "NetworkSim.h"
 #include "../Location.h"
 #include "../Router.h"
 #include "../constants.h"
+#include "../Logger.h"
 
 int cnt = 0;
 
@@ -29,7 +30,7 @@ void NetworkSim::updateSimulation(long timeDeltaMilliseconds) {
         }
 
         // Not a while loop such that only one packet is taken each cycle to simulate a non-infinite-capacity line
-        if (link.a->hasNextInSendQueue()) {
+        while (link.a->hasNextInSendQueue()) {
             SimulatedPacket packet;
 
             packet.data = link.a->pullNextInSendQueue();
@@ -39,7 +40,7 @@ void NetworkSim::updateSimulation(long timeDeltaMilliseconds) {
             link.packetsOnLine.emplace_back(packet);
         }
 
-        if (link.b->hasNextInSendQueue()) {
+        while (link.b->hasNextInSendQueue()) {
             SimulatedPacket packet;
 
             packet.data = link.b->pullNextInSendQueue();
@@ -58,31 +59,16 @@ template <typename T>
 T clip(const T& n, const T& lower, const T& upper) {
     return std::max(lower, std::min(n, upper));
 }
-
+/*
 void NetworkSim::createRelayHubNetwork(int numNodes, int fieldSizeX, int fieldSizeY) {
 
-    nodes.clear();
-    links.clear();
-
-    std::random_device rdev;
-    std::mt19937 rgen(rdev());
+    clearNetwork();
 
     std::uniform_int_distribution<int> link(0, 10);
 
-    std::uniform_int_distribution<char> addrgen(0, 255);
-
     for (int i = 0; i < numNodes; i++) {
 
-        std::vector<char> addr(ADDRESS_LENGTH_OCTETS);
-        for (int i = 0; i < ADDRESS_LENGTH_OCTETS; i++) {
-            addr[i] = addrgen(rgen);
-        }
-
-        std::shared_ptr<Router> newRouter(new Router(addr,
-                                                     Location(fieldSizeX / 2 + cos(2 * M_PI * i / numNodes) * 300,
-                                                              fieldSizeY / 2 + sin(2 * M_PI * i / numNodes) * 300)));
-
-        nodes.push_back(newRouter);
+        newNodeAt(numNodes, fieldSizeX, fieldSizeY, i);
 
         if (i >= 1) linkRouters(nodes[i], nodes[i - 1]);
 
@@ -122,28 +108,49 @@ void NetworkSim::createRelayHubNetwork(int numNodes, int fieldSizeX, int fieldSi
 
     }
 
+}*/
+
+std::shared_ptr<Router> NetworkSim::newNodeAt(double posX, double posY) {
+
+    std::shared_ptr<Router> newRouter(new Router(generateAddress(), Location(posX, posY)));
+
+    nodes.push_back(newRouter);
+
+    return newRouter;
 }
 
-void NetworkSim::createRandomGridNetwork(int fieldSizeX, int fieldSizeY) {
+std::vector<char> NetworkSim::generateAddress() {
+    std::__1::vector<char> addr(ADDRESS_LENGTH_OCTETS);
+    for (int i = 0; i < ADDRESS_LENGTH_OCTETS; i++) {
+            addr[i] = addrgen(rgen);
+        }
+    return addr;
+}
 
+void NetworkSim::clearNetwork() {
     nodes.clear();
     links.clear();
+}
 
-    std::random_device rdev;
-    std::mt19937 rgen(rdev());
+std::vector<std::shared_ptr<Router> > NetworkSim::createRandomGridNetwork(int xMin, int yMin, int xMax, int yMax,
+                                                                          int random_displacement, int spacing) {
 
-    std::uniform_int_distribution<int> displacement(-50, 50);
+    xMin += random_displacement;
+    yMin += random_displacement;
 
-    std::uniform_int_distribution<int> link(0, 10);
+    xMax -= random_displacement;
+    xMax -= random_displacement;
+
+    std::uniform_int_distribution<int> displacement(-random_displacement, random_displacement);
+
+    std::uniform_int_distribution<int> link(1, 10);
 
     std::uniform_int_distribution<char> addrgen(0, 255);
 
-    int routerID = 0;
+    int cols = (xMax - xMin) / spacing - 1;
+    int rows = (yMax - yMin) / spacing - 1;
 
-    int spacing = 75;
-
-    int cols = fieldSizeX / spacing - 1;
-    int rows = fieldSizeY / spacing - 1;
+    std::vector<std::shared_ptr<Router> > gridNodes;
 
     for (int x=0; x < cols; x ++) {
         for (int y=0; y < rows; y++ ) {
@@ -154,19 +161,23 @@ void NetworkSim::createRandomGridNetwork(int fieldSizeX, int fieldSizeY) {
             }
 
             std::shared_ptr<Router> newRouter(new Router(addr,
-                                                         Location(x*spacing + spacing/2 + displacement(rgen),
-                                                                  y*spacing + spacing/2 + displacement(rgen))));
+                                                         Location(xMin + x*spacing + displacement(rgen),
+                                                                  yMin + y*spacing + displacement(rgen))));
 
-            nodes.push_back(newRouter);
+            gridNodes.push_back(newRouter);
 
             if (x > 0 && link(rgen) != 0) {
-                linkRouters(newRouter, nodes[(x-1) * rows + y]);
+                linkRouters(newRouter, gridNodes[(x-1) * rows + y]);
             }
             if (y > 0 && link(rgen) != 0) {
-                linkRouters(newRouter, nodes[x * rows + y - 1]);
+                linkRouters(newRouter, gridNodes[x * rows + y - 1]);
             }
         }
     }
+
+    nodes.insert(nodes.end(), gridNodes.begin(), gridNodes.end());
+
+    return gridNodes;
 }
 
 void NetworkSim::linkRouters(std::shared_ptr<Router> &a, std::shared_ptr<Router> &b) {
@@ -191,4 +202,60 @@ bool NetworkSim::sendMessage(std::string message, int startNodeID, int endNodeID
                                         end->getLocation());
 
     return true;
+}
+
+void NetworkSim::createIslandNetwork(int sizeX, int sizeY) {
+
+    clearNetwork();
+
+    std::vector< std::vector< std::shared_ptr < Router > > > subnets;
+
+    for (int i=0; i < 3; i++) {
+
+        double a = 2 * i * M_PI / 3;
+
+        subnets.emplace_back(createRandomGridNetwork(cos(a) * 300 - 150 + sizeX / 2, sin(a) * 300 - 150 + sizeY / 2,
+                                                     cos(a) * 300 + 150 + sizeX / 2, sin(a) * 300 + 150 + sizeY / 2, 10, 50));
+
+        if (i >= 1) {
+            linkRouters( subnets[i - 1][(subnets[i - 1].size()+1)/2 ] , subnets[i][(subnets[i].size()+1)/2 ] );
+        }
+
+    }
+
+}
+
+void NetworkSim::createCrumpledGridNetwork(int xMax, int yMax) {
+    clearNetwork();
+
+    createRandomGridNetwork(0,0,xMax,yMax, 1, 50);
+
+    Logger::log(LogLevel::INFO, "Generated crumpled grid network of " + std::to_string(nodes.size()) + " nodes.");
+}
+
+void NetworkSim::createConcentricNetwork(int xMax, int yMax, int rings, int ringSize) {
+
+    clearNetwork();
+
+    std::shared_ptr< Router > centralNode = newNodeAt(xMax/2,yMax/2);
+
+    for (int ring = 0; ring < rings; ring++) {
+
+        double radius = (ring+1) * 100;
+
+        for (int rNode = 0; rNode < ringSize; rNode++) {
+            double a = 2 * rNode * M_PI / ringSize + M_PI/8;
+
+            newNodeAt(xMax/2 + cos(a) * radius, yMax/2 + sin(a) * radius);
+
+            if (rNode >= 1) {
+                linkRouters(nodes[nodes.size()-1], nodes[nodes.size()-2]);
+
+            }
+            linkRouters(nodes.back(), ring >= 1 ? nodes[nodes.size()-ringSize-1] : centralNode);
+        }
+        linkRouters(nodes.back(), nodes[nodes.size()-ringSize]);
+
+    }
+
 }

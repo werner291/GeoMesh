@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 #include "../SimulatorInterface.h"
+#include <random>
 
 class NetworkWidget;
 
@@ -32,8 +33,14 @@ struct Link {
 
 class NetworkSim {
 
+    std::random_device rdev;
+    std::mt19937 rgen;
+    std::uniform_int_distribution<char> addrgen;
 
 public:
+
+    NetworkSim() : rgen(rdev()), addrgen(0, 255) {}
+
     std::vector<std::shared_ptr<Router>> const &getNodes() const {
         return nodes;
     }
@@ -56,14 +63,28 @@ private:
     std::vector<std::shared_ptr<Router> > nodes;
     std::vector<Link> links;
 
-public:
-    void createRandomGridNetwork(int fieldSizeX, int fieldSizeY);
+    std::vector<std::shared_ptr<Router> > createRandomGridNetwork(int xMin, int yMin, int xMax, int yMax,
+                                                                  int random_displacement, int spacing);
 
-    void createRelayHubNetwork(int numNodes, int fieldSizeX, int fieldSizeY);
+    //void createRelayHubNetwork(int numNodes, int fieldSizeX, int fieldSizeY);
+
+public:
+
+    void createCrumpledGridNetwork(int xMax, int yMax);
+
+    void createIslandNetwork(int sizeX, int sizeY);
 
     void updateSimulation(long timeDeltaMilliseconds);
 
     void linkRouters(std::shared_ptr<Router> &a, std::shared_ptr<Router> &b);
+
+    void clearNetwork();
+
+    std::vector<char> generateAddress();
+
+    std::shared_ptr<Router> newNodeAt(double posX, double posY);
+
+    void createConcentricNetwork(int xMax, int yMax, int rings, int ringSize);
 };
 
 
