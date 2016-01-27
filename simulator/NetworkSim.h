@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <memory>
-#include "../SimulatorInterface.h"
+#include "SimulatorInterface.h"
 #include <random>
 
 class NetworkWidget;
@@ -38,6 +38,18 @@ class NetworkSim {
     std::uniform_int_distribution<char> addrgen;
 
 public:
+    float getScale() const {
+        return scale;
+    }
+
+    void setScale(float scale) {
+        NetworkSim::scale = scale;
+    }
+
+private:
+    float scale;
+
+public:
 
     NetworkSim() : rgen(rdev()), addrgen(0, 255) {}
 
@@ -63,16 +75,11 @@ private:
     std::vector<std::shared_ptr<Router> > nodes;
     std::vector<Link> links;
 
-    std::vector<std::shared_ptr<Router> > createRandomGridNetwork(int xMin, int yMin, int xMax, int yMax,
-                                                                  int random_displacement, int spacing);
-
     //void createRelayHubNetwork(int numNodes, int fieldSizeX, int fieldSizeY);
 
 public:
 
-    void createCrumpledGridNetwork(int xMax, int yMax);
-
-    void createIslandNetwork(int sizeX, int sizeY);
+    bool createLongitudinalGridNetwork(int nodesPerRing, int rings);
 
     void updateSimulation(long timeDeltaMilliseconds);
 

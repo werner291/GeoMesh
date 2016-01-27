@@ -7,7 +7,7 @@
 
 
 #include <queue>
-#include "AbstractInterface.h"
+#include "../AbstractInterface.h"
 
 class SimulatorInterface : public AbstractInterface {
 

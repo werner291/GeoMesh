@@ -20,11 +20,9 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
     switch (messageType) {
 
         case MSGTYPE_PAYLOAD: {
-            Location destination(
-                    *(reinterpret_cast<double *>(data->data() +
-                                                 LOCATION_COORDINATE_X)), // Dangerous. TODO: use the IEEE standard for doubles.
-                    *(reinterpret_cast<double *>(data->data() + LOCATION_COORDINATE_Y))
-            );
+            Location destination(*(reinterpret_cast<double *>(data->data() + LOCATION_COORDINATE_Y)),
+                                 *(reinterpret_cast<double *>(data->data() +
+                                                              LOCATION_COORDINATE_X)));
 
             if (destination == mLocation) {
                 // Received packet. TODO use UID, don't assume locations are unique.
@@ -82,9 +80,8 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
         case MSGTYPE_PEERINFO: {
 
             // Dangerous. TODO: use the IEEE standard for doubles.
-            Location peerLocation(
-                    *(reinterpret_cast<double *>(data->data() + PEERINFO_ENTRY_LOCATION_X)),
-                    *(reinterpret_cast<double *>(data->data() + PEERINFO_ENTRY_LOCATION_Y)));
+            Location peerLocation(*(reinterpret_cast<double *>(data->data() + PEERINFO_LOCATION_LAT)),
+                                  *(reinterpret_cast<double *>(data->data() + PEERINFO_LOCATION_LON)));
 
             int hops = getPacketData<int32_t>(PEERINFO_HOPS, data);
 
@@ -146,7 +143,8 @@ bool Router::processRoutingSuggestion(int fromIface, const Location &peerLocatio
 
     double suggestionDistanceFromMe = mLocation.distanceTo(peerLocation);
 
-    if (closestRuleDistance > suggestionDistanceFromMe / 2) {
+    // Really need to improve this criterion, it even fails the equatorial ring scenario
+    if (closestRuleDistance > suggestionDistanceFromMe / 20) {
         mGreedyRoutingTable.push_back(RoutingTableEntry {
                 peerLocation, fromIface, hops
         });
@@ -164,8 +162,8 @@ void Router::sendLocationInfo(int interface) {
     *reinterpret_cast<int32_t *>(messageBuffer->data() + PROTOCOL_VERSION_LOC) = PROTOCOL_VERSION;
     *reinterpret_cast<int32_t *>(messageBuffer->data() + MESSAGE_TYPE) = MSGTYPE_PEERINFO;
 
-    setPacketData<double>(PEERINFO_ENTRY_LOCATION_X, messageBuffer, this->mLocation.X);
-    setPacketData<double>(PEERINFO_ENTRY_LOCATION_Y, messageBuffer, this->mLocation.Y);
+    setPacketData<double>(PEERINFO_LOCATION_LON, messageBuffer, this->mLocation.lon);
+    setPacketData<double>(PEERINFO_LOCATION_LAT, messageBuffer, this->mLocation.lat);
 
     setPacketData<int32_t>(PEERINFO_HOPS, messageBuffer, 1);
 
@@ -199,8 +197,8 @@ template <typename T> int sgn(T val) {
 
 bool Router::canSwitchFaceToGreedy(DataBufferPtr data, Location destination) {
 
-    double bestDistance = Location(getPacketData<double>(ROUTING_FACE_START_X, data),
-                                   getPacketData<double>(ROUTING_FACE_START_Y, data)).distanceTo(destination);
+    double bestDistance = Location(getPacketData<double>(ROUTING_FACE_START_Y, data),
+                                   getPacketData<double>(ROUTING_FACE_START_X, data)).distanceTo(destination);
 
     if (destination.distanceTo(mLocation) < bestDistance) return true;
 
@@ -220,8 +218,8 @@ bool Router::routeFaceBegin(DataBufferPtr data, int fromIface, Location destinat
 
     setPacketData<int32_t>(ROUTING_MODE, data, ROUTING_FACE);
     setPacketData<int32_t>(ROUTING_FACE_DIRECTION, data, routing_start_direction);
-    setPacketData<double>(ROUTING_FACE_START_X, data, this->mLocation.X);
-    setPacketData<double>(ROUTING_FACE_START_Y, data, this->mLocation.Y);
+    setPacketData<double>(ROUTING_FACE_START_X, data, this->mLocation.lon);
+    setPacketData<double>(ROUTING_FACE_START_Y, data, this->mLocation.lat);
     setPacketData<double>(ROUTING_FACE_RANGE, data, mLocation.distanceTo(destination) * FACE_ROUTING_RANGE_MULTIPLIER);
 
     // Direction in trigonometric space of the vector from the current node to the destination

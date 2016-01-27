@@ -5,6 +5,7 @@
 #include <random>
 #include "NetworkSim.h"
 #include "../Router.h"
+#include "ActionButton.h"
 
 #include "NetworkWidget.h"
 
@@ -15,7 +16,7 @@ int canSend;
 
 void update(void*) {
 
-    float simulation_speed = 0.5f;
+    float simulation_speed = 0.1f;
 
     simulator->updateSimulation((1000.f*simulation_speed/60.f));
 
@@ -31,7 +32,7 @@ void update(void*) {
 
     if (canSend <= 0) {
         simulator->sendMessage(message, node1, node2);
-        canSend = 0;
+        canSend = 10;
     } else {
         canSend--;
     }
@@ -45,8 +46,7 @@ int main(int argc, char **argv) {
 
     simulator = new NetworkSim();
 
-    //simulator->createCrumpledGridNetwork(1100, 900);
-    simulator->createIslandNetwork(1100, 900);
+    simulator->createLongitudinalGridNetwork(15, 0);
 
     std::unique_ptr< Fl_Window > window(new Fl_Window(1100, 900));
 
@@ -56,11 +56,17 @@ int main(int argc, char **argv) {
     box->labelfont(FL_BOLD+FL_ITALIC);
     box->labeltype(FL_SHADOW_LABEL);
 
-    std::unique_ptr< Fl_Button > zoomIn(new Fl_Button(900,0,100,100,"+"));
-    std::unique_ptr< Fl_Button > zoomOut(new Fl_Button(1000,0,100,100,"-"));
 
-    nw = new NetworkWidget(10, 10, 900, 900, "?", *simulator);
-    window->resizable(nw);
+    nw = new NetworkWidget(0, 0, 900, 900, "?", *simulator);
+
+    NetworkWidget *_nw = nw;
+
+    window->resizable(_nw);
+
+    std::unique_ptr<ActionButton> zoomIn(new ActionButton(900, 0, 100, 100, "+"));
+    zoomIn->setAction([_nw](ActionButton *source) { nw->setScale(nw->getScale() * 1.1); });
+    std::unique_ptr<ActionButton> zoomOut(new ActionButton(1000, 0, 100, 100, "-"));
+    zoomOut->setAction([_nw](ActionButton *source) { nw->setScale(nw->getScale() / 1.1); });
 
     window->end();
     window->show(argc, argv);

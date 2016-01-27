@@ -23,8 +23,8 @@ bool LocalInterface::sendMessage(const std::vector<char> &address, DataBufferPtr
 
     setPacketData<int32_t>(MESSAGE_TYPE, msg, MSGTYPE_PAYLOAD);
 
-    setPacketData<double>(LOCATION_COORDINATE_X, msg, recipientLocation.X);
-    setPacketData<double>(LOCATION_COORDINATE_Y, msg, recipientLocation.Y);
+    setPacketData<double>(LOCATION_COORDINATE_X, msg, recipientLocation.lon);
+    setPacketData<double>(LOCATION_COORDINATE_Y, msg, recipientLocation.lat);
 
     //setPacketData<double>(DESTINATION_ID, data, endNodeID)
     setPacketData<int32_t>(TTL, msg, DEFAULT_TTL);

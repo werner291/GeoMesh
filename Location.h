@@ -9,30 +9,36 @@
 #include <string>
 #include <sstream>
 
+const double EARTH_RAD = 6371000; // Approx earth radius in meters
+
 class Location {
 
+    double inline rad(double angle) const {
+        return angle * 180 / M_PI;
+    }
+
 public:
-    double X;
-    double Y;
+    double lon; // From -180 to 180 degrees, with 0 at IERS Reference Meridian, + towards East
+    double lat; // From -90 to 90 degrees, + towards North
+
+
 
     double distanceTo(const Location& other) const;
 
-    Location(double X, double Y) : X(X), Y(Y) {}
+    Location(double lat, double lon) : lon(lon), lat(lat) { }
 
     const std::string getDescription() const {
         std::stringstream ss;
 
-        ss << "(" << X << "," << Y << ")";
+        ss << "(" << lat << "," << lon << ")";
 
         return ss.str();
     }
 
-    const double getDirectionTo(const Location& target) {
-        return atan2(target.Y - Y, target.X - X);
-    }
+    const double getDirectionTo(const Location &target);
 
     const bool operator==(const Location& other) {
-        return X == other.X && Y == other.Y;
+        return lon == other.lon && lat == other.lat;
     }
 };
 

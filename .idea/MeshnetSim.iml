@@ -11,13 +11,17 @@
       <sourceFolder url="file://$MODULE_DIR$/LinkManager.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/LocalInterface.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Location.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/simulator/NetworkSim.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/simulator/NetworkWidget.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/simulator/NetworkSim.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/simulator/draw3d.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/simulator/simulator_main.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/simulator/NetworkSim.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/simulator/NetworkWidget.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/simulator/SimulatorInterface.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/simulator/ActionButton.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/simulator/ActionButton.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/simulator/draw3d.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/simulator/SimulatorInterface.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/simulator/SimulatorInterface.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Location.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Router.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/LocalInterface.cpp" isTestSource="false" />

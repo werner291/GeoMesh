@@ -6,110 +6,200 @@
 
 #include <iostream>
 
+
 #include "../constants.h"
 #include "../Router.h"
+#include "../Logger.h"
+#include "draw3d.h"
 
+double t = 0;
 int showConnections = 0;
+
+struct Vector3d {
+    double x, y, z;
+};
+
+Vector3d convertLocation(const Location &loc) {
+    return Vector3d {
+            cos(loc.lon * M_PI / 180) * cos(loc.lat * M_PI / 180),
+            sin(loc.lon * M_PI / 180) * cos(loc.lat * M_PI / 180),
+            sin(loc.lat * M_PI / 180)
+    };
+}
+
+Location interpolateLocation(const Location &a, const Location &b, float t) {
+
+    double aLon = a.lon;
+
+    if (a.lon > b.lon + 180) {
+        aLon -= 360;
+    }
+
+    return Location(a.lat * t + b.lat * (1 - t), aLon * t + b.lon * (1 - t));
+}
 
 void NetworkWidget::draw() {
 
-    fl_push_matrix();
+    t += 0.01;
 
-    fl_scale(0.9 + sin(showConnections /10.0)/20.0);
+    if (!valid()) initOpenGl();
 
-    fl_color(FL_WHITE);
-    fl_rectf(0, 0, w(), h());
+    glMatrixMode(GL_MODELVIEW);
 
-    fl_begin_line();
-    fl_color(FL_BLACK);
-    for(const Link& link : netSim.getLinks()) {
+    glLoadIdentity();
 
-        fl_vertex(link.a->getRouter()->getLocation().X, link.a->getRouter()->getLocation().Y);
-        fl_vertex(link.b->getRouter()->getLocation().X, link.b->getRouter()->getLocation().Y);
+    gluLookAt(cos(t / 5) * 2, sin(t / 5) * 2, 4, 0, 0, 0, 0, 0, 1);
+
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_LIGHT0);
+
+    float ambient[] = {0.1, 0.5, 0.5};
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+
+    glColor3f(1, 1, 1);
+
+    //glutSolidSphere(0.99,32,32);
+
+
+
+    glDisable(GL_LIGHTING);
+
+    glPointSize(20);
+
+    glBegin(GL_POINTS);
+
+    for (auto node : netSim.getNodes()) {
+        Vector3d nodePos = convertLocation(node->getLocation());
+
+        glVertex3d(nodePos.x, nodePos.y, nodePos.z);
+    }
+    glEnd();
+
+
+    for (const Link &link : netSim.getLinks()) {
+
+
+        const Location a = link.a->getRouter()->getLocation();
+        const Location b = link.b->getRouter()->getLocation();
+
+        drawLineBetweenLocations(a, b);
 
     }
-    fl_end_line();
-    for(const Link& link : netSim.getLinks()) {
-        for(const SimulatedPacket& packet : link.packetsOnLine) {
+
+
+    for (const Link &link : netSim.getLinks()) {
+        for (const SimulatedPacket &packet : link.packetsOnLine) {
             float t = packet.linkProgress / ((float) link.length + 0.01);
 
             if (packet.direction == SimulatedPacket::B) t = 1.f - t;
-            
-            double packetPosX = link.a->getRouter()->getLocation().X * t + link.b->getRouter()->getLocation().X * (1.f - t);
 
-            double packetPosY = link.a->getRouter()->getLocation().Y * t + link.b->getRouter()->getLocation().Y * (1.f - t);
+            Location intermediate = interpolateLocation(link.a->getRouter()->getLocation(),
+                                                        link.b->getRouter()->getLocation(), t);
 
-
-            if (getPacketData<int32_t >(MESSAGE_TYPE,packet.data) == MSGTYPE_PAYLOAD) {
-                double destinationX = getPacketData<double>(LOCATION_COORDINATE_X,packet.data);
-                double destinationY = getPacketData<double>(LOCATION_COORDINATE_Y,packet.data);
+            Vector3d packetPos = convertLocation(intermediate);
 
 
+            if (getPacketData<int32_t>(MESSAGE_TYPE, packet.data) == MSGTYPE_PAYLOAD) {
+                double destinationX = getPacketData<double>(LOCATION_COORDINATE_X, packet.data);
+                double destinationY = getPacketData<double>(LOCATION_COORDINATE_Y, packet.data);
 
-                if (getPacketData<int32_t >(ROUTING_MODE,packet.data) == ROUTING_GREEDY) {
-                    fl_color(FL_GREEN);
-                    fl_circle(packetPosX, packetPosY, 5);
+                if (getPacketData<int32_t>(ROUTING_MODE, packet.data) == ROUTING_GREEDY) {
+                    glColor3f(0.5, 1, 0.5);
+                    glBegin(GL_POINTS);
+                    glVertex3f(packetPos.x, packetPos.y, packetPos.z);
+                    glEnd();
                 } else {
-                    fl_color(FL_RED);
-                    fl_circle(packetPosX, packetPosY, 5);
-                    fl_color(fl_rgb_color(255,128,128));
-                    fl_color(FL_GRAY);
-                    fl_begin_line();
-                    fl_vertex(packetPosX,packetPosY);
-                    fl_vertex(destinationX,destinationY);
-                    fl_end_line();
-                    /*double faceStartX = getPacketData<double >(ROUTING_FACE_START_X,packet.data);
-                    double faceStartY = getPacketData<double >(ROUTING_FACE_START_Y,packet.data);
-                    fl_circle(destinationX,destinationY,sqrt((faceStartX-destinationX)*(faceStartX-destinationX)+(faceStartY-destinationY)*(faceStartY-destinationY)));
-                    fl_color(fl_rgb_color(128,128,255));
-                    fl_circle(destinationX,destinationY, getPacketData<double >(ROUTING_FACE_RANGE,packet.data));
-
-                    if (getPacketData<int32_t>(ROUTING_FACE_DIRECTION,packet.data) == FACE_ROUTE_RHL) {
-                        fl_draw("R",packetPosX,packetPosY+10);
-                    } else {
-                        fl_draw("L",packetPosX,packetPosY+10);
-                    }*/
+                    glColor3f(1, 0, 0);
+                    glBegin(GL_POINTS);
+                    glVertex3f(packetPos.x, packetPos.y, packetPos.z);
+                    glEnd();
                 }
-            } else if (getPacketData<int32_t >(MESSAGE_TYPE,packet.data) == MSGTYPE_PEERINFO) {
-                fl_color(fl_rgb_color(128,0,255));
-                fl_circle(packetPosX, packetPosY, 5);
+            } else if (getPacketData<int32_t>(MESSAGE_TYPE, packet.data) == MSGTYPE_PEERINFO) {
+                glColor3f(0.5, 0, 1);
+                glBegin(GL_POINTS);
+                glVertex3f(packetPos.x, packetPos.y, packetPos.z);
+                glEnd();
 
-                //fl_color(FL_BLUE);
-                //fl_line(packetPosX,packetPosY, getPacketData<double>(PEERINFO_ENTRY_LOCATION_X,packet.data),
-                //getPacketData<double>(PEERINFO_ENTRY_LOCATION_Y,packet.data));
+                double targetLon = getPacketData<double>(PEERINFO_LOCATION_LON, packet.data);
+                double targetLat = getPacketData<double>(PEERINFO_LOCATION_LAT, packet.data);
 
-                //fl_draw(std::to_string(getPacketData<int32_t >(PEERINFO_HOPS,packet.data)).c_str(),packetPosX-10,packetPosY+10);
-
-                //fl_draw(std::to_string(getPacketData<int32_t>(PEERINFO_HOPS,packet.data)).c_str(),packetPosX,packetPosY+10);
-                //fl_draw(std::to_string(getPacketData<double>(PEERINFO_ENTRY_LOCATION_X,packet.data)).c_str(),packetPosX,packetPosY+20);
-                //fl_draw(std::to_string(getPacketData<double>(PEERINFO_ENTRY_LOCATION_Y,packet.data)).c_str(),packetPosX,packetPosY+30);
+                glColor3f(0, 0, 1);
+                drawDirectLineBetweenLocations(intermediate, Location(targetLat, targetLon));
             }
         }
     }
 
-    fl_color(FL_BLACK);
 
-    fl_font(fl_font(), 15);
+    auto router = netSim.getNodes()[((showConnections++) / 25) % netSim.getNodes().size()];
 
-    for (const std::shared_ptr<Router> node : netSim.getNodes()) {
-        fl_circle(node->getLocation().X,node->getLocation().Y, 1);
-        fl_circle(node->getLocation().X,node->getLocation().Y, 3);
-        //fl_draw(node->getLocation().getDescription().c_str(),node->getLocation().X,node->getLocation().Y);
-        //fl_draw(std::to_string(node->getNumNeighbours()).c_str(),node->getLocation().X,node->getLocation().Y+10);
-        //fl_draw(std::to_string(node->getRoutingTable().size()).c_str(),node->getLocation().X,node->getLocation().Y+20);
-        //fl_circle(node->getLocation().X,node->getLocation().Y, 5);
-    }
+    glColor3f(0, 0, 1);
 
-    fl_color(FL_BLUE);
-
-    auto router = netSim.getNodes()[((showConnections++) / 5) % netSim.getNodes().size()];
-
-    fl_begin_line();
     for (auto itr = router->getRoutingTable().begin(); itr != router->getRoutingTable().end(); itr++) {
-        fl_vertex(router->getLocation().X, router->getLocation().Y);
-        fl_vertex(itr->target.X, itr->target.Y);
-    }
-    fl_end_line();
 
-    fl_pop_matrix();
+        drawDirectLineBetweenLocations(router->getLocation(), itr->target);
+    }
+
+    GLenum error = glGetError();
+
+    if (error != GL_NO_ERROR) {
+        Logger::log(LogLevel::ERROR, "OpenGL error: " + std::to_string(error));
+    }
+
+
 }
+
+void NetworkWidget::drawLineBetweenLocations(const Location &a, const Location &b) const {
+    return;
+    int steps = a.distanceTo(b) * 5 / EARTH_RAD;
+
+    glBegin(GL_LINE_STRIP);
+    for (int i = 0; i <= steps; i++) {
+        float t = i / (float) steps;
+
+        Location intermediate = interpolateLocation(a, b, t);
+
+        Vector3d pt = convertLocation(intermediate);
+
+        glVertex3d(pt.x, pt.y, pt.z);
+    }
+    glEnd();
+}
+
+void NetworkWidget::drawDirectLineBetweenLocations(const Location &a, const Location &b) const {
+
+    glBegin(GL_LINES);
+
+    Vector3d aPos = convertLocation(a);
+
+    glVertex3d(aPos.x, aPos.y, aPos.z);
+
+    Vector3d bPos = convertLocation(b);
+
+    glVertex3d(bPos.x, bPos.y, bPos.z);
+
+    glEnd();
+}
+
+void NetworkWidget::initOpenGl() {
+
+    configureViewport();
+
+
+}
+
+void NetworkWidget::configureViewport() {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glViewport(0, 0, w(), h());
+
+    float aspect = h() / w();
+
+    gluPerspective(40, aspect, 0.1, 50);
+}
+
