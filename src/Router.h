@@ -7,9 +7,9 @@
 
 #include "Location.h"
 #include "AbstractInterface.h"
-#include "constants.h"
 #include "LocalInterface.h"
 #include "LinkManager.h"
+#include "UniqueAddress.h"
 
 #include <set>
 #include <queue>
@@ -18,11 +18,13 @@ struct RoutingTableEntry {
     Location target;
     int iFaceID;
     int hops;
+
 };
 
 struct DirectionalEntry {
     int iFaceID;
     double heading;
+    Location loc;
 
     bool operator<(const DirectionalEntry& other) const {
         return this->heading < other.heading;
@@ -35,10 +37,12 @@ struct DirectionalEntry {
 
 class Router {
 
-    std::vector<char> uniqueaddress;
+    Address uniqueaddress;
 
 private:
-    Location mLocation;
+    Location mVirtualLocation;
+
+    Location mRealLocation;
 
     LocalInterface *localIface;
 
@@ -63,12 +67,13 @@ public:
         return linkMgr;
     }
 
-    const std::vector<char> &getAddress() {
+    const Address &getAddress() {
         return uniqueaddress;
     }
 
     // TODO make the allocation of the local interface and link manager a bit more elegant
-    Router(std::vector<char> uniqueaddress, Location location) : uniqueaddress(uniqueaddress), mLocation(location),
+    Router(Address uniqueaddress, Location location) : uniqueaddress(uniqueaddress), mVirtualLocation(location),
+                                                                 mRealLocation(location),
                                                                  localIface(new LocalInterface(this)),
                                                                  linkMgr(new LinkManager(this)) { };
 
@@ -79,8 +84,8 @@ public:
 
     bool handleMessage(std::shared_ptr<std::vector<char> > data, int fromIface);
 
-    const Location& getLocation() const {
-        return mLocation;
+    const Location&getVirtualLocation() const {
+        return mVirtualLocation;
     }
 
     const int getNumNeighbours() const {

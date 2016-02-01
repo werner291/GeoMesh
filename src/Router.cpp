@@ -5,11 +5,14 @@
 #include "Router.h"
 #include "Logger.h"
 
+#include "PacketFunctions.h"
+
 #include <iostream>
 #include <algorithm>
 #include <sstream>
 #include <math.h>
 #include "constants.h"
+
 
 bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIface) {
 
@@ -20,13 +23,9 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
     switch (messageType) {
 
         case MSGTYPE_PAYLOAD: {
-            Location destination(*(reinterpret_cast<double *>(data->data() + LOCATION_COORDINATE_Y)),
-                                 *(reinterpret_cast<double *>(data->data() +
-                                                              LOCATION_COORDINATE_X)));
+            Location destination = Location::readFromPacket(DESTINATION_LOCATION, data);
 
-            if (destination == mLocation) {
-                // Received packet. TODO use UID, don't assume locations are unique.
-
+            if (uniqueaddress.isDestinationOf(data)) {
                 localIface->dataReceived(data);
 
             } else {
@@ -113,10 +112,26 @@ bool Router::processRoutingSuggestion(int fromIface, const Location &peerLocatio
         int before = mFaceRoutingTable.size();
 
         DirectionalEntry entry{
-                fromIface, this->mLocation.getDirectionTo(peerLocation)
+                fromIface, this->mVirtualLocation.getDirectionTo(peerLocation), peerLocation
         };
 
         mFaceRoutingTable.insert(entry);
+
+        /*double totalWeight = 0;
+
+        for (const DirectionalEntry& entry : mFaceRoutingTable) {
+            totalWeight += 1 / (mRealLocation.distanceTo(entry.loc) + 0.0000001);
+        }
+
+        mVirtualLocation.lat = mRealLocation.lat * 0.5;
+        mVirtualLocation.lon = mRealLocation.lon * 0.5;
+
+        for (const DirectionalEntry& entry : mFaceRoutingTable) {
+            double weight = 1 / (mRealLocation.distanceTo(entry.loc) + 0.0000001);
+
+            mVirtualLocation.lat += (weight * entry.loc.lat / totalWeight) * 0.5;
+            mVirtualLocation.lon += (weight * entry.loc.lon / totalWeight) * 0.5;
+        }*/
 
     }
 
@@ -141,10 +156,10 @@ bool Router::processRoutingSuggestion(int fromIface, const Location &peerLocatio
             }
     }
 
-    double suggestionDistanceFromMe = mLocation.distanceTo(peerLocation);
+    double suggestionDistanceFromMe = mVirtualLocation.distanceTo(peerLocation);
 
     // Really need to improve this criterion, it even fails the equatorial ring scenario
-    if (closestRuleDistance > suggestionDistanceFromMe / 20) {
+    if (closestRuleDistance > suggestionDistanceFromMe / 5) {
         mGreedyRoutingTable.push_back(RoutingTableEntry {
                 peerLocation, fromIface, hops
         });
@@ -162,8 +177,8 @@ void Router::sendLocationInfo(int interface) {
     *reinterpret_cast<int32_t *>(messageBuffer->data() + PROTOCOL_VERSION_LOC) = PROTOCOL_VERSION;
     *reinterpret_cast<int32_t *>(messageBuffer->data() + MESSAGE_TYPE) = MSGTYPE_PEERINFO;
 
-    setPacketData<double>(PEERINFO_LOCATION_LON, messageBuffer, this->mLocation.lon);
-    setPacketData<double>(PEERINFO_LOCATION_LAT, messageBuffer, this->mLocation.lat);
+    setPacketData<double>(PEERINFO_LOCATION_LON, messageBuffer, this->mVirtualLocation.lon);
+    setPacketData<double>(PEERINFO_LOCATION_LAT, messageBuffer, this->mVirtualLocation.lat);
 
     setPacketData<int32_t>(PEERINFO_HOPS, messageBuffer, 1);
 
@@ -197,10 +212,9 @@ template <typename T> int sgn(T val) {
 
 bool Router::canSwitchFaceToGreedy(DataBufferPtr data, Location destination) {
 
-    double bestDistance = Location(getPacketData<double>(ROUTING_FACE_START_Y, data),
-                                   getPacketData<double>(ROUTING_FACE_START_X, data)).distanceTo(destination);
+    double bestDistance = getPacketData<float>(ROUTING_FACE_DISTANCE, data);
 
-    if (destination.distanceTo(mLocation) < bestDistance) return true;
+    if (destination.distanceTo(mVirtualLocation) < bestDistance) return true;
 
     for (auto itr = mGreedyRoutingTable.begin(); itr != mGreedyRoutingTable.end(); itr++) {
         if (destination.distanceTo(itr->target) < bestDistance) return true;
@@ -217,13 +231,12 @@ bool Router::routeFaceBegin(DataBufferPtr data, int fromIface, Location destinat
     int routing_start_direction = FACE_ROUTE_LHR;
 
     setPacketData<int32_t>(ROUTING_MODE, data, ROUTING_FACE);
-    setPacketData<int32_t>(ROUTING_FACE_DIRECTION, data, routing_start_direction);
-    setPacketData<double>(ROUTING_FACE_START_X, data, this->mLocation.lon);
-    setPacketData<double>(ROUTING_FACE_START_Y, data, this->mLocation.lat);
-    setPacketData<double>(ROUTING_FACE_RANGE, data, mLocation.distanceTo(destination) * FACE_ROUTING_RANGE_MULTIPLIER);
+    setPacketFaceRoutingDirection(data, routing_start_direction);
+    setPacketFaceRoutingClosestDistance(data, mVirtualLocation.distanceTo(destination));
+    setPacketFaceRoutingSearchRange(data, mVirtualLocation.distanceTo(destination) * FACE_ROUTING_RANGE_MULTIPLIER);
 
     // Direction in trigonometric space of the vector from the current node to the destination
-    double directionToDestination = mLocation.getDirectionTo(destination);
+    double directionToDestination = mVirtualLocation.getDirectionTo(destination);
 
     if (mFaceRoutingTable.size() == 1) { // Just send it back.
         return linkMgr->sendPacket(data, fromIface);
@@ -244,7 +257,7 @@ bool Router::routeFaceBegin(DataBufferPtr data, int fromIface, Location destinat
             }
 
             if (foundRange) {
-                return linkMgr->sendPacket(data, routing_start_direction != FACE_ROUTE_RHL ? before->iFaceID
+                return linkMgr->sendPacket(data, routing_start_direction != FACE_ROUTE_RHR ? before->iFaceID
                                                                                            : after->iFaceID);
             }
 
@@ -265,7 +278,7 @@ bool Router::routeFaceBegin(DataBufferPtr data, int fromIface, Location destinat
 
 int Router::getGreedyInterface(int fromInterface, const Location &destination) {
     auto bestCandidate = mGreedyRoutingTable.end();
-    double bestDistance = mLocation.distanceTo(destination);
+    double bestDistance = mVirtualLocation.distanceTo(destination);
 
     for (auto itr = mGreedyRoutingTable.begin(); itr != mGreedyRoutingTable.end(); itr++) {
         double distance = itr->target.distanceTo(destination);
@@ -285,16 +298,18 @@ int Router::getGreedyInterface(int fromInterface, const Location &destination) {
 
 bool Router::routeFaceRelay(DataBufferPtr data, int fromIface, Location destination) {
 
-    double distanceFromTarget = mLocation.distanceTo(destination);
+    double distanceFromTarget = mVirtualLocation.distanceTo(destination);
 
-    double searchRange = getPacketData<double>(ROUTING_FACE_RANGE, data);
+    double searchRange = getPacketFaceRoutingSearchRange(data);
+
+    int faceDirection = getPacketFaceDirection(data);
 
     if (distanceFromTarget > searchRange) {
 
-        setPacketData<double>(ROUTING_FACE_RANGE, data, searchRange * FACE_ROUTING_RANGE_MULTIPLIER);
+        setPacketFaceRoutingSearchRange(data, searchRange * FACE_ROUTING_RANGE_MULTIPLIER);
 
-        setPacketData<int32_t>(ROUTING_FACE_DIRECTION, data,
-                              getPacketData<int32_t>(ROUTING_FACE_DIRECTION, data) == FACE_ROUTE_RHL ? FACE_ROUTE_LHR : FACE_ROUTE_RHL);
+
+        setPacketFaceRoutingDirection(data, faceDirection == FACE_ROUTE_RHR ? FACE_ROUTE_LHR : FACE_ROUTE_RHR);
 
         return linkMgr->sendPacket(data, fromIface);
 
@@ -307,10 +322,8 @@ bool Router::routeFaceRelay(DataBufferPtr data, int fromIface, Location destinat
             return false; // Drop.
         }
 
-        int DIRECTION = getPacketData<int32_t>(ROUTING_FACE_DIRECTION, data);
-
         // Neighbours are sorted counter-clickwise. Right-hand routing thus means selecting a previous neigbour
-        if (DIRECTION == FACE_ROUTE_RHL) {
+        if (faceDirection == FACE_ROUTE_RHR) {
             itr++;
             if (itr == mFaceRoutingTable.end()) itr = mFaceRoutingTable.begin();
         } else {

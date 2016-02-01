@@ -13,10 +13,12 @@ NetworkWidget* nw;
 NetworkSim* simulator;
 
 int canSend;
+int sendTotal;
+int sendDelay;
 
 void update(void*) {
 
-    float simulation_speed = 0.1f;
+    float simulation_speed = 1.f;
 
     simulator->updateSimulation((1000.f*simulation_speed/60.f));
 
@@ -25,28 +27,39 @@ void update(void*) {
 
     std::uniform_int_distribution<int> displacement(0, simulator->getNodes().size()-1);
 
-    int node1 = displacement(rgen);
-    int node2 = displacement(rgen);
+
 
     std::string message = "Hello!";
 
-    if (canSend <= 0) {
-        simulator->sendMessage(message, node1, node2);
-        canSend = 10;
-    } else {
-        canSend--;
+    if (sendDelay-- <= 0) {
+        if (sendTotal-- > 0) {
+            if (canSend <= 0) {
+                int node1 = displacement(rgen);
+                int node2 = displacement(rgen);
+                simulator->sendMessage(message, node1, node2);
+
+                canSend = 0;
+            } else {
+                canSend--;
+            }
+        }
     }
 
     nw->redraw();
 
-    Fl::repeat_timeout(1/60.f, update);
+    Fl::repeat_timeout(1/10.f, update);
 }
 
 int main(int argc, char **argv) {
 
+    sendTotal = 500;
+    sendDelay = 150;
+
     simulator = new NetworkSim();
 
-    simulator->createLongitudinalGridNetwork(15, 0);
+    //simulator->createLongitudinalGridNetwork(100, 12);
+
+    simulator->networkFromOSM("/Users/werner/Ontwikkeling/C++/MeshnetSim/testdata/Eindhoven.osm");
 
     std::unique_ptr< Fl_Window > window(new Fl_Window(1100, 900));
 

@@ -1,0 +1,1 @@
+osmfilter --keep="highway=motorway =trunk =primary =secondary =tertiary =unclassified =residential" --drop-relations --drop-version /Users/werner/Downloads/map > /Users/werner/Ontwikkeling/C++/MeshnetSim/testdata/Eindhoven.osm

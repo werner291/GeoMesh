@@ -37,6 +37,9 @@ class NetworkSim {
     std::mt19937 rgen;
     std::uniform_int_distribution<char> addrgen;
 
+    int packetsSent = 0;
+    int packetsReceived = 0;
+
 public:
     float getScale() const {
         return scale;
@@ -77,6 +80,8 @@ private:
 
     //void createRelayHubNetwork(int numNodes, int fieldSizeX, int fieldSizeY);
 
+    void handlePacketArrival();
+
 public:
 
     bool createLongitudinalGridNetwork(int nodesPerRing, int rings);
@@ -92,6 +97,9 @@ public:
     std::shared_ptr<Router> newNodeAt(double posX, double posY);
 
     void createConcentricNetwork(int xMax, int yMax, int rings, int ringSize);
+
+    void networkFromOSM(std::string xmlFilePath);
+
 };
 
 
