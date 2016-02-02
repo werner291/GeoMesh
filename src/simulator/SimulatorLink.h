@@ -9,7 +9,7 @@
 #include <queue>
 #include "../AbstractInterface.h"
 
-class SimulatorInterface : public AbstractInterface {
+class SimulatorLink : public AbstractInterface {
 
 public:
     Router *getRouter() const {
@@ -23,7 +23,7 @@ private:
 
 public:
 
-    SimulatorInterface(Router* router) : router(router){
+    SimulatorLink(Router *router) : router(router) {
     }
 
     virtual bool sendData(std::shared_ptr<std::vector<char> > data);

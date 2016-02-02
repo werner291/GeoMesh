@@ -2,11 +2,11 @@
 // Created by Werner Kroneman on 22-01-16.
 //
 
-#include "SimulatorInterface.h"
+#include "SimulatorLink.h"
 
 int AbstractInterface::nextIfaceID = 1; // Not 0 since that's reserved. Need to use a proper interface manager.
 
-bool SimulatorInterface::sendData(std::shared_ptr<std::vector<char> > data) {
+bool SimulatorLink::sendData(std::shared_ptr<std::vector<char> > data) {
 
     // Create a copy, or we get the really wierd situation where opdating the number of
     // hops on one router will change all copies of the packet, even those in transit!
@@ -15,13 +15,13 @@ bool SimulatorInterface::sendData(std::shared_ptr<std::vector<char> > data) {
     return true;
 }
 
-std::shared_ptr<std::vector<char> > SimulatorInterface::pullNextInSendQueue() {
+std::shared_ptr<std::vector<char> > SimulatorLink::pullNextInSendQueue() {
 
     std::shared_ptr<std::vector<char> > data = sendQueue.front();
     sendQueue.pop();
     return data;
 }
 
-bool SimulatorInterface::hasNextInSendQueue() {
+bool SimulatorLink::hasNextInSendQueue() {
     return sendQueue.size() != 0;
 }

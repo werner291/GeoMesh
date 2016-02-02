@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <memory>
-#include "SimulatorInterface.h"
+#include "SimulatorLink.h"
 #include <random>
 
 class NetworkWidget;
@@ -23,10 +23,10 @@ struct SimulatedPacket {
 
 struct Link {
 
-    Link(std::shared_ptr<SimulatorInterface> a, std::shared_ptr<SimulatorInterface> b) : a(a), b(b) {}
+    Link(std::shared_ptr<SimulatorLink> a, std::shared_ptr<SimulatorLink> b) : a(a), b(b) { }
 
-    std::shared_ptr<SimulatorInterface> a;
-    std::shared_ptr<SimulatorInterface> b;
+    std::shared_ptr<SimulatorLink> a;
+    std::shared_ptr<SimulatorLink> b;
     std::vector<SimulatedPacket> packetsOnLine;
     time_t length;
 };

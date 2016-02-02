@@ -4,46 +4,72 @@
 
 #include "UDPInterface.h"
 
+#include <sys/socket.h>
+#include <fcntl.h>
+#include <errno.h>
+#include "../Logger.h"
+
 UDPInterface::UDPInterface() {
 
+    socketID = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
+    sockaddr_in sin;
 
+    sin.sin_family = AF_INET;
+    sin.sin_addr.s_addr = htonl(INADDR_ANY);
+    sin.sin_port = 0;
 
+    bind(socketID, (struct sockaddr *) &sin, sizeof(sin));
+
+    /* Now bound, get the address */
+    socklen_t slen = sizeof(sin);
+    getsockname(socketID, (struct sockaddr *) &sin, &slen);
+
+    mLocalUDPport = ntohs(sin.sin_port);
+    // Enable non-blocking IO.
+    int flags = fcntl(socketID, F_GETFL, 0);
+    fcntl(socketID, F_SETFL, flags | O_NONBLOCK);
 
 }
 
-void connect(std::string address, int port) {
-    int testSocket;
-    unsigned int counter;
-    struct sockaddr_in destAddr;
-    int errorCode;
-    int returnVal;
+void UDPInterface::pollMessages() {
 
-    counter = 0;
-    returnVal = 0;
+    int nbytes = recvfrom(socketID, mReceptionBuffer, MAX_PACKET_SIZE - IPv6_START, 0, NULL, NULL);
 
-/* Specify the address family */
-    destAddr.sin_family = AF_INET;
-/* Specify the destination port */
-    destAddr.sin_port = htons(TM_DEST_PORT);
-/* Specify the destination IP address */
-    destAddr.sin_addr.s_addr = inet_addr(TM_DEST_ADDR);
+    if (nbytes > 0) {
 
-/* Create a socket */
-    testSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+        DataBufferPtr packet(new std::vector<char>(nbytes));
 
-/*
- * Verify the socket was created correctly. If not, return
- * immediately
- */
-    if (testSocket == TM_SOCKET_ERROR)
-    {
-        returnVal = tfGetSocketError(testSocket);
-        errorStr = tfStrError(returnVal);
-        goto udpClientEnd;
+        memcpy(packet->data(), mReceptionBuffer, nbytes);
+
+        dataArrivedCallback(packet, iFaceID);
+
+    } else if (nbytes == 0) {
+        // do nothing
+    } else {
+        int err = errno;
+
+        if (!(err == EWOULDBLOCK || err == EAGAIN)) {
+            Logger::log(LogLevel::ERROR,
+                        "UDPInterface: receive error: " + std::string(strerror(err)));
+        }
+        // Elseo there was nothing to be read, do nothing
     }
+
 }
 
-void pollMessages() {
+bool UDPInterface::sendData(DataBufferPtr data) {
 
+    int result = sendto(socketID,
+                        data->data(),
+                        data->size(),
+                        0,
+                        (struct sockaddr *) &peerAddress,
+                        sizeof(peerAddress));
+
+    if (result != 0) {
+        Logger::log(LogLevel::ERROR, "UDPInterface: error while sending.");
+    }
+
+    return result == 0;
 }

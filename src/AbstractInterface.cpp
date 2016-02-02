@@ -3,3 +3,9 @@
 //
 
 #include "AbstractInterface.h"
+
+int AbstractInterface::nextIfaceID = 0;
+
+AbstractInterface::AbstractInterface() : iFaceID(nextIfaceID++) {
+
+}

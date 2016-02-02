@@ -28,13 +28,11 @@ protected:
     int iFaceID;
 
 public:
-    int getIFaceID() const {
+    int getInterfaceId() const {
         return iFaceID;
     }
 
-    AbstractInterface() : iFaceID(nextIfaceID++) {
-
-    }
+    AbstractInterface();
 
     virtual bool sendData(DataBufferPtr data) = 0;
 

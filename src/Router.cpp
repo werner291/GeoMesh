@@ -30,7 +30,7 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
 
             } else {
 
-                int hopsLeft = getPacketData<int32_t>(TTL, data);
+                int hopsLeft = getPacketData<unsigned char>(TTL, data);
 
                 if (hopsLeft <= 0) {
                     std::stringstream message;
@@ -90,8 +90,8 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
                 setPacketData<int32_t>(PEERINFO_HOPS, data, hops + 1);
 
                 for (auto neighbour : linkMgr->mInterfaces) {
-                    if (neighbour.second->getIFaceID() != fromIface)
-                        linkMgr->sendPacket(data, neighbour.second->getIFaceID());
+                    if (neighbour.second->getInterfaceId() != fromIface)
+                        linkMgr->sendPacket(data, neighbour.second->getInterfaceId());
                 }
 
             }

@@ -22,7 +22,7 @@ void NetworkSim::updateSimulation(long timeDeltaMilliseconds) {
 
             if (itr->linkProgress > link.length) {
 
-                std::shared_ptr<SimulatorInterface> router = (itr->direction == SimulatedPacket::A ? link.a : link.b);
+                std::shared_ptr<SimulatorLink> router = (itr->direction == SimulatedPacket::A ? link.a : link.b);
 
                 router->handlePacketArrival(itr->data);
 
@@ -88,8 +88,8 @@ void NetworkSim::clearNetwork() {
 }
 
 void NetworkSim::linkRouters(std::shared_ptr<Router> &a, std::shared_ptr<Router> &b) {
-    Link lnk(std::__1::make_shared<SimulatorInterface>(a.get()),
-             std::__1::make_shared<SimulatorInterface>(b.get()));
+    Link lnk(std::__1::make_shared<SimulatorLink>(a.get()),
+             std::__1::make_shared<SimulatorLink>(b.get()));
 
     lnk.a->getRouter()->getLinkManager()->connectInterface(lnk.a);
     lnk.b->getRouter()->getLinkManager()->connectInterface(lnk.b);

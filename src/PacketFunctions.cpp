@@ -42,6 +42,6 @@ float getPacketFaceRoutingClosestDistance(DataBufferPtr data, double distance) {
     return getPacketData<float>(ROUTING_FACE_DISTANCE, data);
 }
 
-float getPacketFaceRoutingSearchRange(DataBufferPtr data, double distance) {
+float getPacketFaceRoutingSearchRange(DataBufferPtr data) {
     return getPacketData<float>(ROUTING_FACE_RANGE, data);
 }

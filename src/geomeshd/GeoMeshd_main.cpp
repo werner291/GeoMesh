@@ -10,30 +10,33 @@
 
 using namespace std;
 
-#include "TunnelInterface_Apple.h"
+#include "TunnelDeliveryInterface_Apple.h"
 
+#include "../UniqueAddress.h"
 
-#if defined(__GLIBC__) && __GLIBC__ >=2 && __GLIBC_MINOR__ >= 1
-#include <netpacket/packet.h>
-#include <net/ethernet.h>
-#else
-#include <sys/types.h>
-#include <netinet/if_ether.h>
-#endif
+#include "../Logger.h"
 
-#include "UniqueAddress.h"
+#include "UDPManager.h"
 
-#include "Logger.h"
-
+#include "../Router.h"
 
 
 int main(int argc, char **argv) {
 
     Router* routerCore = new Router(Address::generateRandom(), Location(0,0));
 
-    TunnelInterface_Apple* tunIface = new TunnelInterface_Apple();
+    TunnelDeliveryInterface_Apple *tunIface = new TunnelDeliveryInterface_Apple(routerCore->getLocalIface(),
+                                                                                routerCore->getAddress());
 
-    UDPConnectionManager* udpMan = new UDPConnectionManager(routerCore->getLinkManager());
+    tunIface->startTunnelInterface();
 
+    UDPManager *udpMan = new UDPManager(routerCore->getLinkManager());
+
+    while (1) {
+        udpMan->pollMessages();
+        tunIface->pollMessages();
+
+        usleep(10000); // Sleep 0.01 seconds
+    }
 
 }

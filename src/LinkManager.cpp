@@ -19,11 +19,11 @@ bool LinkManager::sendPacket(const DataBufferPtr &data, int iFace) {
 
 void LinkManager::connectInterface(std::shared_ptr<AbstractInterface> iFace) {
 
-    mInterfaces.insert(std::make_pair(iFace->getIFaceID(), iFace));
+    mInterfaces.insert(std::make_pair(iFace->getInterfaceId(), iFace));
     iFace->setDataReceivedCallback(std::bind(&Router::handleMessage, // Ugly...
                                              router, std::placeholders::_1, std::placeholders::_2));
 
-    router->sendLocationInfo(iFace->getIFaceID()); // Maybe the router should decide what should be done?
+    router->sendLocationInfo(iFace->getInterfaceId()); // Maybe the router should decide what should be done?
 }
 
 void LinkManager::broadcastMessage(const DataBufferPtr &data) {

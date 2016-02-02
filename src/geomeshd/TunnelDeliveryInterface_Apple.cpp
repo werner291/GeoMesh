@@ -9,19 +9,22 @@
 #include <sys/ioctl.h>
 #include <sys/un.h>
 #include <regex>
-#include "TunnelInterface_Apple.h"
+#include <errno.h>
+#include "TunnelDeliveryInterface_Apple.h"
 #include "../Logger.h"
 
 #define UTUN_CONTROL_NAME "com.apple.net.utun_control"
 #define UTUN_OPT_IFNAME 2
 
 
-
-TunnelInterface_Apple::TunnelInterface_Apple(std::weak_ptr<LocalInterface> localInterface) : mLocalInterface(localInterface) {
-     localInterface.lock()->setDataReceivedHandler(std::bind(&TunnelInterface_Apple::deliverIPv6Packet, this, std::placeholders::_1));
+TunnelDeliveryInterface_Apple::TunnelDeliveryInterface_Apple(LocalInterface *localInterface,
+                                                             const Address &iFaceAddress)
+        : mLocalInterface(localInterface), iFaceAddress(iFaceAddress) {
+    localInterface->setDataReceivedHandler(
+            std::bind(&TunnelDeliveryInterface_Apple::deliverIPv6Packet, this, std::placeholders::_1));
 }
 
-void TunnelInterface_Apple::startTunnelInterface() {
+void TunnelDeliveryInterface_Apple::startTunnelInterface() {
 
     mSocketId = socket(PF_SYSTEM, SOCK_DGRAM, SYSPROTO_CONTROL);
 
@@ -40,7 +43,7 @@ void TunnelInterface_Apple::startTunnelInterface() {
         Logger::log(LogLevel::ERROR, "getting utun device id " + std::string(strerror(errno)));
     }
 
-    struct sockaddr_ctl addr;
+
 
     addr.sc_id = info.ctl_id;
 
@@ -55,7 +58,7 @@ void TunnelInterface_Apple::startTunnelInterface() {
         Logger::log(LogLevel::ERROR, "connecting to utun device" + std::string(strerror(err)));
     }
 
-    int maxNameSize = 512; // TODO too arbitrary
+    int maxNameSize = TUNInterface_IFNAMSIZ;
 
     /* retrieve the assigned utun interface name */
     if (getsockopt(mSocketId, SYSPROTO_CONTROL, UTUN_OPT_IFNAME,
@@ -72,6 +75,14 @@ void TunnelInterface_Apple::startTunnelInterface() {
     int flags = fcntl(mSocketId, F_GETFL, 0);
     fcntl(mSocketId, F_SETFL, flags | O_NONBLOCK);
 
+    int n = MAX_PACKET_SIZE * 5;
+    if (setsockopt(mSocketId, SOL_SOCKET, SO_SNDBUF, &n, sizeof(n)) == -1) {
+        int err = errno;
+        Logger::log(LogLevel::ERROR, "Error setting buffer size!" + std::string(strerror(err)));
+        close(mSocketId);
+    }
+
+    assignIP();
 
 }
 
@@ -81,7 +92,7 @@ void TunnelInterface_Apple::startTunnelInterface() {
  * Used a system() call to ifconfig. I was drowning in obscure compiler errors while trying to do it the proper ioctl() way.
  * If anyone reading this feels courageous... IMHO this works just fine
  */
-void TunnelInterface_Apple::assignIP(char *iFaceName, const Address& addr) {
+void TunnelDeliveryInterface_Apple::assignIP() {
 
     std::regex utunReg("utun[0-9]+");
 
@@ -98,8 +109,8 @@ void TunnelInterface_Apple::assignIP(char *iFaceName, const Address& addr) {
     for (int i = 0; i+1 < ADDRESS_LENGTH_OCTETS; i += 2) {
 
         if (i != 0) command << ":";
-
-        command << (unsigned int) addr.bytes[i] << (unsigned int) addr.bytes[i+1];
+        // TODO enable leading 0's
+        command << (unsigned int) iFaceAddress.bytes[i] << (unsigned int) iFaceAddress.bytes[i + 1];
 
     }
 
@@ -110,24 +121,60 @@ void TunnelInterface_Apple::assignIP(char *iFaceName, const Address& addr) {
     system(command.str().c_str());
 }
 
-void TunnelInterface_Apple::deliverIPv6Packet(DataBufferPtr packet) {
+void TunnelDeliveryInterface_Apple::deliverIPv6Packet(DataBufferPtr packet) {
+
+    // I should create a Packet class...
+    // Clear 4 octets of memory at the from of the buffer by shifting everything to the right
+    packet->resize(packet->size() + 4);
+    memmove(packet->data() + 4, packet->data(), 4);
+
+
+    ((uint16_t *) packet->data())[0] = htons(0);            // Always 0
+    ((uint16_t *) packet->data())[1] = htons(AF_INET6);   // Set to AF_INET6 so it is handled by the Internet stack.
+
+    // Send to the local system.
+    int result = send(mSocketId,
+                      packet->data(),
+                      packet->size(),
+                      0);
+    //(struct sockaddr*) &addr,
+    //sizeof(addr));
+
+    if (result == -1) {
+        int err = errno;
+        Logger::log(LogLevel::ERROR,
+                    "TunnelDeliveryInterface_Apple: error while sending: " + std::string(strerror(err)));
+    }
 
 }
 
 
-void TunnelInterface_Apple::pollSocket() {
+void TunnelDeliveryInterface_Apple::pollMessages() {
 
-    int nbytes = recvfrom(mSocketId, mReceptionBuffer, MAX_PACKET_SIZE - IPv6_START, 0, NULL, NULL);
+    int nbytes = recvfrom(mSocketId, mReceptionBuffer, MAX_PACKET_SIZE - IPv6_START - 4, O_NONBLOCK, NULL, NULL);
 
     if (nbytes > 0) {
 
-        mLocalInterface.lock()->sendIPv6Message(mReceptionBuffer+2, nbytes - 2);
+        int aftype = ntohs(((uint16_t *) mReceptionBuffer)[1]);
+
+        if (aftype == AF_INET6) {
+            mLocalInterface->sendIPv6Message(mReceptionBuffer + 4, nbytes - 4);
+        } else {
+            Logger::log(LogLevel::ERROR,
+                        "TunnelDeliveryInterface_Apple: invalid aftype: " + std::to_string(aftype));
+        }
+
 
     } else if (nbytes == 0) {
-
+        // do nothing
     } else {
         int err = errno;
-        Logger::log(LogLevel::WARN, "Error when receiving packet " + std::string(strerror(err)));
+
+        if (!(err == EWOULDBLOCK || err == EAGAIN)) {
+            Logger::log(LogLevel::ERROR,
+                        "TunnelDeliveryInterface_Apple: receive error: " + std::string(strerror(err)));
+        }
+        // Elseo there was nothing to be read, do nothing
     }
 
 

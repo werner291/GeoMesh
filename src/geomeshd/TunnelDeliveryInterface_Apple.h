@@ -6,21 +6,29 @@
 #define GEOMESH_TUNNELINTERFACE_H
 
 #include <memory>
+#include <sys/kern_control.h>
 #include "../LocalInterface.h"
 
 // No need for aome #IF APPLE since this include file is already only used on Apple
 #define TUNInterface_IFNAMSIZ 16
 
-class TunnelInterface_Apple {
+class TunnelDeliveryInterface_Apple {
 
-    std::weak_ptr<LocalInterface> mLocalInterface;
+    LocalInterface *mLocalInterface;
+    struct sockaddr_ctl addr;
 
     char mReceptionBuffer[MAX_PACKET_SIZE - IPv6_START];
 
     char iFaceName[TUNInterface_IFNAMSIZ];
     int mSocketId;
 
-    TunnelInterface_Apple(std::weak_ptr<LocalInterface> localInterface);
+    Address iFaceAddress;
+
+    void assignIP();
+
+public:
+
+    TunnelDeliveryInterface_Apple(LocalInterface *localInterface, const Address &iFaceAddress);
 
     void startTunnelInterface();
 
@@ -28,7 +36,7 @@ class TunnelInterface_Apple {
 
     void pollMessages();
 
-    void assignIP(char *iFaceName, const Address& addr);
+
 };
 
 
