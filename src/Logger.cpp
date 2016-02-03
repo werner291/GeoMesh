@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <ctime>
 #include "Logger.h"
 
 void Logger::log(LogLevel level, std::string message) {
