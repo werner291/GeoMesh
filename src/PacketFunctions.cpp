@@ -5,6 +5,7 @@
 #include <assert.h>
 #include "PacketFunctions.h"
 #include "constants.h"
+#include <limits.h>
 
 const int FACE_ROUTE_DIRECTION_BITMASK = 128;
 
