@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <sstream>
+#include <limits.h>
 #include "UDPManager.h"
 #include "../Logger.h"
 
