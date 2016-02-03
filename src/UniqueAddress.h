@@ -6,6 +6,7 @@
 #define GEOMESH_UNIQUEADDRESS_H
 
 #include <random>
+#include <cstring>
 #include <netinet/in.h>
 #include "constants.h"
 
