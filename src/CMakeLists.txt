@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.0)
 project(MeshnetSim)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -27,8 +27,16 @@ TARGET_LINK_LIBRARIES(Simulator core ${FLTK_LIBRARY} ${FLTK_LIBRARY_GL} ${LIBRAR
 
 FIND_LIBRARY(LIBRARY_asio boost_asio)
 
-set(DAEMON_SRC geomeshd/GeoMeshd_main.cpp geomeshd/TunnelDeliveryInterface_Apple.cpp geomeshd/UDPInterface.cpp
-        geomeshd/UDPManager.cpp)
+set(DAEMON_SRC geomeshd/GeoMeshd_main.cpp geomeshd/UDPInterface.cpp geomeshd/UDPManager.cpp)
+
+IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(DAEMON_SRC ${DAEMON_SRC} geomeshd/TunnelDeliveryInterface_Apple.cpp)
+ENDIF ()
+
+IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    set(DAEMON_SRC ${DAEMON_SRC} geomeshd/TunnelDeliveryInterface_Linux.cpp)
+ENDIF ()
+
 add_executable(geomeshd ${DAEMON_SRC})
 
 TARGET_LINK_LIBRARIES(geomeshd core)# LIBRARY_asio)

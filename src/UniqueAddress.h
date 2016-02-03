@@ -29,6 +29,8 @@ struct Address {
 
     static Address generateRandom();
 
+    static Address fromString(std::string str);
+
     void writeToSocketAddress(struct sockaddr_in6& socketAddress) const;
 };
 

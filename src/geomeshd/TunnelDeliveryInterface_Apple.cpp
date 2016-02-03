@@ -12,6 +12,8 @@
 #include <errno.h>
 #include "TunnelDeliveryInterface_Apple.h"
 #include "../Logger.h"
+#include <iostream>
+#include <iomanip>
 
 #define UTUN_CONTROL_NAME "com.apple.net.utun_control"
 #define UTUN_OPT_IFNAME 2
@@ -104,13 +106,13 @@ void TunnelDeliveryInterface_Apple::assignIP() {
 
     std::stringstream command;
 
-    command << "ifconfig " << iFaceName << " inet6 add " << std::hex;
+    command << "ifconfig " << iFaceName << " inet6 add " << std::hex << std::setfill('0');
 
     for (int i = 0; i+1 < ADDRESS_LENGTH_OCTETS; i += 2) {
 
         if (i != 0) command << ":";
         // TODO enable leading 0's
-        command << (unsigned int) iFaceAddress.bytes[i] << (unsigned int) iFaceAddress.bytes[i + 1];
+        command << std::setw(2) << (unsigned int) iFaceAddress.bytes[i]  << std::setw(2) << (unsigned int) iFaceAddress.bytes[i + 1];
 
     }
 

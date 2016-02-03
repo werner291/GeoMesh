@@ -13,6 +13,14 @@
 UDPManager::UDPManager(LinkManager *linkMgr) : linkMgr(linkMgr) {
     socketID = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
+    sockaddr_in sin;
+
+    sin.sin_family = AF_INET;
+    sin.sin_addr.s_addr = htonl(INADDR_ANY);
+    sin.sin_port = 10976;
+
+    bind(socketID, (struct sockaddr *) &sin, sizeof(sin));
+
     // Enable non-blocking IO.
     int flags = fcntl(socketID, F_GETFL, 0);
     fcntl(socketID, F_SETFL, flags | O_NONBLOCK);
@@ -43,6 +51,8 @@ void UDPManager::connectTo(std::string address, int port) {
            0,
            (struct sockaddr *) &destAddr,
            sizeof(destAddr));
+
+    Logger::log(LogLevel::INFO, "Peering request sent.");
 
 }
 
@@ -86,6 +96,8 @@ void UDPManager::pollMessages() {
                    (struct sockaddr *) &sender, // Return to sender
                    sizeof(sender));
 
+            Logger::log(LogLevel::INFO, "Received peering request, opened link on UDP port " + std::to_string(newIface->getLocalPort()));
+
             // This is a response to a hello message we sent previously
         } else if (strncmp(buffer, "GeoMesh_UDP_Bridge_Established", strlen("GeoMesh_UDP_Bridge_Hello")) == 0) {
 
@@ -107,6 +119,8 @@ void UDPManager::pollMessages() {
                     break;
                 }
             }
+
+            Logger::log(LogLevel::INFO, "Peering request confirmed.");
         } else {
             Logger::log(LogLevel::WARN, "Received invalid message: " + std::string(buffer));
         }

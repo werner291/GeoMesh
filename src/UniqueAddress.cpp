@@ -3,6 +3,7 @@
 //
 
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include "UniqueAddress.h"
 
 std::random_device rdev;
@@ -17,6 +18,17 @@ Address Address::generateRandom() { // TODO use keypair for generating addresses
 
     for (int i=1; i<ADDRESS_LENGTH_OCTETS;i++)
         blank.bytes[i] = addrgen(rgen);
+
+    return blank;
+}
+
+Address Address::fromString(std::string str) {
+    struct in6_addr ipv6data;
+    inet_pton(AF_INET6, str.c_str(), &ipv6data);
+
+    Address blank;
+
+    std::memcpy(blank.bytes, ipv6data.s6_addr, ADDRESS_LENGTH_OCTETS);
 
     return blank;
 }
