@@ -6,6 +6,7 @@
 #define MESHNETSIM_CONSTANTS_H
 
 #include <vector>
+#include <memory>
 
 typedef std::shared_ptr<std::vector<char> > DataBufferPtr;
 
