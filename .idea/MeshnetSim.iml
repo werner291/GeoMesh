@@ -15,25 +15,14 @@
       <sourceFolder url="file://$MODULE_DIR$/src/geomeshd/UDPInterface.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/geomeshd/UDPManager.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/geomeshd/UDPManager.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/Logger.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/PacketFunctions.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/AbstractInterface.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/PacketFunctions.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Logger.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/LinkManager.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/LocalInterface.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Location.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/UniqueAddress.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Location.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simulator/NetworkSim.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simulator/NetworkWidget.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simulator/NetworkSim.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simulator/draw3d.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simulator/simulator_main.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simulator/SimulatorLink.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simulator/SimulatorLink.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simulator/NetworkWidget.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simulator/ActionButton.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simulator/draw3d.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/simulator/ActionButton.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/Location.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Router.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/LocalInterface.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/AbstractInterface.cpp" isTestSource="false" />
@@ -144,15 +133,15 @@
           <root url="file:///System/Library/Frameworks/CoreAudio.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/HIToolbox.framework/Headers" />
+          <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/Help.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/Print.framework/Headers" />
-          <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/SecurityHI.framework/Headers" />
+          <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/SpeechRecognition.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/NavigationServices.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/CommonPanels.framework/Headers" />
-          <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/Help.framework/Headers" />
+          <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/SecurityHI.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/OpenScripting.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/CarbonSound.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/Ink.framework/Headers" />
-          <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/SpeechRecognition.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/ImageCapture.framework/Headers" />
           <root url="file:///System/Library/Frameworks/AppKit.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Cocoa.framework/Headers" />
@@ -316,15 +305,15 @@
           <root url="file:///System/Library/Frameworks/CoreAudio.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/HIToolbox.framework/Headers" />
+          <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/Help.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/Print.framework/Headers" />
-          <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/SecurityHI.framework/Headers" />
+          <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/SpeechRecognition.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/NavigationServices.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/CommonPanels.framework/Headers" />
-          <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/Help.framework/Headers" />
+          <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/SecurityHI.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/OpenScripting.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/CarbonSound.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/Ink.framework/Headers" />
-          <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/SpeechRecognition.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Carbon.framework/Frameworks/ImageCapture.framework/Headers" />
           <root url="file:///System/Library/Frameworks/AppKit.framework/Headers" />
           <root url="file:///System/Library/Frameworks/Cocoa.framework/Headers" />
