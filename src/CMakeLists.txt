@@ -7,8 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 include_directories(/opt/local/include)
 
 set(CORE_SRC AbstractInterface.cpp Router.cpp Location.cpp Logger.cpp LinkManager.cpp LocalInterface.cpp
-        UniqueAddress.cpp geomeshd/TunnelDeliveryInterface_Apple.cpp
-        PacketFunctions.cpp geomeshd/UDPManager.cpp)
+        UniqueAddress.cpp PacketFunctions.cpp geomeshd/UDPManager.cpp)
 add_library(core ${CORE_SRC})
 
 IF (BUILD_SIMULATOR)
