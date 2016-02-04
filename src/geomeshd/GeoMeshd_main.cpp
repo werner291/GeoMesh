@@ -10,7 +10,12 @@
 
 using namespace std;
 
+#ifdef __linux__
+#include "TunnelDeliveryInterface_Linux.h"
+#endif
+#ifdef __APPLE__
 #include "TunnelDeliveryInterface_Apple.h"
+#endif
 
 #include "../UniqueAddress.h"
 
@@ -43,7 +48,7 @@ int main(int argc, char **argv) {
     TunnelDeliveryInterface_Apple *tunIface = new TunnelDeliveryInterface_Apple(routerCore->getLocalIface(),
                                                                                 routerCore->getAddress());
 #endif
-#ifdef LINUX
+#ifdef __linux__
     TunnelDeliveryInterface_Linux *tunIface = new TunnelDeliveryInterface_Linux(routerCore->getLocalIface(),
                                                                                 routerCore->getAddress());
 #endif

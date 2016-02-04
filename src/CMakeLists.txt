@@ -22,6 +22,9 @@ IF (BUILD_SIMULATOR)
 
     add_executable(Simulator ${SIM_SRC})
     TARGET_LINK_LIBRARIES(Simulator core ${FLTK_LIBRARY} ${FLTK_LIBRARY_GL} ${LIBRARY_OpenGL} ${LIBRARY_glu} ${LIBRARY_glut})
+
+    set_property(TARGET Simulator PROPERTY CXX_STANDARD 11)
+    set_property(TARGET Simulator PROPERTY CXX_STANDARD_REQUIRED ON)
 ENDIF ()
 
 
@@ -36,6 +39,9 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 ENDIF ()
 
 add_executable(geomeshd ${DAEMON_SRC})
+
+set_property(TARGET geomeshd PROPERTY CXX_STANDARD 11)
+set_property(TARGET geomeshd PROPERTY CXX_STANDARD_REQUIRED ON)
 
 TARGET_LINK_LIBRARIES(geomeshd core)# LIBRARY_asio)
 
