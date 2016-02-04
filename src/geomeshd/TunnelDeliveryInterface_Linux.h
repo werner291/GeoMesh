@@ -5,6 +5,9 @@
 #ifndef GEOMESH_TUNNELDELIVERYINTERFACE_LINUX_H
 #define GEOMESH_TUNNELDELIVERYINTERFACE_LINUX_H
 
+#include "LocalInterface.h"
+#include "PacketFunctions.h"
+#include "constants.h"
 
 #define TUNInterface_IFNAMSIZ 16
 
