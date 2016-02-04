@@ -35,7 +35,7 @@ Address Address::fromString(std::string str) {
 
 void Address::writeToSocketAddress(struct sockaddr_in6& socketAddress) const {
 
-    std::memcpy(&socketAddress.sin6_addr.__u6_addr.__u6_addr8, bytes, ADDRESS_LENGTH_OCTETS);
+    std::memcpy(&socketAddress.sin6_addr.s6_addr, bytes, ADDRESS_LENGTH_OCTETS);
 
 
 

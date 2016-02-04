@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <sstream>
 #include <limits.h>
+#include <string.h>
 #include "UDPManager.h"
 #include "../Logger.h"
 
