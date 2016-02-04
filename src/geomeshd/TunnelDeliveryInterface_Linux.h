@@ -11,10 +11,9 @@
 
 #define TUNInterface_IFNAMSIZ 16
 
-class TunnelDeliveryInterface_Apple {
+class TunnelDeliveryInterface_Linux {
 
     LocalInterface *mLocalInterface;
-    struct sockaddr_ctl addr;
 
     char mReceptionBuffer[MAX_PACKET_SIZE - IPv6_START];
 
