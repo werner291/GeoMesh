@@ -1,14 +1,14 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1)
 project(MeshnetSim)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-
 
 include_directories(/opt/local/include)
 
 set(CORE_SRC AbstractInterface.cpp Router.cpp Location.cpp Logger.cpp LinkManager.cpp LocalInterface.cpp
         UniqueAddress.cpp PacketFunctions.cpp geomeshd/UDPManager.cpp)
 add_library(core ${CORE_SRC})
+
+set_property(TARGET core PROPERTY CXX_STANDARD 11)
+set_property(TARGET core PROPERTY CXX_STANDARD_REQUIRED ON)
 
 IF (BUILD_SIMULATOR)
     FIND_LIBRARY(FLTK_LIBRARY_GL fltk_gl /opt/local/lib)
