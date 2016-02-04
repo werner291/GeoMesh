@@ -42,7 +42,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
     // Create a temporary INET6 socket
     if ((s = socket(AF_INET6, SOCK_DGRAM, 0)) < 0) {
-        Except_throw(eh, "socket() [%s]", strerror(errno));
+        Logger::log(LogLevel::ERROR, "Error creating temporary Inet6 socket: " + std::string(strerror(errno)));
     }
 
     // Copy the iface name into the request
@@ -52,7 +52,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     if (ioctl(s, SIOCGIFINDEX, ifRequestOut) < 0) {
         int err = errno;
         close(s);
-        Except_throw(eh, "ioctl(SIOCGIFINDEX) [%s]", strerror(err));
+        Logger::log(LogLevel::ERROR, "Error SIOCGIFINDEX: " + std::string(strerror(errno)));
     }
     int ifIndex = ifRequest.ifr_ifindex;
 
@@ -61,7 +61,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     if (ioctl(socket, SIOCSIFFLAGS, ifRequest) < 0) {
         int err = errno;
         close(socket);
-        Except_throw(eh, "ioctl(SIOCSIFFLAGS) [%s]", strerror(err));
+        Logger::log(LogLevel::ERROR, "Error SIOCSIFFLAGS: " + std::string(strerror(errno)));
     }
 
 
