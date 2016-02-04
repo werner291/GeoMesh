@@ -7,7 +7,10 @@
 
 #include "../AbstractInterface.h"
 #include "../constants.h"
+#include "UDPInterface.h"
 #include <netinet/in.h>
+#include <string>
+#include <string.h>
 
 class UDPInterface : public AbstractInterface {
 

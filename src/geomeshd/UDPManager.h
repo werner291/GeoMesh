@@ -8,6 +8,7 @@
 #include "../LinkManager.h"
 #include "UDPInterface.h"
 #include <string>
+#include <string.h>
 
 class UDPManager {
 

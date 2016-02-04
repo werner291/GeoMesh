@@ -4,6 +4,8 @@
 
 #include "TunnelDeliveryInterface_Linux.h"
 
+#include "../Logger.h"
+
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
 
