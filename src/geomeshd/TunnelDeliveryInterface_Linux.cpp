@@ -6,6 +6,9 @@
 
 #include "../Logger.h"
 
+#include <sys/ioctl.h>
+#include <net/if.h>
+
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
 
