@@ -56,7 +56,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     }
 
     // Copy the iface name into the request
-    strncpy(ifRequest->ifr_name, iFaceName, IFNAMSIZ);
+    strncpy(ifRequest.ifr_name, iFaceName, IFNAMSIZ);
 
     // Fetch the iface index
     if (ioctl(s, SIOCGIFINDEX, ifRequest) < 0) {
