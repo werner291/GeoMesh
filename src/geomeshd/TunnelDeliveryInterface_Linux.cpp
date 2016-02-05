@@ -8,6 +8,9 @@
 
 #include <sys/ioctl.h>
 #include <net/if.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
