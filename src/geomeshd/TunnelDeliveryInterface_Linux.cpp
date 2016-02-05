@@ -48,7 +48,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     int s;
     struct ifreq ifRequest;
     // Set ifRequestOut to all 0
-    memset(ifRequest, 0, sizeof(struct ifreq));
+    memset(&ifRequest, 0, sizeof(struct ifreq));
 
     // Create a temporary INET6 socket
     if ((s = socket(AF_INET6, SOCK_DGRAM, 0)) < 0) {
@@ -56,10 +56,10 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     }
 
     // Copy the iface name into the request
-    strncpy(ifRequestOut->ifr_name, iFaceName, IFNAMSIZ);
+    strncpy(ifRequest->ifr_name, iFaceName, IFNAMSIZ);
 
     // Fetch the iface index
-    if (ioctl(s, SIOCGIFINDEX, ifRequestOut) < 0) {
+    if (ioctl(s, SIOCGIFINDEX, ifRequest) < 0) {
         int err = errno;
         close(s);
         Logger::log(LogLevel::ERROR, "Error SIOCGIFINDEX: " + std::string(strerror(errno)));
