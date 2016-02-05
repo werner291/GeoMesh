@@ -68,9 +68,9 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
     // Set interface up and running
     ifRequest.ifr_flags |= IFF_UP | IFF_RUNNING;
-    if (ioctl(socket, SIOCSIFFLAGS, ifRequest) < 0) {
+    if (ioctl(s, SIOCSIFFLAGS, ifRequest) < 0) {
         int err = errno;
-        close(socket);
+        close(s);
         Logger::log(LogLevel::ERROR, "Error SIOCSIFFLAGS: " + std::string(strerror(errno)));
     }
 
