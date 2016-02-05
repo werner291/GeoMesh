@@ -7,6 +7,7 @@
 #include <string>
 #include <algorithm>
 #include <regex>
+#include <unistd.h>
 
 using namespace std;
 
