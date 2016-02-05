@@ -11,6 +11,7 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
