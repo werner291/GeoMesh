@@ -7,6 +7,7 @@
 #include "../Logger.h"
 
 #include <linux/if_tun.h>
+#include <linux/ipv6.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <sys/types.h>
