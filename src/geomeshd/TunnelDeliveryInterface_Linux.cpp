@@ -6,11 +6,13 @@
 
 #include "../Logger.h"
 
+#include <linux/if_tun.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
