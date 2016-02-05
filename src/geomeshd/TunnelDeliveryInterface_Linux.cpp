@@ -8,7 +8,7 @@
 
 #include <linux/if.h>
 #include <linux/if_tun.h>
-#include <linux/ioctl.h>
+#include <sys/ioctl.h>
 #include <fcntl.h>
 
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
