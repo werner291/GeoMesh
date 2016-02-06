@@ -26,7 +26,7 @@ TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *loc
         : mLocalInterface(localInterface), iFaceAddress(iFaceAddress) {
 
     localInterface->setDataReceivedHandler(
-            std::bind(&TunnelDeliveryInterface_Apple::deliverIPv6Packet, this, std::placeholders::_1));
+            std::bind(&TunnelDeliveryInterface_Linux::deliverIPv6Packet, this, std::placeholders::_1));
 }
 
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
