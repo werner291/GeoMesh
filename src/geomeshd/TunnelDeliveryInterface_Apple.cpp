@@ -14,9 +14,11 @@
 #include "../Logger.h"
 #include <iostream>
 #include <iomanip>
+#include "UnixSocketsFunctions.h"
 
 #define UTUN_CONTROL_NAME "com.apple.net.utun_control"
 #define UTUN_OPT_IFNAME 2
+
 
 
 TunnelDeliveryInterface_Apple::TunnelDeliveryInterface_Apple(LocalInterface *localInterface,
@@ -153,31 +155,10 @@ void TunnelDeliveryInterface_Apple::deliverIPv6Packet(DataBufferPtr packet) {
 
 void TunnelDeliveryInterface_Apple::pollMessages() {
 
-    int nbytes = recvfrom(mSocketId, mReceptionBuffer, MAX_PACKET_SIZE - IPv6_START - 4, O_NONBLOCK, NULL, NULL);
+    int received = receiveMessage(mReceptionBuffer, MAX_PACKET_SIZE);
 
-    if (nbytes > 0) {
-
-        int aftype = ntohs(((uint16_t *) mReceptionBuffer)[1]);
-
-        if (aftype == AF_INET6) {
-            mLocalInterface->sendIPv6Message(mReceptionBuffer + 4, nbytes - 4);
-        } else {
-            Logger::log(LogLevel::ERROR,
-                        "TunnelDeliveryInterface_Apple: invalid aftype: " + std::to_string(aftype));
-        }
-
-
-    } else if (nbytes == 0) {
-        // do nothing
-    } else {
-        int err = errno;
-
-        if (!(err == EWOULDBLOCK || err == EAGAIN)) {
-            Logger::log(LogLevel::ERROR,
-                        "TunnelDeliveryInterface_Apple: receive error: " + std::string(strerror(err)));
-        }
-        // Elseo there was nothing to be read, do nothing
+    if (received > 0) {
+        mLocalInterface->sendIPv6Message(mReceptionBuffer + 4, nbytes - 4);
     }
-
 
 }

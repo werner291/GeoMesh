@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "UnixSocketsFunctions.h"
 
 // Define this here due to a duplicate definition when including ipv6.h
 struct in6_ifreq {
@@ -19,6 +20,17 @@ struct in6_ifreq {
          __u32           ifr6_prefixlen;
          int             ifr6_ifindex; 
 };
+
+TunnelDeliveryInterface_Apple_Linux::TunnelDeliveryInterface_Apple(LocalInterface
+*localInterface,
+const Address &iFaceAddress
+)
+:
+
+mLocalInterface(localInterface), iFaceAddress(iFaceAddress) {
+    localInterface->setDataReceivedHandler(
+            std::bind(&TunnelDeliveryInterface_Apple::deliverIPv6Packet, this, std::placeholders::_1));
+}
 
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
@@ -97,5 +109,15 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
     close(s);
 
+
+}
+
+void TunnelDeliveryInterface_Linux::pollMessages() {
+
+    int received = receiveMessage(mReceptionBuffer, MAX_PACKET_SIZE);
+
+    if (received > 0) {
+        mLocalInterface->sendIPv6Message(mReceptionBuffer + 4, nbytes - 4);
+    }
 
 }
