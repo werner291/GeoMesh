@@ -37,9 +37,8 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     char *clonedev = "/dev/net/tun";
 
     /* open the clone device */
-    if ((fd = open(clonedev, O_RDWR)) < 0) {
-        int error = errno;
-        Logger::log(LogLevel::ERROR, "getting tun device id " + std::string(strerror(error)));
+    if (err = (fd = open(clonedev, O_RDWR)) < 0) {
+        Logger::log(LogLevel::ERROR, "Error opening clone device. " + std::string(strerror(err)));
     }
 
     /* preparation of the struct ifr, of type "struct ifreq" */
@@ -50,8 +49,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     /* try to create the device */
     if ((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
-        int error = errno;
-        Logger::log(LogLevel::ERROR, "getting tun device id " + std::string(strerror(error)));
+        Logger::log(LogLevel::ERROR, "getting tun device id " + std::string(strerror(err)));
         close(fd);
     }
 
@@ -65,11 +63,12 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 void TunnelDeliveryInterface_Linux::assignIP() {
 
     int s;
+    int err;
     struct ifreq ifRequest = {0};
 
     // Create a temporary INET6 socket
-    if ((s = socket(AF_INET6, SOCK_DGRAM, 0)) < 0) {
-        Logger::log(LogLevel::ERROR, "Error creating temporary Inet6 socket: " + std::string(strerror(errno)));
+    if (err = (s = socket(AF_INET6, SOCK_DGRAM, 0)) < 0) {
+        Logger::log(LogLevel::ERROR, "Error creating temporary Inet6 socket: " + std::string(strerror(err)));
     }
 
     // Copy the iface name into the request
@@ -78,10 +77,10 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     printf(ifRequest.ifr_name);
 
     // Fetch the iface index
-    if (ioctl(s, SIOCGIFINDEX, ifRequest) < 0) {
+    if (err = ioctl(s, SIOCGIFINDEX, ifRequest) < 0) {
         int err = errno;
         close(s);
-        Logger::log(LogLevel::ERROR, "Error SIOCGIFINDEX: " + std::string(strerror(errno)));
+        Logger::log(LogLevel::ERROR, "Error SIOCGIFINDEX: " + std::string(strerror(err)));
     }
     int ifIndex = ifRequest.ifr_ifindex;
 
@@ -89,10 +88,10 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
     // Set interface up and running
     ifRequest.ifr_flags |= IFF_UP | IFF_RUNNING;
-    if (ioctl(s, SIOCSIFFLAGS, ifRequest) < 0) {
+    if (err = ioctl(s, SIOCSIFFLAGS, ifRequest) < 0) {
         int err = errno;
         close(s);
-        Logger::log(LogLevel::ERROR, "Error SIOCSIFFLAGS: " + std::string(strerror(errno)));
+        Logger::log(LogLevel::ERROR, "Error SIOCSIFFLAGS: " + std::string(strerror(err)));
     }
 
 
@@ -104,10 +103,10 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
     memcpy(&(ifr6.ifr6_addr), iFaceAddress.bytes, 16);
 
-    if (ioctl(s, SIOCSIFADDR, &ifr6) < 0) {
+    if (err = ioctl(s, SIOCSIFADDR, &ifr6) < 0) {
         int err = errno;
         close(s);
-        Logger::log(LogLevel::ERROR, "Error SIOCSIFADDR: " + std::string(strerror(errno)));
+        Logger::log(LogLevel::ERROR, "Error SIOCSIFADDR: " + std::string(strerror(err)));
     }
 
     close(s);
