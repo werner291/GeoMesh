@@ -54,7 +54,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     Logger::log(LogLevel::INFO, "Allocated interface " + std::string(iFaceName));
 
-    //assignIP();
+    assignIP();
 };
 
 void TunnelDeliveryInterface_Linux::assignIP() {
@@ -69,7 +69,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     }
 
     // Copy the iface name into the request
-    strncpy(ifRequest.ifr_name, iFaceName, IFNAMSIZ);
+    strncpy(ifRequest.ifr_name, "tun0", IFNAMSIZ);
 
     Logger::log(LogLevel::ERROR, "Tun interface name: " + std::string(ifRequest.ifr_name));
 
