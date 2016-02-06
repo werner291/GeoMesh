@@ -42,42 +42,30 @@ TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *loc
 
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
-    struct ifreq ifr = {0};
 
-    Logger::log(LogLevel::DEBUG, "Tun : " + std::to_string(fd));
-    /* open the clone device */
+    struct ifreq ifr;
+    int err;
+
     if ((fd = open("/dev/net/tun", O_RDWR)) < 0) {
-        Logger::log(LogLevel::ERROR, "Error opening clone device: " + std::string(strerror(errno)));
-    }
-    Logger::log(LogLevel::DEBUG, "Tun : " + std::to_string(fd));
-
-
-    // This is a TUN device
-    ifr.ifr_flags = IFF_TUN;
-
-    if (iFaceName) {
-        strncpy(ifr.ifr_name, iFaceName, TUNInterface_IFNAMSIZ);
+        perror("Opening /dev/net/tun");
+        return fd;
     }
 
-    /* try to create the device */
-    if (ioctl(fd, TUNSETIFF, (void *) &ifr) < 0) {
-        Logger::log(LogLevel::ERROR, "Error creating tun device " + std::string(strerror(errno)));
+    memset(&ifr, 0, sizeof(ifr));
+
+    ifr.ifr_flags = flags;
+
+    if (*iFaceName) {
+        strncpy(ifr.ifr_name, dev, IFNAMSIZ);
+    }
+
+    if ((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
+        perror("ioctl(TUNSETIFF)");
         close(fd);
+        return err;
     }
-
-    Logger::log(LogLevel::DEBUG, "Tun : " + std::to_string(fd));
 
     strcpy(iFaceName, ifr.ifr_name);
-
-    Logger::log(LogLevel::INFO, "Allocated interface " + std::string(iFaceName));
-
-    char buffer[1500];
-
-    if (recv(fd, buffer, 1500, O_NONBLOCK) < 0) {
-        Logger::log(LogLevel::ERROR, "Error creating tun device " + std::string(strerror(errno)));
-    }
-
-    Logger::log(LogLevel::INFO, "Allocated interface " + std::string(iFaceName));
 
     //assignIP();
 };
