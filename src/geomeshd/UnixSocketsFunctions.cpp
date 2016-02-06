@@ -34,7 +34,7 @@ int receiveMessage(int sock, char *buffer, size_t buffSize) {
 
         if (!(err == EWOULDBLOCK || err == EAGAIN)) {
             Logger::log(LogLevel::ERROR,
-                        "receiveMessage: receive error: " + std::string(strerror(err)));
+                        "ReceiveMessage: receive error: " + std::string(strerror(err)));
         }
         // Else there was nothing to be read, do nothing
     }
