@@ -31,7 +31,7 @@ TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *loc
 
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
-    struct ifreq ifr = 0;
+    struct ifreq ifr = {0};
 
     /* open the clone device */
     if ((fd = open("/dev/net/tun", O_RDWR)) < 0) {
