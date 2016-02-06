@@ -75,7 +75,9 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     // Copy the iface name into the request
     strncpy(ifRequest.ifr_name, iFaceName, IFNAMSIZ);
 
-    printf(ifRequest.ifr_name);
+    Logger::log(LogLevel::ERROR, "Tun interface name: " + std::string(ifRequest.ifr_name));
+
+
 
     // Fetch the iface index
     if (err = ioctl(s, SIOCGIFINDEX, ifRequest) < 0) {
