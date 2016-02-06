@@ -31,15 +31,12 @@ TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *loc
 
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
-    struct ifreq ifr;
+    struct ifreq ifr = 0;
 
     /* open the clone device */
     if ((fd = open("/dev/net/tun", O_RDWR)) < 0) {
         Logger::log(LogLevel::ERROR, "Error opening clone device: " + std::string(strerror(errno)));
     }
-
-    /* preparation of the struct ifr, of type "struct ifreq" */
-    memset(&ifr, 0, sizeof(ifr));
 
     // This is a TUN device
     ifr.ifr_flags = IFF_TUN;
