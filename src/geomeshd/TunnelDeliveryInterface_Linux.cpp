@@ -71,6 +71,14 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     Logger::log(LogLevel::INFO, "Allocated interface " + std::string(iFaceName));
 
+    char buffer[1500];
+
+    if (read(fd, buffer, 1500) < 0) {
+        Logger::log(LogLevel::ERROR, "Error creating tun device " + std::string(strerror(errno)));
+    }
+
+
+
     //assignIP();
 };
 
