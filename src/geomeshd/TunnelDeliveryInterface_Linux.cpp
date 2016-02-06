@@ -37,8 +37,9 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     char *clonedev = "/dev/net/tun";
 
     /* open the clone device */
-    if (err = (fd = open(clonedev, O_RDWR)) < 0) {
-        Logger::log(LogLevel::ERROR, "Error opening clone device. " + std::string(strerror(err)));
+    if ((fd = open(clonedev, O_RDWR)) < 0) {
+        int error = errno;
+        Logger::log(LogLevel::ERROR, "Error opening clone device. " + std::string(strerror(error)));
     }
 
     /* preparation of the struct ifr, of type "struct ifreq" */
