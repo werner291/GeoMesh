@@ -5,6 +5,8 @@
 #include <sys/socket.h>
 #include <sys/fcntl.h>
 #include <sys/errno.h>
+#include <string.h>
+#include <arpa/inet.h>
 #include "UnixSocketsFunctions.h"
 #include "../constants.h"
 #include "../Logger.h"
