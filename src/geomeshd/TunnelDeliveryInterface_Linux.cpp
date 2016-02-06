@@ -49,7 +49,6 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     if ((fd = open("/dev/net/tun", O_RDWR)) < 0) {
         perror("Opening /dev/net/tun");
-        return fd;
     }
 
     memset(&ifr, 0, sizeof(ifr));
@@ -63,7 +62,6 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     if ((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
         perror("ioctl(TUNSETIFF)");
         close(fd);
-        return err;
     }
 
     strcpy(iFaceName, ifr.ifr_name);
