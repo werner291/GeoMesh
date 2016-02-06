@@ -25,7 +25,14 @@ TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *loc
                                                              const Address &iFaceAddress)
         : mLocalInterface(localInterface), iFaceAddress(iFaceAddress), fd(-1) {
 
-    iFaceName = "tunGeo";
+    iFaceName[0] = 't';
+    iFaceName[1] = 'u';
+    iFaceName[2] = 'n';
+    iFaceName[3] = 'G';
+    iFaceName[4] = 'e';
+    iFaceName[5] = 'o';
+    iFaceName[6] = 0;
+
 
     //memset(iFaceName, 0, TUNInterface_IFNAMSIZ);
 
@@ -44,6 +51,10 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     // This is a TUN device
     ifr.ifr_flags = IFF_TUN;
+
+    if (iFaceName) {
+        strncpy(ifr.ifr_name, iFaceName, TUNInterface_IFNAMSIZ);
+    }
 
     /* try to create the device */
     if (ioctl(fd, TUNSETIFF, (void *) &ifr) < 0) {
