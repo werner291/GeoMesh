@@ -65,27 +65,12 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 void TunnelDeliveryInterface_Linux::assignIP() {
 
     int s;
+    struct ifreq ifRequest = {0};
 
     // Create a temporary INET6 socket
     if ((s = socket(AF_INET6, SOCK_DGRAM, 0)) < 0) {
         Logger::log(LogLevel::ERROR, "Error creating temporary Inet6 socket: " + std::string(strerror(errno)));
     }
-
-    // The address setting
-    struct in6_ifreq ifr6 = {0};
-
-    ifr6.ifr6_ifindex = ifIndex;
-    ifr6.ifr6_prefixlen = 128; // Geomesh uses the full address length. (TODO check whether this is actually such a bright idea)
-
-    memcpy(&(ifr6.ifr6_addr), iFaceAddress.bytes, 16);
-
-    if (ioctl(s, SIOCSIFADDR, &ifr6) < 0) {
-        int err = errno;
-        close(s);
-        Logger::log(LogLevel::ERROR, "Error SIOCSIFADDR: " + std::string(strerror(errno)));
-    }
-
-    struct ifreq ifRequest = {0};
 
     // Copy the iface name into the request
     strncpy(ifRequest.ifr_name, iFaceName, IFNAMSIZ);
@@ -109,7 +94,19 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     }
 
 
+    // The address setting
+    struct in6_ifreq ifr6 = {0};
 
+    ifr6.ifr6_ifindex = ifIndex;
+    ifr6.ifr6_prefixlen = 128; // Geomesh uses the full address length. (TODO check whether this is actually such a bright idea)
+
+    memcpy(&(ifr6.ifr6_addr), iFaceAddress.bytes, 16);
+
+    if (ioctl(s, SIOCSIFADDR, &ifr6) < 0) {
+        int err = errno;
+        close(s);
+        Logger::log(LogLevel::ERROR, "Error SIOCSIFADDR: " + std::string(strerror(errno)));
+    }
 
     close(s);
 
