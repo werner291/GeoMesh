@@ -85,8 +85,6 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
     Logger::log(LogLevel::ERROR, "Tun interface name: " + std::string(ifRequest.ifr_name));
 
-
-
     // Fetch the iface index
     if (ioctl(s, SIOCGIFINDEX, ifRequest) < 0) {
         close(s);
