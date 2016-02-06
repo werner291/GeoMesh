@@ -85,6 +85,8 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     }
     int ifIndex = ifRequest.ifr_ifindex;
 
+    printf("ifIndex %i", ifIndex);
+
     // Set interface up and running
     ifRequest.ifr_flags |= IFF_UP | IFF_RUNNING;
     if (ioctl(s, SIOCSIFFLAGS, ifRequest) < 0) {
