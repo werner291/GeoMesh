@@ -41,7 +41,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     /* preparation of the struct ifr, of type "struct ifreq" */
     memset(&ifr, 0, sizeof(ifr));
 
-    // This is a TUN device, and we're sending proper IP packets (so no 4 extra packets).
+    // This is a TUN device
     ifr.ifr_flags = IFF_TUN;
 
     /* try to create the device */
@@ -53,8 +53,6 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     strcpy(iFaceName, ifr.ifr_name);
 
     Logger::log(LogLevel::INFO, "Allocated interface " + std::string(iFaceName));
-
-    printf("Sock int: %i", fd);
 
     //assignIP();
 };
@@ -71,7 +69,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     }
 
     // Copy the iface name into the request
-    strncpy(ifRequest.ifr_name, iFaceName, IFNAMSIZ);
+    strncpy(ifRequest.ifr_name, "tun0", IFNAMSIZ);
 
     Logger::log(LogLevel::ERROR, "Tun interface name: " + std::string(ifRequest.ifr_name));
 
@@ -115,8 +113,6 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 }
 
 void TunnelDeliveryInterface_Linux::pollMessages() {
-
-    printf("Sock int: %i", fd);
 
     int received = receiveMessage(fd, mReceptionBuffer, MAX_PACKET_SIZE);
 
