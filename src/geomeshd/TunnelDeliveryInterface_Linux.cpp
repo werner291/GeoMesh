@@ -73,11 +73,11 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     char buffer[1500];
 
-    if (read(fd, buffer, 1500) < 0) {
+    if (recv(fd, buffer, 1500, O_NONBLOCK) < 0) {
         Logger::log(LogLevel::ERROR, "Error creating tun device " + std::string(strerror(errno)));
     }
 
-
+    Logger::log(LogLevel::INFO, "Allocated interface " + std::string(iFaceName));
 
     //assignIP();
 };
