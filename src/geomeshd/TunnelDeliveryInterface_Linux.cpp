@@ -58,6 +58,8 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     strcpy(iFaceName, ifr.ifr_name);
 
     Logger::log(LogLevel::INFO, "Allocated interface " + std::string(iFaceName));
+
+    assignIP();
 };
 
 void TunnelDeliveryInterface_Linux::assignIP() {
