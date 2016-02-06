@@ -118,7 +118,7 @@ void TunnelDeliveryInterface_Linux::pollMessages() {
 
     printf("Sock int: %i", fd);
 
-    int received = -1;//receiveMessage(fd, mReceptionBuffer, MAX_PACKET_SIZE);
+    int received = receiveMessage(fd, mReceptionBuffer, MAX_PACKET_SIZE);
 
     if (received > 0) {
         mLocalInterface->sendIPv6Message(mReceptionBuffer + 4, received - 4);
