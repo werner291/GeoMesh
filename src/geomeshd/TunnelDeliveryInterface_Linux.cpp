@@ -120,3 +120,30 @@ void TunnelDeliveryInterface_Linux::pollMessages() {
 
 
 }
+
+void TunnelDeliveryInterface_Linux::deliverIPv6Packet(DataBufferPtr packet) {
+
+    // I should create a Packet class...
+    // Clear 4 octets of memory at the from of the buffer by shifting everything to the right
+    packet->resize(packet->size() + 4);
+    memmove(packet->data() + 4, packet->data(), 4);
+
+
+    ((uint16_t *) packet->data())[0] = htons(0);            // Always 0
+    ((uint16_t *) packet->data())[1] = htons(AF_INET6);   // Set to AF_INET6 so it is handled by the Internet stack.
+
+    // Send to the local system.
+    int result = send(fd,
+                      packet->data(),
+                      packet->size(),
+                      0);
+    //(struct sockaddr*) &addr,
+    //sizeof(addr));
+
+    if (result == -1) {
+        int err = errno;
+        Logger::log(LogLevel::ERROR,
+                    "TunnelDeliveryInterface_Apple: error while sending: " + std::string(strerror(err)));
+    }
+
+}
