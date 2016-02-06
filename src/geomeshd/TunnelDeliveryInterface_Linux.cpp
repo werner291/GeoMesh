@@ -129,7 +129,7 @@ void TunnelDeliveryInterface_Linux::pollMessages() {
 
 void TunnelDeliveryInterface_Linux::deliverIPv6Packet(DataBufferPtr packet) {
 
-    printf("Sock int: %i", fd);
+    //printf("Sock int: %i", fd);
 
     // I should create a Packet class...
     // Clear 4 octets of memory at the from of the buffer by shifting everything to the right
