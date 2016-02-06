@@ -33,7 +33,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
 
     struct ifreq ifr;
-    int fd, err;
+    int err;
     char *clonedev = "/dev/net/tun";
 
     /* open the clone device */
@@ -112,7 +112,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
 void TunnelDeliveryInterface_Linux::pollMessages() {
 
-    int received = receiveMessage(mSocketId, mReceptionBuffer, MAX_PACKET_SIZE);
+    int received = receiveMessage(fd, mReceptionBuffer, MAX_PACKET_SIZE);
 
     if (received > 0) {
         mLocalInterface->sendIPv6Message(mReceptionBuffer + 4, received - 4);
