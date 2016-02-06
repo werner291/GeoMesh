@@ -45,6 +45,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     struct ifreq ifr;
     int err;
+    int flags = IFF_TUN;
 
     if ((fd = open("/dev/net/tun", O_RDWR)) < 0) {
         perror("Opening /dev/net/tun");
@@ -56,7 +57,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     ifr.ifr_flags = flags;
 
     if (*iFaceName) {
-        strncpy(ifr.ifr_name, dev, IFNAMSIZ);
+        strncpy(ifr.ifr_name, iFaceName, IFNAMSIZ);
     }
 
     if ((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
