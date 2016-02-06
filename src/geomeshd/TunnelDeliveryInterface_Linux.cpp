@@ -116,6 +116,8 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
 void TunnelDeliveryInterface_Linux::pollMessages() {
 
+    printf("Sock int: %i", fd);
+
     int received = receiveMessage(fd, mReceptionBuffer, MAX_PACKET_SIZE);
 
     if (received > 0) {
