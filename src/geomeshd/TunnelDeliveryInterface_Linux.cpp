@@ -31,15 +31,11 @@ TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *loc
 
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
-
     struct ifreq ifr;
-    int err;
-    char *clonedev = "/dev/net/tun";
 
     /* open the clone device */
-    if ((fd = open(clonedev, O_RDWR)) < 0) {
-        int error = errno;
-        Logger::log(LogLevel::ERROR, "Error opening clone device. " + std::string(strerror(error)));
+    if ((fd = open("/dev/net/tun", O_RDWR)) < 0) {
+        Logger::log(LogLevel::ERROR, "Error opening clone device: " + std::string(strerror(errno)));
     }
 
     /* preparation of the struct ifr, of type "struct ifreq" */
@@ -49,8 +45,8 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     ifr.ifr_flags = IFF_TUN;
 
     /* try to create the device */
-    if ((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
-        Logger::log(LogLevel::ERROR, "getting tun device id " + std::string(strerror(err)));
+    if (ioctl(fd, TUNSETIFF, (void *) &ifr) < 0) {
+        Logger::log(LogLevel::ERROR, "Error creating tun device " + std::string(strerror(errno)));
         close(fd);
     }
 
@@ -58,7 +54,9 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     Logger::log(LogLevel::INFO, "Allocated interface " + std::string(iFaceName));
 
-    assignIP();
+    printf("Sock int: %i", fd);
+
+    //assignIP();
 };
 
 void TunnelDeliveryInterface_Linux::assignIP() {
@@ -80,11 +78,9 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
 
     // Fetch the iface index
-    if (err = ioctl(s, SIOCGIFINDEX, ifRequest) < 0) {
-        int err = errno;
-
+    if (ioctl(s, SIOCGIFINDEX, ifRequest) < 0) {
         close(s);
-        Logger::log(LogLevel::ERROR, "Error SIOCGIFINDEX: " + std::string(strerror(err)));
+        Logger::log(LogLevel::ERROR, "Error SIOCGIFINDEX: " + std::string(strerror(errno)));
     }
     int ifIndex = ifRequest.ifr_ifindex;
 
@@ -130,6 +126,8 @@ void TunnelDeliveryInterface_Linux::pollMessages() {
 }
 
 void TunnelDeliveryInterface_Linux::deliverIPv6Packet(DataBufferPtr packet) {
+
+    printf("Sock int: %i", fd);
 
     // I should create a Packet class...
     // Clear 4 octets of memory at the from of the buffer by shifting everything to the right
