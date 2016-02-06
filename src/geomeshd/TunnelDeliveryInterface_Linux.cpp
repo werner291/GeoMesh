@@ -13,6 +13,12 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+// Define this here due to a duplicate definition when including ipv6.h
+struct in6_ifreq {
+         struct in6_addr ifr6_addr;
+         __u32           ifr6_prefixlen;
+         int             ifr6_ifindex; 
+};
 
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
@@ -76,16 +82,17 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
 
     // The address setting
-        struct in6_ifreq ifr6 = {
-                .ifr6_ifindex = ifIndex,
-                .ifr6_prefixlen = prefixLen
-        };
-        memcpy(&ifr6.ifr6_addr, iFaceAddress.bytes, 16);
+        struct in6_ifreq ifr6 = {0};
+
+	ifr6.ifr6_ifindex = ifIndex;
+        ifr6.ifr6_prefixlen = 128; // Geomesh uses the full address length. (TODO check whether this is actually such a bright idea)
+
+        memcpy(&(ifr6.ifr6_addr), iFaceAddress.bytes, 16);
 
         if (ioctl(s, SIOCSIFADDR, &ifr6) < 0) {
             int err = errno;
             close(s);
-            Except_throw(eh, "ioctl(SIOCSIFADDR) [%s]", strerror(err));
+            Logger::log(LogLevel::ERROR, "Error SIOCSIFADDR: " + std::string(strerror(errno)));
         }
 
     close(s);
