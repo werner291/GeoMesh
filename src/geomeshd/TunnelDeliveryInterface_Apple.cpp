@@ -155,10 +155,10 @@ void TunnelDeliveryInterface_Apple::deliverIPv6Packet(DataBufferPtr packet) {
 
 void TunnelDeliveryInterface_Apple::pollMessages() {
 
-    int received = receiveMessage(mReceptionBuffer, MAX_PACKET_SIZE);
+    int received = receiveMessage(mSocketId, mReceptionBuffer, MAX_PACKET_SIZE);
 
     if (received > 0) {
-        mLocalInterface->sendIPv6Message(mReceptionBuffer + 4, nbytes - 4);
+        mLocalInterface->sendIPv6Message(mReceptionBuffer + 4, received - 4);
     }
 
 }

@@ -16,18 +16,15 @@
 
 // Define this here due to a duplicate definition when including ipv6.h
 struct in6_ifreq {
-         struct in6_addr ifr6_addr;
-         __u32           ifr6_prefixlen;
-         int             ifr6_ifindex; 
+    struct in6_addr ifr6_addr;
+    __u32 ifr6_prefixlen;
+    int ifr6_ifindex;
 };
 
-TunnelDeliveryInterface_Apple_Linux::TunnelDeliveryInterface_Apple(LocalInterface
-*localInterface,
-const Address &iFaceAddress
-)
-:
+TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *localInterface,
+                                                             const Address &iFaceAddress)
+        : mLocalInterface(localInterface), iFaceAddress(iFaceAddress) {
 
-mLocalInterface(localInterface), iFaceAddress(iFaceAddress) {
     localInterface->setDataReceivedHandler(
             std::bind(&TunnelDeliveryInterface_Apple::deliverIPv6Packet, this, std::placeholders::_1));
 }
@@ -35,30 +32,31 @@ mLocalInterface(localInterface), iFaceAddress(iFaceAddress) {
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
 
-        struct ifreq ifr;
-        int fd, err;
-        char *clonedev = "/dev/net/tun";
+    struct ifreq ifr;
+    int fd, err;
+    char *clonedev = "/dev/net/tun";
 
-        /* open the clone device */
-        if( (fd = open(clonedev, O_RDWR)) < 0 ) {
-            int error = errno;
-            Logger::log(LogLevel::ERROR, "getting utun device id " + std::string(strerror(error)));
-        }
+    /* open the clone device */
+    if ((fd = open(clonedev, O_RDWR)) < 0) {
+        int error = errno;
+        Logger::log(LogLevel::ERROR, "getting utun device id " + std::string(strerror(error)));
+    }
 
-        /* preparation of the struct ifr, of type "struct ifreq" */
-        memset(&ifr, 0, sizeof(ifr));
+    /* preparation of the struct ifr, of type "struct ifreq" */
+    memset(&ifr, 0, sizeof(ifr));
 
-        ifr.ifr_flags = IFF_TUN | IFF_NO_PI; // This is a TUN device, and we're sending proper IP packets (so no 4 extra packets).
+    ifr.ifr_flags =
+            IFF_TUN | IFF_NO_PI; // This is a TUN device, and we're sending proper IP packets (so no 4 extra packets).
 
-        /* try to create the device */
-        if( (err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0 ) {
-            int error = errno;
-            Logger::log(LogLevel::ERROR, "getting utun device id " + std::string(strerror(error)));
-            close(fd);
+    /* try to create the device */
+    if ((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
+        int error = errno;
+        Logger::log(LogLevel::ERROR, "getting utun device id " + std::string(strerror(error)));
+        close(fd);
 
-        }
+    }
 
-        strcpy(iFaceName, ifr.ifr_name);
+    strcpy(iFaceName, ifr.ifr_name);
 };
 
 void TunnelDeliveryInterface_Linux::assignIP() {
@@ -94,18 +92,18 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
 
     // The address setting
-        struct in6_ifreq ifr6 = {0};
+    struct in6_ifreq ifr6 = {0};
 
-	ifr6.ifr6_ifindex = ifIndex;
-        ifr6.ifr6_prefixlen = 128; // Geomesh uses the full address length. (TODO check whether this is actually such a bright idea)
+    ifr6.ifr6_ifindex = ifIndex;
+    ifr6.ifr6_prefixlen = 128; // Geomesh uses the full address length. (TODO check whether this is actually such a bright idea)
 
-        memcpy(&(ifr6.ifr6_addr), iFaceAddress.bytes, 16);
+    memcpy(&(ifr6.ifr6_addr), iFaceAddress.bytes, 16);
 
-        if (ioctl(s, SIOCSIFADDR, &ifr6) < 0) {
-            int err = errno;
-            close(s);
-            Logger::log(LogLevel::ERROR, "Error SIOCSIFADDR: " + std::string(strerror(errno)));
-        }
+    if (ioctl(s, SIOCSIFADDR, &ifr6) < 0) {
+        int err = errno;
+        close(s);
+        Logger::log(LogLevel::ERROR, "Error SIOCSIFADDR: " + std::string(strerror(errno)));
+    }
 
     close(s);
 
@@ -114,10 +112,11 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
 void TunnelDeliveryInterface_Linux::pollMessages() {
 
-    int received = receiveMessage(mReceptionBuffer, MAX_PACKET_SIZE);
+    int received = receiveMessage(mSocketId, mReceptionBuffer, MAX_PACKET_SIZE);
 
     if (received > 0) {
-        mLocalInterface->sendIPv6Message(mReceptionBuffer + 4, nbytes - 4);
+        mLocalInterface->sendIPv6Message(mReceptionBuffer + 4, received - 4);
     }
+
 
 }

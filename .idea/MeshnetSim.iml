@@ -11,6 +11,8 @@
       <sourceFolder url="file://$MODULE_DIR$/src/geomeshd/GeoMeshd_main.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/geomeshd/TunnelDeliveryInterface_Apple.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/geomeshd/UDPInterface.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/geomeshd/UnixSocketsFunctions.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/geomeshd/UnixSocketsFunctions.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/geomeshd/TunnelDeliveryInterface_Apple.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/geomeshd/UDPInterface.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/geomeshd/UDPManager.cpp" isTestSource="false" />
