@@ -44,10 +44,13 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     struct ifreq ifr = {0};
 
+    Logger::log(LogLevel::DEBUG, "Tun : " + std::to_string(fd));
     /* open the clone device */
     if ((fd = open("/dev/net/tun", O_RDWR)) < 0) {
         Logger::log(LogLevel::ERROR, "Error opening clone device: " + std::string(strerror(errno)));
     }
+    Logger::log(LogLevel::DEBUG, "Tun : " + std::to_string(fd));
+
 
     // This is a TUN device
     ifr.ifr_flags = IFF_TUN;
@@ -62,11 +65,13 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
         close(fd);
     }
 
+    Logger::log(LogLevel::DEBUG, "Tun : " + std::to_string(fd));
+
     strcpy(iFaceName, ifr.ifr_name);
 
     Logger::log(LogLevel::INFO, "Allocated interface " + std::string(iFaceName));
 
-    assignIP();
+    //assignIP();
 };
 
 void TunnelDeliveryInterface_Linux::assignIP() {
@@ -81,7 +86,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     }
 
     // Copy the iface name into the request
-    strncpy(ifRequest.ifr_name, "/dev/net/tunGeo", IFNAMSIZ);
+    strncpy(ifRequest.ifr_name, iFaceName, IFNAMSIZ);
 
     Logger::log(LogLevel::ERROR, "Tun interface name: " + std::string(ifRequest.ifr_name));
 
