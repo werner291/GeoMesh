@@ -23,7 +23,7 @@ int receiveMessage(int sock, char *buffer, size_t buffSize) {
             return nbytes;
         } else {
             Logger::log(LogLevel::ERROR,
-                        "TunnelDeliveryInterface_Apple: invalid aftype: " + std::to_string(aftype));
+                        "receiveMessage: invalid aftype: " + std::to_string(aftype));
         }
 
 
@@ -34,7 +34,7 @@ int receiveMessage(int sock, char *buffer, size_t buffSize) {
 
         if (!(err == EWOULDBLOCK || err == EAGAIN)) {
             Logger::log(LogLevel::ERROR,
-                        "TunnelDeliveryInterface_Apple: receive error: " + std::string(strerror(err)));
+                        "receiveMessage: receive error: " + std::string(strerror(err)));
         }
         // Else there was nothing to be read, do nothing
     }

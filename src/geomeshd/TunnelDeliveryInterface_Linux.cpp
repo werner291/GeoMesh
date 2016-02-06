@@ -39,24 +39,25 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     /* open the clone device */
     if ((fd = open(clonedev, O_RDWR)) < 0) {
         int error = errno;
-        Logger::log(LogLevel::ERROR, "getting utun device id " + std::string(strerror(error)));
+        Logger::log(LogLevel::ERROR, "getting tun device id " + std::string(strerror(error)));
     }
 
     /* preparation of the struct ifr, of type "struct ifreq" */
     memset(&ifr, 0, sizeof(ifr));
 
-    ifr.ifr_flags =
-            IFF_TUN | IFF_NO_PI; // This is a TUN device, and we're sending proper IP packets (so no 4 extra packets).
+    // This is a TUN device, and we're sending proper IP packets (so no 4 extra packets).
+    ifr.ifr_flags = IFF_TUN;
 
     /* try to create the device */
     if ((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
         int error = errno;
-        Logger::log(LogLevel::ERROR, "getting utun device id " + std::string(strerror(error)));
+        Logger::log(LogLevel::ERROR, "getting tun device id " + std::string(strerror(error)));
         close(fd);
-
     }
 
     strcpy(iFaceName, ifr.ifr_name);
+
+    Logger::log(LogLevel::INFO, "Allocated interface " + iFaceName);
 };
 
 void TunnelDeliveryInterface_Linux::assignIP() {
@@ -143,7 +144,7 @@ void TunnelDeliveryInterface_Linux::deliverIPv6Packet(DataBufferPtr packet) {
     if (result == -1) {
         int err = errno;
         Logger::log(LogLevel::ERROR,
-                    "TunnelDeliveryInterface_Apple: error while sending: " + std::string(strerror(err)));
+                    "TunnelDeliveryInterface_Linux: error while sending: " + std::string(strerror(err)));
     }
 
 }
