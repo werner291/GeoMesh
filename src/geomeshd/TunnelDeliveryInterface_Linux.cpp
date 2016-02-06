@@ -23,7 +23,7 @@ struct in6_ifreq {
 
 TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *localInterface,
                                                              const Address &iFaceAddress)
-        : mLocalInterface(localInterface), iFaceAddress(iFaceAddress) {
+        : mLocalInterface(localInterface), iFaceAddress(iFaceAddress), fd(-1) {
 
     localInterface->setDataReceivedHandler(
             std::bind(&TunnelDeliveryInterface_Linux::deliverIPv6Packet, this, std::placeholders::_1));
