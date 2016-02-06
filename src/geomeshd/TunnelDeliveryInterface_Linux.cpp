@@ -14,6 +14,8 @@
 #include <unistd.h>
 #include "UnixSocketsFunctions.h"
 
+#include <libexplain/ioctl.h>
+
 // Define this here due to a duplicate definition when including ipv6.h
 struct in6_ifreq {
     struct in6_addr ifr6_addr;
@@ -80,6 +82,9 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     // Fetch the iface index
     if (err = ioctl(s, SIOCGIFINDEX, ifRequest) < 0) {
         int err = errno;
+
+        fprintf(stderr, "%s\n", explain_ioctl(s, SIOCGIFINDEX, ifRequest));
+
         close(s);
         Logger::log(LogLevel::ERROR, "Error SIOCGIFINDEX: " + std::string(strerror(err)));
     }
