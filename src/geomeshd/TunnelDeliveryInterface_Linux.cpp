@@ -66,7 +66,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     Logger::log(LogLevel::INFO, "Allocated interface " + std::string(iFaceName));
 
-    assignIP();
+    //assignIP();
 };
 
 void TunnelDeliveryInterface_Linux::assignIP() {
