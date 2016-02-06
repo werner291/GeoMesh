@@ -25,7 +25,9 @@ TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *loc
                                                              const Address &iFaceAddress)
         : mLocalInterface(localInterface), iFaceAddress(iFaceAddress), fd(-1) {
 
-    memset(iFaceName, 0, TUNInterface_IFNAMSIZ);
+    iFaceName = "tunGeo";
+
+    //memset(iFaceName, 0, TUNInterface_IFNAMSIZ);
 
     localInterface->setDataReceivedHandler(
             std::bind(&TunnelDeliveryInterface_Linux::deliverIPv6Packet, this, std::placeholders::_1));
