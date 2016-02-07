@@ -46,7 +46,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     struct ifreq ifr;
     int err;
-    int flags = IFF_TUN;
+    int flags = IFF_TUN | O_NONBLOCK;
 
     if ((fd = open("/dev/net/tun", O_RDWR)) < 0) {
         perror("Opening /dev/net/tun");
@@ -69,7 +69,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     char buffer[2000];
 
-    int nbytes = recv(fd, buffer, 2000, O_NONBLOCK);
+    int nbytes = read(fd, buffer, 2000);
 
     if (nbytes > 0) {
 
