@@ -13,6 +13,7 @@
 #include "../Logger.h"
 
 UDPManager::UDPManager(LinkManager *linkMgr) : linkMgr(linkMgr) {
+
     socketID = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
     sockaddr_in sin;
@@ -30,8 +31,6 @@ UDPManager::UDPManager(LinkManager *linkMgr) : linkMgr(linkMgr) {
     // Enable non-blocking IO.
     int flags = fcntl(socketID, F_GETFL, 0);
     fcntl(socketID, F_SETFL, flags | O_NONBLOCK);
-
-
 }
 
 void UDPManager::connectTo(std::string address, int port) {
@@ -60,7 +59,7 @@ void UDPManager::connectTo(std::string address, int port) {
            (struct sockaddr *) &destAddr,
            sizeof(destAddr));
 
-    Logger::log(LogLevel::INFO, "Peering request sent.");
+    Logger::log(LogLevel::INFO, "Peering request sent to " + address);
 
 }
 
@@ -73,6 +72,7 @@ void UDPManager::pollMessages() {
 
     int nbytes = recvfrom(socketID, buffer, 499, 0, (struct sockaddr *) &sender, (socklen_t *) &len);
 
+    Logger::log(LogLevel::DEBUG, "Polling");
 
     buffer[499] = 0; // Set last to 0 for safety
 
