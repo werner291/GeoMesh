@@ -72,13 +72,11 @@ void UDPManager::pollMessages() {
 
     int nbytes = recvfrom(socketID, buffer, 499, 0, (struct sockaddr *) &sender, (socklen_t *) &len);
 
-    Logger::log(LogLevel::DEBUG, "Polling");
-
     buffer[499] = 0; // Set last to 0 for safety
 
     if (nbytes > 0) { // It's a proper datagaram (not an error)
 
-        Logger::log(LogLevel::DEBUG, "Received!");
+        Logger::log(LogLevel::DEBUG, "Received UDP bridge control datagram!");
 
         // This is a UDP bridge hello message
         if (strncmp(buffer, "GeoMesh_UDP_Bridge_Hello", strlen("GeoMesh_UDP_Bridge_Hello")) == 0) {
