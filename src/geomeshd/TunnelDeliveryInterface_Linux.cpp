@@ -68,7 +68,8 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     ifr.ifr_mtu = TUN_IFACE_MTU;
 
     if ((err = ioctl(fd, SIOCSIFMTU, (void *) &ifr)) < 0) {
-        Logger::log(LogLevel::ERROR, "Error setting tunnel MTU: " + std::string(strerror(errno)));
+        Logger::log(LogLevel::ERROR, "Error setting tunnel MTU: " + std::string(strerror(errno)) + ". Tried MTU of " +
+                                     std::to_string(TUN_IFACE_MTU));
         close(fd);
     }
 
