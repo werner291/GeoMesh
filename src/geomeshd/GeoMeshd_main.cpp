@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
         udpMan->pollMessages();
         tunIface->pollMessages();
 
-        usleep(10000); // Sleep 0.01 seconds
+        usleep(1000000); // Sleep 0.01 seconds
     }
 
 }
