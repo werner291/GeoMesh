@@ -54,7 +54,7 @@ private:
 
     struct DHTroutingTableEntry {
         uint8_t length;
-        std::vector<uint8_t> address
+        std::vector<uint8_t> address;
     };
 
 
