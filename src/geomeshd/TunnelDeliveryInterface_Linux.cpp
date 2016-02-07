@@ -83,7 +83,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
         if (!(err == EWOULDBLOCK || err == EAGAIN)) {
 
-            fprintf(stderr, "%s\n", explain_ioctl(fd, request, data));
+            //fprintf(stderr, "%s\n", explain_ioctl(fd, request, data));
 
             Logger::log(LogLevel::ERROR,
                         "ReceiveMessage: receive error: " + std::string(strerror(err)));
