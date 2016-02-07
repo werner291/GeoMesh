@@ -21,11 +21,17 @@ UDPManager::UDPManager(LinkManager *linkMgr) : linkMgr(linkMgr) {
     sin.sin_addr.s_addr = htonl(INADDR_ANY);
     sin.sin_port = 10976;
 
-    bind(socketID, (struct sockaddr *) &sin, sizeof(sin));
+    if (bind(socketID, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
+        Logger::log(LogLevel::ERROR, "Error while binding UDP bridge control socket: " + std::string(strerror(errno)));
+    } else {
+        Logger::log(LogLevel::INFO, "UDP bridge listening on port " + std::to_string(sin.sin_port));
+    }
 
     // Enable non-blocking IO.
     int flags = fcntl(socketID, F_GETFL, 0);
     fcntl(socketID, F_SETFL, flags | O_NONBLOCK);
+
+
 }
 
 void UDPManager::connectTo(std::string address, int port) {
