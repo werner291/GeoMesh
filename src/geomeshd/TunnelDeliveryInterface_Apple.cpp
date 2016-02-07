@@ -12,14 +12,11 @@
 #include <errno.h>
 #include "TunnelDeliveryInterface_Apple.h"
 #include "../Logger.h"
-#include <iostream>
 #include <iomanip>
 #include "UnixSocketsFunctions.h"
 
 #define UTUN_CONTROL_NAME "com.apple.net.utun_control"
 #define UTUN_OPT_IFNAME 2
-
-
 
 TunnelDeliveryInterface_Apple::TunnelDeliveryInterface_Apple(LocalInterface *localInterface,
                                                              const Address &iFaceAddress)

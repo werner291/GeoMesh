@@ -79,7 +79,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     strcpy(iFaceName, ifr.ifr_name);
 
 
-    //assignIP();
+    assignIP();
 };
 
 void TunnelDeliveryInterface_Linux::assignIP() {

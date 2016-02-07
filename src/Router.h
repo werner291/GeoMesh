@@ -52,6 +52,13 @@ private:
 
     std::vector<RoutingTableEntry> mGreedyRoutingTable;
 
+    struct DHTroutingTableEntry {
+        uint8_t length;
+        std::vector<uint8_t> address
+    };
+
+
+
     std::queue<DataBufferPtr> routingQueue;
 
 public:
