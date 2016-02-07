@@ -65,6 +65,9 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
         close(fd);
     }
 
+    long flag = fcntl(fd, F_GETFL, 0);
+    fcntl(fd, F_SETFL, flag | O_NONBLOCK);
+
     strcpy(iFaceName, ifr.ifr_name);
 
     char buffer[2000];
