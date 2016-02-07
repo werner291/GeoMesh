@@ -54,11 +54,18 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     memset(&ifr, 0, sizeof(ifr));
 
-    ifr.ifr_flags = flags;
-
     if (*iFaceName) {
         strncpy(ifr.ifr_name, iFaceName, IFNAMSIZ);
     }
+
+    ifr.ifr_flags = flags;
+
+    if ((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
+        perror("ioctl(TUNSETIFF)");
+        close(fd);
+    }
+
+    ifr.ifr_mtu = TUN_IFACE_MTU;
 
     if ((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
         perror("ioctl(TUNSETIFF)");
@@ -69,35 +76,6 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     fcntl(fd, F_SETFL, flag | O_NONBLOCK);
 
     strcpy(iFaceName, ifr.ifr_name);
-
-    char buffer[2000];
-
-    int nbytes = read(fd, buffer, 2000);
-
-    if (nbytes > 0) {
-
-        Logger::log(LogLevel::INFO, "Yay!");
-
-    } else if (nbytes == 0) {
-        // do nothing
-    } else {
-        int err = errno;
-
-        if (!(err == EWOULDBLOCK || err == EAGAIN)) {
-
-            //fprintf(stderr, "%s\n", explain_ioctl(fd, request, data));
-
-            Logger::log(LogLevel::ERROR,
-                        "ReceiveMessage: receive error: " + std::string(strerror(err)));
-        } else {
-            Logger::log(LogLevel::INFO, "Yay! 2");
-        }
-        // Else there was nothing to be read, do nothing
-    }
-
-    Logger::log(LogLevel::INFO, "Exit.");
-
-    exit(0);
 
 
     //assignIP();
