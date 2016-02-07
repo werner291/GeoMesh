@@ -69,7 +69,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     char buffer[2000];
 
-    int nbytes = recvfrom(fd, buffer, MAX_PACKET_SIZE - IPv6_START - 4, O_NONBLOCK, NULL, NULL);
+    int nbytes = recvfrom(fd, buffer, 2000, O_NONBLOCK, NULL, NULL);
 
     if (nbytes > 0) {
 
