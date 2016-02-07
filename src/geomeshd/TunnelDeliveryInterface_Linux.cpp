@@ -69,7 +69,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     char buffer[2000];
 
-    int nbytes = recvfrom(fd, buffer, 2000, O_NONBLOCK, NULL, NULL);
+    int nbytes = recv(fd, buffer, 2000, O_NONBLOCK);
 
     if (nbytes > 0) {
 
