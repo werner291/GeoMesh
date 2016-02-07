@@ -61,14 +61,14 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     ifr.ifr_flags = flags;
 
     if ((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
-        perror("ioctl(TUNSETIFF)");
+        Logger::log(LogLevel::ERROR, "Error setting tunnel flags: " + std::string(strerror(errno)));
         close(fd);
     }
 
     ifr.ifr_mtu = TUN_IFACE_MTU;
 
-    if ((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
-        perror("ioctl(TUNSETIFF)");
+    if ((err = ioctl(fd, SIOCSIFMTU, (void *) &ifr)) < 0) {
+        Logger::log(LogLevel::ERROR, "Error setting tunnel MTU: " + std::string(strerror(errno)));
         close(fd);
     }
 
