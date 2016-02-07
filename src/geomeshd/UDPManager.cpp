@@ -25,7 +25,7 @@ UDPManager::UDPManager(LinkManager *linkMgr) : linkMgr(linkMgr) {
     if (bind(socketID, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
         Logger::log(LogLevel::ERROR, "Error while binding UDP bridge control socket: " + std::string(strerror(errno)));
     } else {
-        Logger::log(LogLevel::INFO, "UDP bridge listening on port " + std::to_string(sin.sin_port));
+        Logger::log(LogLevel::INFO, "UDP bridge listening on port " + std::to_string(ntohs(sin.sin_port)));
     }
 
     // Enable non-blocking IO.

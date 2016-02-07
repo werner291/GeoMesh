@@ -67,8 +67,8 @@ bool UDPInterface::sendData(DataBufferPtr data) {
                         (struct sockaddr *) &peerAddress,
                         sizeof(peerAddress));
 
-    if (result != 0) {
-        Logger::log(LogLevel::ERROR, "UDPInterface: error while sending.");
+    if (result < 0) {
+        Logger::log(LogLevel::ERROR, "UDPInterface: error while sending: " + std::string(strerror(errno)));
     }
 
     return result == 0;
