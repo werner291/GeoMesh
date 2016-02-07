@@ -6,6 +6,7 @@
 
 #include "../Logger.h"
 
+#include <libexplain/ioctl.h>
 #include <linux/if.h>
 #include <linux/if_tun.h>
 #include <sys/ioctl.h>
@@ -65,6 +66,36 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     }
 
     strcpy(iFaceName, ifr.ifr_name);
+
+    char buffer[2000];
+
+    int nbytes = recvfrom(fd, buffer, MAX_PACKET_SIZE - IPv6_START - 4, O_NONBLOCK, NULL, NULL);
+
+    if (nbytes > 0) {
+
+        Logger::log(LogLevel::INFO,
+                    "Yay! " + std::string(strerror(err)));
+
+    } else if (nbytes == 0) {
+        // do nothing
+    } else {
+        int err = errno;
+
+        if (!(err == EWOULDBLOCK || err == EAGAIN)) {
+
+            fprintf(stderr, "%s\n", explain_ioctl(fd, request, data));
+
+            Logger::log(LogLevel::ERROR,
+                        "ReceiveMessage: receive error: " + std::string(strerror(err)));
+        } else {
+            Logger::log(LogLevel::INFO,
+                        "Yay! 2" + std::string(strerror(err)));
+        }
+        // Else there was nothing to be read, do nothing
+    }
+
+    exit(0);
+
 
     //assignIP();
 };
