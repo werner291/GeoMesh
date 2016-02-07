@@ -20,7 +20,7 @@ UDPManager::UDPManager(LinkManager *linkMgr) : linkMgr(linkMgr) {
 
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = htonl(INADDR_ANY);
-    sin.sin_port = 10976;
+    sin.sin_port = htons(10976);
 
     if (bind(socketID, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
         Logger::log(LogLevel::ERROR, "Error while binding UDP bridge control socket: " + std::string(strerror(errno)));
@@ -77,6 +77,8 @@ void UDPManager::pollMessages() {
     buffer[499] = 0; // Set last to 0 for safety
 
     if (nbytes > 0) { // It's a proper datagaram (not an error)
+
+        Logger::log(LogLevel::DEBUG, "Received!");
 
         // This is a UDP bridge hello message
         if (strncmp(buffer, "GeoMesh_UDP_Bridge_Hello", strlen("GeoMesh_UDP_Bridge_Hello")) == 0) {
