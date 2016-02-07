@@ -46,7 +46,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     struct ifreq ifr;
     int err;
-    int flags = IFF_TUN | O_NONBLOCK;
+    int flags = IFF_TUN;
 
     if ((fd = open("/dev/net/tun", O_RDWR)) < 0) {
         perror("Opening /dev/net/tun");
@@ -73,8 +73,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     if (nbytes > 0) {
 
-        Logger::log(LogLevel::INFO,
-                    "Yay! " + std::string(strerror(err)));
+        Logger::log(LogLevel::INFO, "Yay!");
 
     } else if (nbytes == 0) {
         // do nothing
@@ -88,11 +87,12 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
             Logger::log(LogLevel::ERROR,
                         "ReceiveMessage: receive error: " + std::string(strerror(err)));
         } else {
-            Logger::log(LogLevel::INFO,
-                        "Yay! 2" + std::string(strerror(err)));
+            Logger::log(LogLevel::INFO, "Yay! 2");
         }
         // Else there was nothing to be read, do nothing
     }
+
+    Logger::log(LogLevel::INFO, "Exit.");
 
     exit(0);
 
