@@ -11,7 +11,8 @@
 #include "constants.h"
 
 struct Address {
-    unsigned char bytes[ADDRESS_LENGTH_OCTETS];
+
+    uint8_t bytes[ADDRESS_LENGTH_OCTETS];
 
     bool operator==(const Address& other) const {
         return memcmp(bytes,other.bytes,ADDRESS_LENGTH_OCTETS) == 0;
@@ -33,6 +34,30 @@ struct Address {
     static Address fromString(std::string str);
 
     void writeToSocketAddress(struct sockaddr_in6& socketAddress) const;
+
+    double xorDistanceTo(const Address &other) {
+        // Distance between the wto adresses
+        double dist = 0;
+
+        // By how much to multiply the XOR-ed octets
+        double multiplier = 1;
+
+        // By how much to multiply the multiplier each iteration
+        double iterationMult = pow(2, 8);
+
+        // Iterate over all the octets
+        for (int i = 0; i < ADDRESS_LENGTH_OCTETS; ++i) {
+
+            // Take the XOR distance, multiply according to the octet position.
+            dist += ((double) (bytes[i] ^ other.bytes[i])) * multiplier;
+
+            // Multiply the multiplier.
+            multiplier *= iterationMult;
+
+        }
+
+        return dist;
+    }
 };
 
 #include "Location.h"

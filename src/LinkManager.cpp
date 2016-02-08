@@ -23,7 +23,9 @@ void LinkManager::connectInterface(std::shared_ptr<AbstractInterface> iFace) {
     iFace->setDataReceivedCallback(std::bind(&Router::handleMessage, // Ugly...
                                              router, std::placeholders::_1, std::placeholders::_2));
 
-    router->sendLocationInfo(iFace->getInterfaceId()); // Maybe the router should decide what should be done?
+    for (auto listener : linkEventListeners) {
+        listener(*iFace, LINK_CREATED);
+    }
 }
 
 void LinkManager::broadcastMessage(const DataBufferPtr &data) {

@@ -52,12 +52,7 @@ private:
 
     std::vector<RoutingTableEntry> mGreedyRoutingTable;
 
-    struct DHTroutingTableEntry {
-        uint8_t length;
-        std::vector<uint8_t> address;
-    };
-
-
+    DHTRoutingTable dhtRoutingTable;
 
     std::queue<DataBufferPtr> routingQueue;
 
@@ -80,9 +75,18 @@ public:
 
     // TODO make the allocation of the local interface and link manager a bit more elegant
     Router(Address uniqueaddress, Location location) : uniqueaddress(uniqueaddress), mVirtualLocation(location),
-                                                                 mRealLocation(location),
-                                                                 localIface(new LocalInterface(this)),
-                                                                 linkMgr(new LinkManager(this)) { };
+                                                       mRealLocation(location),
+                                                       localIface(new LocalInterface(this)),
+                                                       linkMgr(new LinkManager(this)) {
+
+        linkMgr->addLinkListener([](std::share_ptr<AbstractInterface>, LinkEvent event) {
+
+            if (event == LinkManager::LINK_CREATED) {
+                this->sendLocationInfo(iFace->getInterfaceId()); // Maybe the router should decide what should be done?
+            }
+        });
+
+    };
 
     ~Router() {
         delete localIface;

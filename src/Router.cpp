@@ -5,6 +5,7 @@
 #include "Router.h"
 #include "Logger.h"
 
+#include "Packet.h"
 #include "PacketFunctions.h"
 
 #include <iostream>
@@ -76,7 +77,7 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
             }
             break;
         }
-        case MSGTYPE_PEERINFO: {
+        case MSGTYPE_LOCATION_INFO: {
 
             // Dangerous. TODO: use the IEEE standard for doubles.
             Location peerLocation(*(reinterpret_cast<double *>(data->data() + PEERINFO_LOCATION_LAT)),
@@ -98,6 +99,14 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
 
             return true;
             break;
+        }
+        case MSGTYPE_DHT_ROUTETABLE_COPY: {
+            dhtRoutingTable.processRoutingTableCopy(data, fromIface);
+            return true;
+        }
+            break;
+        case MSGTYPE_DHT_ROUTETABLE_COPY_REQUEST: {
+
         }
     }
 
@@ -175,7 +184,7 @@ void Router::sendLocationInfo(int interface) {
     std::shared_ptr<std::vector<char> > messageBuffer(new std::vector<char>(PEERINFO_ENTRY_UID + ADDRESS_LENGTH_OCTETS));
 
     *reinterpret_cast<int32_t *>(messageBuffer->data() + PROTOCOL_VERSION_LOC) = PROTOCOL_VERSION;
-    *reinterpret_cast<int32_t *>(messageBuffer->data() + MESSAGE_TYPE) = MSGTYPE_PEERINFO;
+    *reinterpret_cast<int32_t *>(messageBuffer->data() + MESSAGE_TYPE) = MSGTYPE_LOCATION_INFO;
 
     setPacketData<double>(PEERINFO_LOCATION_LON, messageBuffer, this->mVirtualLocation.lon);
     setPacketData<double>(PEERINFO_LOCATION_LAT, messageBuffer, this->mVirtualLocation.lat);

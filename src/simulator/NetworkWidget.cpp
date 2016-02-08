@@ -122,7 +122,7 @@ void NetworkWidget::draw() {
                     drawDirectLineBetweenLocations(intermediate, Location(destinationY, destinationX));
 
                 }
-            } else if (getPacketData<int32_t>(MESSAGE_TYPE, packet.data) == MSGTYPE_PEERINFO) {
+            } else if (getPacketData<int32_t>(MESSAGE_TYPE, packet.data) == MSGTYPE_LOCATION_INFO) {
                 glColor3f(0.5, 0, 1);
                 glBegin(GL_POINTS);
                 glVertex3f(packetPos.x, packetPos.y, packetPos.z);

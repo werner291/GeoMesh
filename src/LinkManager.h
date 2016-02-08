@@ -14,6 +14,13 @@ class LinkManager {
 
     Router *router;
 
+    enum LinkEvent {
+        LINK_CREATED,
+        LINK_DESTROYED
+    };
+
+    std::vector<std::function<void(const AbstractInterface &, const LinkEvent &)> > linkEventListeners;
+
 public:
     LinkManager(Router *router) : router(router) { };
 

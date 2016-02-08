@@ -21,14 +21,17 @@ template<typename T> void setPacketData(int charposition, DataBufferPtr data, T 
 // TODO automate the variable allocation positions within the packet
 // using the C++ preprocessor. This manual process is going to lead to mistakes.
 
+/*
 const int PROTOCOL_VERSION = 0;
 const int DEFAULT_TTL = 255; // IPv6 only has one byte for this, maybe GeoMesh should use its own?
 
 typedef double location_scalar;
 const int ADDRESS_LENGTH_OCTETS = 16; // 128-bit addresses, we're optimistic.
 
-const int MSGTYPE_PAYLOAD = 0; // A regular message containing actual data to be transmitted
-const int MSGTYPE_PEERINFO = 1; // A message containing information about the sender and their direct peers
+const uint8_t MSGTYPE_PAYLOAD = 0; // A regular message containing actual data to be transmitted
+const uint8_t MSGTYPE_LOCATION_INFO = 1; // A message containing information about the sender's location
+
+
 
 const int ROUTING_GREEDY = 0;
 const int ROUTING_XOR = 1;
@@ -64,5 +67,5 @@ const int PEERINFO_ENTRY_UID = PEERINFO_LOCATION_LAT + 8;
 const int MAX_PACKET_SIZE = 1500; // 1500 bytes
 
 const int TUN_IFACE_MTU = MAX_PACKET_SIZE - IPv6_START - 4;
-
+*/
 #endif //MESHNETSIM_CONSTANTS_H
