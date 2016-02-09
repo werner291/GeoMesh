@@ -35,11 +35,10 @@ There are two types of packets in GeoMesh:
     </tr>
     <tr>
         <td>16</td>
-        <td colspan="4">Face routing start distance</td>
+        <td rowspan="2" colspan="4">Special routing mode data</td>
     </tr>
     <tr>
         <td>20</td>
-        <td colspan="4">Face routing search range</td>
     </tr>
     <tr>
         <td>24</td>
