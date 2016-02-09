@@ -117,7 +117,6 @@ the first 24 bytes of the GeoMesh packet.
 <tr><td>...</td></tr>
 <tr><td>...</td></tr>
 <tr><td>...</td></tr>
-<tr><td>...</td></tr>
 <tr><td>24 + 32 * n</td><td colspan="4" rowspan="4">Node *n* ID</td></tr>
 <tr><td>28 + 32 * n</td></tr>
 <tr><td>32 + 32 * n</td></tr>
