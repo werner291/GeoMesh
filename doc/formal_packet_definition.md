@@ -94,26 +94,33 @@ the first 24 bytes of the GeoMesh packet.
 ## DHT routing table copy request response
 
 <table>
-<tr>
-<th>Octet</th>
-<th>0</th>
-<th>1</th>
-<th>2</th>
-<th>3</th>
-</tr>
-<tr>
-<td>0</td>
-<td colspan="2">Protocol Version</td>
-<td>Message type</td>
-<td>Routing Mode</td>
-</tr>
+<tr><th>Octet</th><th>0</th><th>1</th><th>2</th><th>3</th></tr>
+<tr><td>0</td><td colspan="2">Protocol Version</td><td>Message type</td><td>Routing Mode</td></tr>
 <tr><td>4</td><td colspan="4" rowspan="4">Route label</td></tr>
+<tr><td>8</td></tr>
+<tr><td>12</td></tr>
+<tr><td>16</td></tr>
 <tr><td>20</td><td colspan="4">Number of entries</td></tr>
 <tr><td>24</td><td colspan="4" rowspan="4">Node 1 ID</td></tr>
-<tr><td>28</td><td colspan="4" rowspan="4">Node 1 Route label</td></tr>
+<tr><td>28</td></tr>
+<tr><td>32</td></tr>
+<tr><td>36</td></tr>
+<tr><td>40</td><td colspan="4" rowspan="4">Node 1 Route label</td></tr>
+<tr><td>44</td></tr>
+<tr><td>48</td></tr>
+<tr><td>52</td></tr>
 <tr><td>...</td><td colspan="4" rowspan="8">...</td></tr>
+<tr><td>...</td></tr>
+<tr><td>...</td></tr>
+<tr><td>...</td></tr>
 <tr><td>24 + 32 * n</td><td colspan="4" rowspan="4">Node *n* ID</td></tr>
-<tr><td>28 + 32 * n</td><td colspan="4" rowspan="4">Node *1*n Route label</td></tr>
+<tr><td>28 + 32 * n</td></tr>
+<tr><td>32 + 32 * n</td></tr>
+<tr><td>36 + 32 * n</td></tr>
+<tr><td>40 + 32 * n</td><td colspan="4" rowspan="4">Node *1*n Route label</td></tr>
+<tr><td>44 + 32 * n</td></tr>
+<tr><td>48 + 32 * n</td></tr>
+<tr><td>52 + 32 * n</td></tr>
 </table>
 
 ## Location Lookup Packet
@@ -121,17 +128,17 @@ the first 24 bytes of the GeoMesh packet.
 <table>
 <tr><th>Octet</th><th>0</th><th>1</th><th>2</th><th>3</th></tr>
 <tr><td>0</td><td colspan="2">Protocol Version</td><td>Message type</td><td>Routing Mode</td></tr>
-<tr><td>4</td><td colspan="4" rowspan="4">Destination address</td></tr>
+<tr><td>4</td><td colspan="4" rowspan="4">Source address</td></tr>
 <tr><td>8</td></tr>
 <tr><td>12</td></tr>
 <tr><td>16</td></tr>
-<tr><td>20</td><td colspan="4" rowspan="4">Source address</td></tr>
+<tr><td>20</td><td colspan="4" rowspan="4">Destination address</td></tr>
 <tr><td>24</td></tr>
 <tr><td>28</td></tr>
 <tr><td>32</td></tr>
-<tr><td>36</td><td colspan="4">Sender latitude</td></tr>
-<tr><td>40</td><td colspan="4">Sender longitude</td></tr>
-<tr><td>44</td><td colspan="4">Sender altitude</td></tr>
+<tr><td>36</td><td colspan="4">Source latitude</td></tr>
+<tr><td>40</td><td colspan="4">Source longitude</td></tr>
+<tr><td>44</td><td colspan="4">Source altitude</td></tr>
 </table>
 
 ## Location Lookup Response
