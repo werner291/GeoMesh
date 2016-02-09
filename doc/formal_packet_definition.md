@@ -5,7 +5,7 @@ There are two types of packets in GeoMesh:
 * Payload packages, carrying data for layer 4 protocols
 * Location advertisement packages, advertising the location and address of a node.
 
-##Payload package header
+##Geomesh Packet Header
 
 <table>
 <tr>
@@ -21,41 +21,26 @@ There are two types of packets in GeoMesh:
 <td>Message type</td>
 <td>Routing Mode</td>
 </tr>
-<tr>
-<td>4</td>
-<td colspan="4">Destination latitude</td>
-</tr>
-<tr>
-<td>8</td>
-<td colspan="4">Destination longitude</td>
-</tr>
-<tr>
-<td>12</td>
-<td colspan="4">Destination altitude</td>
-</tr>
-<tr>
-<td>16</td>
-<td colspan="4">Face routing start distance</td>
-</tr>
-<tr>
-<td>20</td>
-<td colspan="4">Face routing search range</td>
-</tr>
-<tr>
-<td>24</td>
-<td colspan="4">Default IPv6 header</td>
-</tr>
-<tr>
-<td>...</td>
-<td colspan="4"></td>
-</tr>
-<tr>
-<td>64</td>
-<td colspan="4">Payload start</td>
-</tr>
+<tr><td>4</td><td colspan="4" rowspan="4">Source address</td></tr>
+<tr><td>8</td></tr>
+<tr><td>12</td></tr>
+<tr><td>16</td></tr>
+<tr><td>20</td><td colspan="4">Source latitude</td></tr>
+<tr><td>24</td><td colspan="4">Source longitude</td></tr>
+<tr><td>28</td><td colspan="4">Source altitude</td></tr>
+<tr><td>32</td><td colspan="4" rowspan="4">Destination address</td></tr>
+<tr><td>36</td></tr>
+<tr><td>40</td></tr>
+<tr><td>44</td></tr>
+<tr><td>48</td><td colspan="4">Destination latitude</td></tr>
+<tr><td>52</td><td colspan="4">Destination longitude</td></tr>
+<tr><td>56</td><td colspan="4">Destination altitude</td></tr>
+<tr><td>60</td><td colspan="4">Face routing start distance</td></tr>
+<tr><td>64</td><td colspan="4">Face routing search range</td></tr>
+<tr><td>...</td><td colspan="4">Payload</td></tr>
 </table>
 
-* Destination latitude / longitude: Signed 32-bit integer representing an angle. Convert to degrees by multiplying by
+* Destination latitude / longitude: Signed 32-bit integers representing an angle. Convert to degrees by multiplying by
 180 and dividing by 2^31. Converting the number to a double beforehand is recommended.
 
 * Destination altitude. 32-bit IEEE floating point number, representing altitude in meters. 0 is at ground level.
@@ -70,6 +55,8 @@ prepended to the IPv6 packet, instead of wrapping the whole packet. The original
 the first 24 bytes of the GeoMesh packet.
 
 ## DHT routing table copy request
+
+A packet consisting of a request of a copy of the DHT routing table of a direct neighbour.
 
 <table>
 <tr>
@@ -91,7 +78,10 @@ the first 24 bytes of the GeoMesh packet.
 </tr>
 </table>
 
+
 ## DHT routing table copy request response
+
+
 
 <table>
 <tr><th>Octet</th><th>0</th><th>1</th><th>2</th><th>3</th></tr>
@@ -105,10 +95,8 @@ the first 24 bytes of the GeoMesh packet.
 <tr><td>28</td></tr>
 <tr><td>32</td></tr>
 <tr><td>36</td></tr>
-<tr><td>40</td><td colspan="4" rowspan="4">Node 1 Route label</td></tr>
-<tr><td>44</td></tr>
-<tr><td>48</td></tr>
-<tr><td>52</td></tr>
+<tr><td>40</td><td colspan="4">Node 1 Latitude</td></tr>
+<tr><td>40</td><td colspan="4">Node 1 Longitude</td></tr>
 <tr><td>...</td><td colspan="4" rowspan="8">...</td></tr>
 <tr><td>...</td></tr>
 <tr><td>...</td></tr>
@@ -145,6 +133,12 @@ the first 24 bytes of the GeoMesh packet.
 <tr><td>44</td><td colspan="4">Source altitude</td></tr>
 </table>
 
+* Source address: The unique 128-bit ID of the sender of the request.
+
+* Destination address:  The unique 128-bit ID of the receiver of the request.
+
+* Source latitude / longitude / altitude: The geographical position of the node sending the lookup response
+
 ## Location Lookup Response
 
 <table>
@@ -165,20 +159,20 @@ the first 24 bytes of the GeoMesh packet.
 <tr><td>8</td></tr>
 <tr><td>16</td></tr>
 <tr><td>20</td></tr>
-<tr><td>24</td><td colspan="4">Source latitude</td></tr>
-<tr><td>28</td><td colspan="4">Source longitude</td></tr>
-<tr><td>32</td><td colspan="4">Source altitude</td></tr>
-<tr><td>20</td><td colspan="4" rowspan="4">Destination address</td></tr>
+<tr><td>24</td><td colspan="4" rowspan="4">Destination address</td></tr>
 <tr><td>28</td></tr>
 <tr><td>32</td></tr>
 <tr><td>36</td></tr>
-<tr><td>40</td><td colspan="4">Destination latitude</td></tr>
-<tr><td>44</td><td colspan="4">Destination longitude</td></tr>
-<tr><td>48</td><td colspan="4">Destination altitude</td></tr>
-<tr><td>52</td><td colspan="4" rowspan="2">Timestamp</td></tr>
-<tr><td>56</td></tr>
-<tr><td>60</td><td colspan="4" rowspan="2">Valid For</td></tr>
-<tr><td>66</td></tr>
+<tr><td>40</td><td colspan="4">Source latitude</td></tr>
+<tr><td>44</td><td colspan="4">Source longitude</td></tr>
+<tr><td>48</td><td colspan="4">Source altitude</td></tr>
+<tr><td>52</td><td colspan="4">Destination latitude</td></tr>
+<tr><td>56</td><td colspan="4">Destination longitude</td></tr>
+<tr><td>60</td><td colspan="4">Destination altitude</td></tr>
+<tr><td>64</td><td colspan="4" rowspan="2">Timestamp</td></tr>
+<tr><td>68</td></tr>
+<tr><td>72</td><td colspan="4" rowspan="2">Valid For</td></tr>
+<tr><td>76</td></tr>
 </table>
 
 * Source address: The unique address of the node sending the location lookup response (not the one that made the request)
