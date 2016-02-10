@@ -7,6 +7,8 @@ There are two types of packets in GeoMesh:
 
 ##Geomesh Packet Header
 
+All GeoMesh packets MUST begin with a header as specified below.
+
 <table>
 <tr>
 <th>Octet</th>
@@ -54,139 +56,96 @@ at the start of face routing in meters.
 prepended to the IPv6 packet, instead of wrapping the whole packet. The original IPv6 packet can be retrieved by removing
 the first 24 bytes of the GeoMesh packet.
 
+* Payload: An arbitrary-length payload, must correspond to the message type.
+
 ## DHT routing table copy request
 
-A packet consisting of a request of a copy of the DHT routing table of a direct neighbour.
+A DHT routing table copy request packet has an empty body, since the header has sufficient information to fulfill
+the request.
 
-<table>
-<tr>
-<th>Octet</th>
-<th>0</th>
-<th>1</th>
-<th>2</th>
-<th>3</th>
-</tr>
-<tr>
-<td>0</td>
-<td colspan="2">Protocol Version</td>
-<td>Message type</td>
-<td>Routing Mode</td>
-</tr>
-<tr>
-<td>4</td>
-<td colspan="4" rowspan="4">Route label</td>
-</tr>
-</table>
-
+Note: In general, a routing table copy request SHOULD NOT be relayed, as it generally travels only 1 hop.
+This is to prevent spoofing.
 
 ## DHT routing table copy request response
 
+A DHT routing table copy response contains a list of routing table entries.
+Note: In general, a routing table copy request response SHOULD NOT be relayed, as it generally travels only 1 hop.
 
+Also, if a node receives such a routing table copy without requesting it, the node SHOULD ignore the packet.
 
 <table>
 <tr><th>Octet</th><th>0</th><th>1</th><th>2</th><th>3</th></tr>
-<tr><td>0</td><td colspan="2">Protocol Version</td><td>Message type</td><td>Routing Mode</td></tr>
-<tr><td>4</td><td colspan="4" rowspan="4">Route label</td></tr>
+<tr><td>0</td><td colspan="4">Number of entries</td></tr>
+<tr><td>4</td><td colspan="4" rowspan="4">Peer 1 address</td></tr>
 <tr><td>8</td></tr>
 <tr><td>12</td></tr>
 <tr><td>16</td></tr>
-<tr><td>20</td><td colspan="4">Number of entries</td></tr>
-<tr><td>24</td><td colspan="4" rowspan="4">Node 1 ID</td></tr>
-<tr><td>28</td></tr>
-<tr><td>32</td></tr>
+<tr><td>20</td><td colspan="4">Peer 1 latitude</td></tr>
+<tr><td>24</td><td colspan="4">Peer 1 longitude</td></tr>
+<tr><td>28</td><td colspan="4">Peer 1 altitude</td></tr>
+<tr><td>32</td><td colspan="4" rowspan="2">Peer 1 entry expires</td></tr>
 <tr><td>36</td></tr>
-<tr><td>40</td><td colspan="4">Node 1 Latitude</td></tr>
-<tr><td>40</td><td colspan="4">Node 1 Longitude</td></tr>
-<tr><td>...</td><td colspan="4" rowspan="8">...</td></tr>
-<tr><td>...</td></tr>
-<tr><td>...</td></tr>
-<tr><td>...</td></tr>
-<tr><td>...</td></tr>
-<tr><td>...</td></tr>
-<tr><td>...</td></tr>
-<tr><td>...</td></tr>
-<tr><td>24 + 32 * n</td><td colspan="4" rowspan="4">Node *n* ID</td></tr>
-<tr><td>28 + 32 * n</td></tr>
-<tr><td>32 + 32 * n</td></tr>
-<tr><td>36 + 32 * n</td></tr>
-<tr><td>40 + 32 * n</td><td colspan="4" rowspan="4">Node *1*n Route label</td></tr>
-<tr><td>44 + 32 * n</td></tr>
-<tr><td>48 + 32 * n</td></tr>
-<tr><td>52 + 32 * n</td></tr>
+<tr><td>...</td><td colspan="4">...</td></tr>
+<tr><td>4 + n * 36</td><td colspan="4" rowspan="4">Peer 1 address</td></tr>
+<tr><td>8 + n * 36</td></tr>
+<tr><td>12 + n * 36</td></tr>
+<tr><td>16 + n * 36</td></tr>
+<tr><td>20 + n * 36</td><td colspan="4">Peer *n* latitude</td></tr>
+<tr><td>24 + n * 36</td><td colspan="4">Peer *n* longitude</td></tr>
+<tr><td>28 + n * 36</td><td colspan="4">Peer *n* altitude</td></tr>
+<tr><td>32 + n * 36</td><td colspan="4" rowspan="2">Peer *n* entry expires</td></tr>
+<tr><td>36 + n * 36</td></tr>
 </table>
+
+* Number of entries: 32-bit unsigned integer indicating the number of entries.
+
+* Peer *i* address (for some integer *i*): The unique identifier of peer *i*.
 
 ## Location Lookup Packet
 
+This packet also has an empty body.
+
 <table>
 <tr><th>Octet</th><th>0</th><th>1</th><th>2</th><th>3</th></tr>
-<tr><td>0</td><td colspan="2">Protocol Version</td><td>Message type</td><td>Routing Mode</td></tr>
-<tr><td>4</td><td colspan="4" rowspan="4">Source address</td></tr>
+<tr><td>4</td><td colspan="4" rowspan="4">Requester address</td></tr>
 <tr><td>8</td></tr>
 <tr><td>12</td></tr>
 <tr><td>16</td></tr>
-<tr><td>20</td><td colspan="4" rowspan="4">Destination address</td></tr>
-<tr><td>24</td></tr>
-<tr><td>28</td></tr>
-<tr><td>32</td></tr>
-<tr><td>36</td><td colspan="4">Source latitude</td></tr>
-<tr><td>40</td><td colspan="4">Source longitude</td></tr>
-<tr><td>44</td><td colspan="4">Source altitude</td></tr>
+<tr><td>20</td><td colspan="4">Requester latitude</td></tr>
+<tr><td>24</td><td colspan="4">Requester longitude</td></tr>
+<tr><td>28</td><td colspan="4">Requester altitude</td></tr>
+<tr><td>4</td><td colspan="4" rowspan="4">Target address</td></tr>
+<tr><td>8</td></tr>
+<tr><td>12</td></tr>
+<tr><td>16</td></tr>
 </table>
 
-* Source address: The unique 128-bit ID of the sender of the request.
+* Requester address: The unique address of the node requesting the location
 
-* Destination address:  The unique 128-bit ID of the receiver of the request.
+* Requester lat/lon/alt: The location of the node requesting the location
 
-* Source latitude / longitude / altitude: The geographical position of the node sending the lookup response
+* Target address: The address of the node whose location the requester would like to know.
+
+For relay rules, see [DHT.md].
 
 ## Location Lookup Response
 
 <table>
-<tr>
-<th>Octet</th>
-<th>0</th>
-<th>1</th>
-<th>2</th>
-<th>3</th>
-</tr>
-<tr>
-<td>0</td>
-<td colspan="2">Protocol Version</td>
-<td>Message type</td>
-<td>Routing Mode</td>
-</tr>
-<tr><td>4</td><td colspan="4" rowspan="4">Source address</td></tr>
-<tr><td>8</td></tr>
-<tr><td>16</td></tr>
-<tr><td>20</td></tr>
-<tr><td>24</td><td colspan="4" rowspan="4">Destination address</td></tr>
-<tr><td>28</td></tr>
-<tr><td>32</td></tr>
-<tr><td>36</td></tr>
-<tr><td>40</td><td colspan="4">Source latitude</td></tr>
-<tr><td>44</td><td colspan="4">Source longitude</td></tr>
-<tr><td>48</td><td colspan="4">Source altitude</td></tr>
-<tr><td>52</td><td colspan="4">Destination latitude</td></tr>
-<tr><td>56</td><td colspan="4">Destination longitude</td></tr>
-<tr><td>60</td><td colspan="4">Destination altitude</td></tr>
-<tr><td>64</td><td colspan="4" rowspan="2">Timestamp</td></tr>
-<tr><td>68</td></tr>
-<tr><td>72</td><td colspan="4" rowspan="2">Valid For</td></tr>
-<tr><td>76</td></tr>
+<tr><th>Octet</th><th>0</th><th>1</th><th>2</th><th>3</th></tr>
+<tr><td>0</td><td colspan="4" rowspan="2">Timestamp</td></tr>
+<tr><td>4</td></tr>
+<tr><td>8</td><td colspan="4" rowspan="2">Valid For</td></tr>
+<tr><td>12</td></tr>
 </table>
 
-* Source address: The unique address of the node sending the location lookup response (not the one that made the request)
+The header already contains both the source and destination location, so that should be sufficient as a
+response.
 
-* Source latitude / longitude / altitude: The geographical position of the node sending the lookup response
+Two nodes desiring to communicate SHOULD re-send location lookup response packets before the information expires.
 
-* Destination address: The unique address of the node receiving the location lookup response (the one that wants to know the location)
+Proposal/request for comments: Should this message include a cryptographic signature?
+Potentially malicious nodes could respond to a location lookup with a fake response, and since such a request
+tends to travel quite far, some kind of authentication mechanism would be nice.
 
-* Destination latitude / longitude / altitude: The geographical position of the node receiving the lookup response
-
-* Timestamp: The 64-bit Unix timestamp at which the location of the sending node was valid.
-
-* Valid For: The 64-bit Unix timestamp after which the receiving node should consider
-  the location information to be ureliable. Please note when implementing this, that the virtual location of a node
-  can change even when it is stationary in the real world.
-
-Two nodes desiring to communicate SHOULD re-send location lookup response packets before the inforation expires.
+Another proposal would be for a node to send out multiple request in multiple directions, and use the response that is
+produced most often.
