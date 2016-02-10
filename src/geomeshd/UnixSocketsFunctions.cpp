@@ -11,9 +11,9 @@
 #include "../constants.h"
 #include "../Logger.h"
 
-int receiveMessage(int sock, char *buffer, size_t buffSize) {
+int receiveMessage(int sock, uint8_t *buffer, size_t buffSize) {
 
-    int nbytes = recvfrom(sock, buffer, MAX_PACKET_SIZE - IPv6_START - 4, O_NONBLOCK, NULL, NULL);
+    int nbytes = recvfrom(sock, buffer, buffSize, O_NONBLOCK, NULL, NULL);
 
     if (nbytes > 0) {
 

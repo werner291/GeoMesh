@@ -30,7 +30,7 @@ public:
      * @param ipV6packet A valid ipV6packet
      * @bytes The length of the data
      */
-    bool sendIPv6Message(const char* ipV6packet, int bytes);
+    bool sendIPv6Message(const uint8_t *ipV6packet, int bytes);
 
     void dataReceived(PacketPtr data);
 

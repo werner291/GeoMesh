@@ -13,7 +13,7 @@
 /**
  *
  */
-bool LocalInterface::sendIPv6Message(const char* ipV6packet, int bytes) {
+bool LocalInterface::sendIPv6Message(const uint8_t *ipV6packet, int bytes) {
 
     PacketPtr packet = Packet::createFromIPv6(ipV6packet, bytes, router->getVirtualLocation(), Location(0, 0));
 

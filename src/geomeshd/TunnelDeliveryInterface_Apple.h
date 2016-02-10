@@ -17,7 +17,7 @@ class TunnelDeliveryInterface_Apple {
     LocalInterface *mLocalInterface;
     struct sockaddr_ctl addr;
 
-    char mReceptionBuffer[MAX_PACKET_SIZE - IPv6_START];
+    uint8_t mReceptionBuffer[MAX_PACKET_SIZE - GEOMESH_PAYLOAD_START];
 
     char iFaceName[TUNInterface_IFNAMSIZ];
     int mSocketId;

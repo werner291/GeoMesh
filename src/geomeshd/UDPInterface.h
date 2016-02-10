@@ -20,7 +20,7 @@ class UDPInterface : public AbstractInterface {
 
     struct sockaddr_in peerAddress;
 
-    char mReceptionBuffer[MAX_PACKET_SIZE];
+    uint8_t mReceptionBuffer[MAX_PACKET_SIZE];
 
 public:
 

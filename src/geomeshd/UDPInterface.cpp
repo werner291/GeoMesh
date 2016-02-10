@@ -34,13 +34,11 @@ UDPInterface::UDPInterface() {
 
 void UDPInterface::pollMessages() {
 
-    int nbytes = recvfrom(socketID, mReceptionBuffer, MAX_PACKET_SIZE - IPv6_START, 0, NULL, NULL);
+    int nbytes = recvfrom(socketID, mReceptionBuffer, MAX_PACKET_SIZE, 0, NULL, NULL);
 
     if (nbytes > 0) {
 
-        PacketPtr packet(new std::vector<char>(nbytes));
-
-        memcpy(packet->data(), mReceptionBuffer, nbytes);
+        PacketPtr packet = Packet::createFromData(mReceptionBuffer, MAX_PACKET_SIZE);
 
         dataArrivedCallback(packet, iFaceID);
 
@@ -61,8 +59,8 @@ void UDPInterface::pollMessages() {
 bool UDPInterface::sendData(PacketPtr data) {
 
     int result = sendto(socketID,
-                        data->data(),
-                        data->size(),
+                        data->getData(),
+                        data->getDataLength(),
                         0,
                         (struct sockaddr *) &peerAddress,
                         sizeof(peerAddress));

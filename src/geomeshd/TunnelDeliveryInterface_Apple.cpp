@@ -44,8 +44,6 @@ void TunnelDeliveryInterface_Apple::startTunnelInterface() {
         Logger::log(LogLevel::ERROR, "getting utun device id " + std::string(strerror(errno)));
     }
 
-
-
     addr.sc_id = info.ctl_id;
 
     addr.sc_len = sizeof(addr);
@@ -111,7 +109,8 @@ void TunnelDeliveryInterface_Apple::assignIP() {
 
         if (i != 0) command << ":";
         // TODO enable leading 0's
-        command << std::setw(2) << (unsigned int) iFaceAddress.bytes[i]  << std::setw(2) << (unsigned int) iFaceAddress.bytes[i + 1];
+        command << std::setw(2) << (unsigned int) iFaceAddress.getBytes()[i] << std::setw(2) <<
+        (unsigned int) iFaceAddress.getBytes()[i + 1];
 
     }
 
@@ -124,19 +123,17 @@ void TunnelDeliveryInterface_Apple::assignIP() {
 
 void TunnelDeliveryInterface_Apple::deliverIPv6Packet(PacketPtr packet) {
 
-    // I should create a Packet class...
-    // Clear 4 octets of memory at the from of the buffer by shifting everything to the right
-    packet->resize(packet->size() + 4);
-    memmove(packet->data() + 4, packet->data(), 4);
+    uint8_t buffer[MAX_PACKET_SIZE + 4];
 
+    ((uint16_t *) buffer)[0] = htons(0);            // Always 0
+    ((uint16_t *) buffer)[1] = htons(AF_INET6);   // Set to AF_INET6 so it is handled by the Internet stack.
 
-    ((uint16_t *) packet->data())[0] = htons(0);            // Always 0
-    ((uint16_t *) packet->data())[1] = htons(AF_INET6);   // Set to AF_INET6 so it is handled by the Internet stack.
+    memcpy(buffer + 4, packet->getData(), packet->getDataLength());
 
     // Send to the local system.
     int result = send(mSocketId,
-                      packet->data(),
-                      packet->size(),
+                      buffer,
+                      packet->getDataLength() + 4,
                       0);
     //(struct sockaddr*) &addr,
     //sizeof(addr));

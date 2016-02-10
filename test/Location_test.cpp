@@ -143,3 +143,30 @@ TEST(location_int_angles, angle_minus_90) {
     EXPECT_NEAR(degreesToIntAngle(-90), INT_MIN/2, 10);
 
 }
+
+TEST(location_int_angles, to_and_back_0) {
+
+    EXPECT_NEAR(intAngleToDegrees(degreesToIntAngle(0)), 0, 10);
+
+}
+
+TEST(location_int_angles, to_and_back_minus_90) {
+
+    EXPECT_NEAR(intAngleToDegrees(degreesToIntAngle(-90)), -90, 10);
+
+}
+
+TEST(location_serialisation, ser_deser) {
+
+    Location loc(5, 10);
+
+    uint8_t buffer[8];
+
+    loc.toBytes(buffer);
+
+    Location locDeser = Location::fromBytes(buffer);
+
+    EXPECT_EQ(loc, locDeser);
+
+
+}

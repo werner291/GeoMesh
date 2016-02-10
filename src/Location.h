@@ -23,7 +23,7 @@ static int32_t inline degreesToIntAngle(double degrees) {
 }
 
 static double inline intAngleToDegrees(int32_t intAngle) {
-    return intAngle * 180 / INT32_MAX;
+    return intAngle * 180.0 / (double) INT32_MAX;
 }
 
 class Location {
@@ -32,8 +32,6 @@ class Location {
         return angle * M_PI / 180.0;
     }
 
-
-
 public:
     double lon; // From -180 to 180 degrees, with 0 at IERS Reference Meridian, + towards East
     double lat; // From -90 to 90 degrees, + towards North
@@ -41,8 +39,6 @@ public:
     double distanceTo(const Location& other) const;
 
     Location(double lat, double lon) : lon(lon), lat(lat) { }
-
-
 
     const std::string getDescription() const {
         std::stringstream ss;
@@ -60,9 +56,12 @@ public:
 
     inline static Location fromBytes(const uint8_t *buffer) {
 
+        uint32_t latInt = ntohl(((uint32_t *) buffer)[0]);
+        uint32_t lonInt = ntohl(((uint32_t *) buffer)[1]);
+
         return Location(
-                intAngleToDegrees(ntohl(((uint32_t *) buffer)[0])),
-                intAngleToDegrees(ntohl(((uint32_t *) buffer)[1]))
+                intAngleToDegrees(latInt),
+                intAngleToDegrees(lonInt)
         );
 
     }
@@ -70,8 +69,11 @@ public:
 
     inline void toBytes(const uint8_t *buffer) const {
 
-        ((uint32_t *) buffer)[0] = htonl(degreesToIntAngle(lat));
-        ((uint32_t *) buffer)[1] = htonl(degreesToIntAngle(lon));
+        uint32_t latInt = degreesToIntAngle(lat);
+        uint32_t lonInt = degreesToIntAngle(lon);
+
+        ((uint32_t *) buffer)[0] = htonl(latInt);
+        ((uint32_t *) buffer)[1] = htonl(lonInt);
 
     }
 };

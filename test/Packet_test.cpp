@@ -7,53 +7,44 @@
 #include "../src/UniqueAddress.h"
 #include "../src/Packet.h"
 
-TEST(packet_creation_from_ipv6, from_ipv6
-) {
+TEST(packet_creation_from_ipv6, from_ipv6) {
 
-Address testAddrSource = Address::generateRandom();
-Address testAddrDestination = Address::generateRandom();
+    Address testAddrSource = Address::generateRandom();
+    Address testAddrDestination = Address::generateRandom();
 
-unsigned char ipv6Packet[1500];
+    uint8_t ipv6Packet[1280];
 
-std::memcpy(ipv6packet
-+ 8, testAddrSource.
+    memset(ipv6Packet, 1, 1280);
 
-getBytes(), ADDRESS_LENGTH_OCTETS
+    PacketPtr testPacket = Packet::createFromIPv6(ipv6Packet, 1280, Location(-1, -1), Location(1, 1));
 
-);
-
-
-PacketPtr testPacket = Packet::createFromIPv6();
+    EXPECT_EQ(testPacket->isDestination(testAddrDestination), true);
 
 
 }
 
-TEST(location_info, location_info_checksum
-) {
+const double SMALL = 0.00001;
 
-Location loc(5, 90);
-Address addr = Address::generateRandom();
+TEST(location_info, location_info_checksum) {
 
-PacketPtr pack = Packet::createLocationInfoPacket(loc, addr);
+    Location loc(5, 90);
+    Address addr = Address::generateRandom();
 
-EXPECT_EQUAL(pack
-->
+    PacketPtr pack = Packet::createLocationInfoPacket(loc, addr);
 
-verifyLocationInformation(),
+    EXPECT_EQ(pack->verifyLocationInformation(), true);
 
-true);
+    Location packetLoc = pack->getSourceLocation();
 
-pack->
+    EXPECT_NEAR(packetLoc.lat, loc.lat, SMALL);
+    EXPECT_NEAR(packetLoc.lon, loc.lon, SMALL);
 
-getBytes()[5]
+    EXPECT_EQ(pack->getLocationInfoHopCount(), 1);
 
--= 1; // Change one of the bytes by 1.
+    EXPECT_EQ(pack->getSourceAddress(), addr);
 
-EXPECT_EQUAL(pack
-->
+    pack->getHeader()[5] -= 1; // Change one of the bytes by 1.
 
-verifyLocationInformation(),
-
-false);
+    EXPECT_EQ(pack->verifyLocationInformation(), false);
 
 }

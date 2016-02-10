@@ -43,10 +43,9 @@ TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *loc
 
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
-
     struct ifreq ifr;
     int err;
-    int flags = IFF_TUN;
+    int flags = IFF_TUN | IFF_NO_PI;
 
     if ((fd = open("/dev/net/tun", O_RDWR)) < 0) {
         perror("Opening /dev/net/tun");

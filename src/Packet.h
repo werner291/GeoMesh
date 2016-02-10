@@ -10,9 +10,6 @@
 #include "UniqueAddress.h"
 #include <assert.h>
 
-
-const int GEOMESH_HEADER_START = 4; // To accomodate for the 4 extra bytes added by some protocols, avoids copying.
-
 // A few constants
 const int PROTOCOL_VERSION = 0;
 const int DEFAULT_TTL = 255; // IPv6 only has one byte for this, maybe GeoMesh should use its own?
@@ -83,6 +80,8 @@ const int LOCATION_LOOKUP_VALID_TIME = 0;
 const int LOCATION_INFO_HOPS = 32;
 const int LOCATION_INFO_CHECK = 34;
 
+const int MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - GEOMESH_PAYLOAD_START;
+
 class Packet; // Forward-declare for PacketPtr
 
 typedef std::shared_ptr<Packet> PacketPtr;
@@ -95,17 +94,30 @@ typedef std::shared_ptr<Packet> PacketPtr;
 class Packet {
 
     uint8_t data[MAX_PACKET_SIZE];
-
+    int dataLength = MAX_PACKET_SIZE;
     uint8_t *header;
     uint8_t *payload;
 
-public:
-
-    Packet(int msgType) : header(data + GEOMESH_HEADER_START), payload(header + GEOMESH_PAYLOAD_START) {
+    // Private on purpose. Use the factory methods.
+    Packet(int msgType) : header(data), payload(header + GEOMESH_PAYLOAD_START) {
         setMessageType(msgType);
 
         // Set protocol version to current
         *(reinterpret_cast<uint16_t *>(header + GEOMESH_HEADER_PROTOCOL_VERSION)) = htons(PROTOCOL_VERSION);
+    }
+
+public:
+
+    const uint8_t *getData() const {
+        return data;
+    }
+
+    uint8_t *getHeader() const {
+        return header;
+    }
+
+    int getDataLength() const {
+        return dataLength;
     }
 
     inline int getProtocolVersion() const {
@@ -140,24 +152,19 @@ public:
         header[GEOMESH_HEADER_MESSAGE_TYPE] = msgType;
     }
 
-    inline int getMaxPayloadSize() const {
-        return MAX_PACKET_SIZE - (GEOMESH_HEADER_START + GEOMESH_PAYLOAD_START);
-    }
-
-
     inline int getRoutingMode() const {
         // Need to apply bitmask since the face routing direction is in the leftmost bit
         return header[GEOMESH_HEADER_MESSAGE_TYPE];
     }
 
-    inline uint32_t getLocationInfoHopCount() const {
+    inline uint16_t getLocationInfoHopCount() const {
         assert(getMessageType() == MSGTYPE_LOCATION_INFO);
-        return ntohl(*(reinterpret_cast<uint32_t *>(header + LOCATION_INFO_HOPS)));
+        return ntohs(*(reinterpret_cast<uint16_t *>(header + LOCATION_INFO_HOPS)));
     }
 
     inline void setLocationInfoHopCount(const int &hops) {
         assert(getMessageType() == MSGTYPE_LOCATION_INFO);
-        *(reinterpret_cast<uint32_t *>(header + LOCATION_INFO_HOPS)) = htonl(hops);
+        *(reinterpret_cast<uint16_t *>(header + LOCATION_INFO_HOPS)) = htons(hops);
     }
 
     inline void setRoutingMode(uint8_t routingMode) {
@@ -174,11 +181,12 @@ public:
         loc.toBytes(header + GEOMESH_HEADER_SOURCE_LOCATION);
     }
 
-    static PacketPtr createFromIPv6(const char *IPv6packet, size_t length, const Location &sourceLocation,
+    static PacketPtr createFromIPv6(const uint8_t *IPv6packet, size_t length, const Location &sourceLocation,
                                     const Location &destinationLocation);
 
     static PacketPtr createLocationInfoPacket(const Location &loc, const Address &addr);
 
+    static PacketPtr createFromData(const uint8_t *data, size_t length);
 
     /**
      * @return Whether the specified address is equal to the address in the IPv6 destination header field.

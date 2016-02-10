@@ -7,7 +7,7 @@
 
 #include <stddef.h>
 
-int receiveMessage(int sock, char *buffer, size_t buffSize);
+int receiveMessage(int sock, uint8_t *buffer, size_t buffSize);
 
 
 #endif //GEOMESH_UNIXSOCKETSFUNCTIONS_H
