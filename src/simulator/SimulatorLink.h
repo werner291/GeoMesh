@@ -32,7 +32,7 @@ public:
 
     std::shared_ptr<std::vector<char> > pullNextInSendQueue();
 
-    void handlePacketArrival(DataBufferPtr data) {
+    void handlePacketArrival(PacketPtr data) {
         this->dataArrivedCallback(data, this->iFaceID);
     }
 };

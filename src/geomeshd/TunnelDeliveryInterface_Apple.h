@@ -32,7 +32,7 @@ public:
 
     void startTunnelInterface();
 
-    void deliverIPv6Packet(DataBufferPtr packet);
+    void deliverIPv6Packet(PacketPtr packet);
 
     void pollMessages();
 

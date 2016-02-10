@@ -13,7 +13,7 @@
 class NetworkWidget;
 
 struct SimulatedPacket {
-    DataBufferPtr data;
+    PacketPtr data;
 
     float linkProgress;
     enum {

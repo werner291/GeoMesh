@@ -7,12 +7,12 @@
 
 #include <vector>
 #include <functional>
-#include "constants.h"
+#include "Packet.h"
 
 
 class AbstractInterface;
 
-typedef std::function<void(DataBufferPtr, int)> DataCallback;
+typedef std::function<void(PacketPtr, int)> DataCallback;
 
 
 
@@ -34,7 +34,7 @@ public:
 
     AbstractInterface();
 
-    virtual bool sendData(DataBufferPtr data) = 0;
+    virtual bool sendData(PacketPtr data) = 0;
 
     void setDataReceivedCallback(DataCallback const &dataArrivedCallback) {
         this->dataArrivedCallback = dataArrivedCallback;

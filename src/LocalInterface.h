@@ -15,10 +15,10 @@
 class LocalInterface {
 
     Router *router;
-    std::function<void(DataBufferPtr)> dataReceivedHandler;
+    std::function<void(PacketPtr)> dataReceivedHandler;
 
 public:
-    void setDataReceivedHandler(const std::function<void(DataBufferPtr)> &dataReceivedHandler) {
+    void setDataReceivedHandler(const std::function<void(PacketPtr)> &dataReceivedHandler) {
         LocalInterface::dataReceivedHandler = dataReceivedHandler;
     }
 
@@ -32,7 +32,7 @@ public:
      */
     bool sendIPv6Message(const char* ipV6packet, int bytes);
 
-    void dataReceived(DataBufferPtr data);
+    void dataReceived(PacketPtr data);
 
 };
 

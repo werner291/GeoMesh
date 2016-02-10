@@ -4,7 +4,7 @@ project(MeshnetSim)
 include_directories(/opt/local/include)
 
 set(CORE_SRC AbstractInterface.cpp Router.cpp Location.cpp Logger.cpp LinkManager.cpp LocalInterface.cpp
-        UniqueAddress.cpp PacketFunctions.cpp geomeshd/UDPManager.cpp DHTRoutingTable.cpp DHTRoutingTable.h)
+        UniqueAddress.cpp Packet.cpp geomeshd/UDPManager.cpp DHTRoutingTable.cpp DHTRoutingTable.h)
 add_library(core ${CORE_SRC})
 
 set_property(TARGET core PROPERTY CXX_STANDARD 11)

@@ -6,7 +6,7 @@
 #include "Logger.h"
 #include "Router.h"
 
-bool LinkManager::sendPacket(const DataBufferPtr &data, int iFace) {
+bool LinkManager::sendPacket(const PacketPtr &data, int iFace) {
     auto itr = mInterfaces.find(iFace);
 
     if (itr != mInterfaces.end()) {
@@ -24,11 +24,11 @@ void LinkManager::connectInterface(std::shared_ptr<AbstractInterface> iFace) {
                                              router, std::placeholders::_1, std::placeholders::_2));
 
     for (auto listener : linkEventListeners) {
-        listener(*iFace, LINK_CREATED);
+        listener(iFace, LINKEVENT_CREATED);
     }
 }
 
-void LinkManager::broadcastMessage(const DataBufferPtr &data) {
+void LinkManager::broadcastMessage(const PacketPtr &data) {
     for (auto pair : mInterfaces) {
         pair.second->sendData(data);
     }

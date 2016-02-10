@@ -8,25 +8,47 @@
 #include <random>
 #include <cstring>
 #include <netinet/in.h>
-#include "constants.h"
 
-struct Address {
+const int ADDRESS_LENGTH_OCTETS = 16; // 128-bit addresses, we're optimistic.
+
+struct AddressDistance {
+
+    uint32_t data[ADDRESS_LENGTH_OCTETS / 4];
+
+    inline bool operator<(const AddressDistance &other) const {
+        for (int i = 0; i < ADDRESS_LENGTH_OCTETS / 4; ++i) {
+            if (data[i] < other.data[i]) return true;
+        }
+        return false;
+    }
+
+    inline bool operator>(const AddressDistance &other) const {
+        for (int i = 0; i < ADDRESS_LENGTH_OCTETS / 4; ++i) {
+            if (data[i] > other.data[i]) return true;
+        }
+        return false;
+    }
+
+    inline bool operator==(const AddressDistance &other) const {
+        for (int i = 0; i < ADDRESS_LENGTH_OCTETS / 4; ++i) {
+            if (data[i] != other.data[i]) return false;
+        }
+        return true;
+    }
+
+};
+
+class Address {
 
     uint8_t bytes[ADDRESS_LENGTH_OCTETS];
 
+public:
+
+    /**
+     * @return Whether this address exactly matches the other address.
+     */
     bool operator==(const Address& other) const {
         return memcmp(bytes,other.bytes,ADDRESS_LENGTH_OCTETS) == 0;
-    }
-
-    bool isDestinationOf(const DataBufferPtr& packet) const {
-
-        char* packetAddrPtr = packet->data() + DESTINATION_ADDRESS;
-
-        return memcmp(bytes,packetAddrPtr,ADDRESS_LENGTH_OCTETS) == 0;
-    }
-
-    void writeAsDestination(DataBufferPtr& packet) const {
-        memcpy(packet->data() + DESTINATION_ADDRESS, bytes,ADDRESS_LENGTH_OCTETS);
     }
 
     static Address generateRandom();
@@ -35,33 +57,28 @@ struct Address {
 
     void writeToSocketAddress(struct sockaddr_in6& socketAddress) const;
 
-    double xorDistanceTo(const Address &other) {
-        // Distance between the wto adresses
-        double dist = 0;
+    void setBytes(uint8_t *newBytes) {
+        memcpy(bytes, newBytes, ADDRESS_LENGTH_OCTETS);
+    }
 
-        // By how much to multiply the XOR-ed octets
-        double multiplier = 1;
+    const uint8_t *getBytes() const {
+        return bytes;
+    }
 
-        // By how much to multiply the multiplier each iteration
-        double iterationMult = pow(2, 8);
+    AddressDistance xorDistanceTo(const Address &other) const {
+
+        AddressDistance dist;
 
         // Iterate over all the octets
         for (int i = 0; i < ADDRESS_LENGTH_OCTETS; ++i) {
 
             // Take the XOR distance, multiply according to the octet position.
-            dist += ((double) (bytes[i] ^ other.bytes[i])) * multiplier;
-
-            // Multiply the multiplier.
-            multiplier *= iterationMult;
+            dist.data[i] = (bytes[i] ^ other.bytes[i]);
 
         }
 
         return dist;
     }
 };
-
-#include "Location.h"
-#include "AbstractInterface.h"
-#include "constants.h"
 
 #endif //GEOMESH_UNIQUEADDRESS_H

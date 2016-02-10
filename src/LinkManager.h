@@ -10,27 +10,34 @@
 
 class Router;
 
+enum LinkEvent {
+    LINKEVENT_CREATED,
+    LINKEVENT_BROKEN
+};
+
+typedef std::function<void(std::shared_ptr<AbstractInterface>, LinkEvent)> LinkChangeListener;
+
 class LinkManager {
 
     Router *router;
 
-    enum LinkEvent {
-        LINK_CREATED,
-        LINK_DESTROYED
-    };
 
-    std::vector<std::function<void(const AbstractInterface &, const LinkEvent &)> > linkEventListeners;
+    std::vector<LinkChangeListener> linkEventListeners;
 
 public:
     LinkManager(Router *router) : router(router) { };
 
     std::map<int, std::shared_ptr<AbstractInterface> > mInterfaces;
 
-    bool sendPacket(const DataBufferPtr &data, int fromIface);
+    bool sendPacket(const PacketPtr &data, int fromIface);
 
     void connectInterface(std::shared_ptr<AbstractInterface> iFace);
 
-    void broadcastMessage(const DataBufferPtr &data);
+    void broadcastMessage(const PacketPtr &data);
+
+    void addLinkListener(const LinkChangeListener &changeListener) {
+        linkEventListeners.push_back(changeListener);
+    }
 };
 
 

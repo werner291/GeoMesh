@@ -38,7 +38,7 @@ public:
 
     }
 
-    bool sendData(DataBufferPtr data) override;
+    bool sendData(PacketPtr data) override;
 
 };
 

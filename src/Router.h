@@ -10,6 +10,7 @@
 #include "LocalInterface.h"
 #include "LinkManager.h"
 #include "UniqueAddress.h"
+#include "DHTRoutingTable.h"
 
 #include <set>
 #include <queue>
@@ -54,7 +55,7 @@ private:
 
     DHTRoutingTable dhtRoutingTable;
 
-    std::queue<DataBufferPtr> routingQueue;
+    std::queue<PacketPtr> routingQueue;
 
 public:
     LocalInterface *getLocalIface() const {
@@ -79,9 +80,9 @@ public:
                                                        localIface(new LocalInterface(this)),
                                                        linkMgr(new LinkManager(this)) {
 
-        linkMgr->addLinkListener([](std::share_ptr<AbstractInterface>, LinkEvent event) {
+        linkMgr->addLinkListener([this](std::shared_ptr<AbstractInterface> iFace, LinkEvent event) {
 
-            if (event == LinkManager::LINK_CREATED) {
+            if (event == LINKEVENT_CREATED) {
                 this->sendLocationInfo(iFace->getInterfaceId()); // Maybe the router should decide what should be done?
             }
         });
@@ -93,7 +94,7 @@ public:
         delete linkMgr;
     }
 
-    bool handleMessage(std::shared_ptr<std::vector<char> > data, int fromIface);
+    bool handleMessage(PacketPtr data, int fromIface);
 
     const Location&getVirtualLocation() const {
         return mVirtualLocation;
@@ -105,21 +106,21 @@ public:
 
     void sendLocationInfo(int iFace);
 
-    bool processRoutingSuggestion(int fromIface, const Location &peerLocation, int hops);
+    bool processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket);
 
-    bool routeGreedy(DataBufferPtr data, int fromIface, Location destination);
+    bool routeGreedy(PacketPtr data, int fromIface, Location destination);
 
     int getGreedyInterface(int fromInterface, const Location &destination);
 
-    void greedyToFace(DataBufferPtr data);
+    void greedyToFace(PacketPtr data);
 
-    bool routeFaceBegin(DataBufferPtr data, int fromIface, Location destination);
+    bool routeFaceBegin(PacketPtr data, int fromIface, Location destination);
 
-    bool canSwitchFaceToGreedy(DataBufferPtr data, Location destination);
+    bool canSwitchFaceToGreedy(PacketPtr data, Location destination);
 
-    bool routeFaceRelay(DataBufferPtr data, int fromIface, Location destination);
+    bool routeFaceRelay(PacketPtr data, int fromIface, Location destination);
 
-
+    void processDHTRoutingSuggestion(Address addr, Location loc);
 };
 
 

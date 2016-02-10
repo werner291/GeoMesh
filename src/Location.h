@@ -52,15 +52,28 @@ public:
         return ss.str();
     }
 
-    const double getDirectionTo(const Location &target);
+    double getDirectionTo(const Location &target) const;
 
-    const bool operator==(const Location& other) {
+    inline bool operator==(const Location &other) const {
         return lon == other.lon && lat == other.lat;
     }
 
-    static Location readFromPacket(int offset, DataBufferPtr packet);
+    inline static Location fromBytes(const uint8_t *buffer) {
 
-    void writeToPacket(int offset, DataBufferPtr packet);
+        return Location(
+                intAngleToDegrees(ntohl(((uint32_t *) buffer)[0])),
+                intAngleToDegrees(ntohl(((uint32_t *) buffer)[1]))
+        );
+
+    }
+
+
+    inline void toBytes(const uint8_t *buffer) const {
+
+        ((uint32_t *) buffer)[0] = htonl(degreesToIntAngle(lat));
+        ((uint32_t *) buffer)[1] = htonl(degreesToIntAngle(lon));
+
+    }
 };
 
 Vector3d convertLocation(const Location &loc);

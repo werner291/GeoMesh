@@ -122,7 +122,7 @@ void TunnelDeliveryInterface_Apple::assignIP() {
     system(command.str().c_str());
 }
 
-void TunnelDeliveryInterface_Apple::deliverIPv6Packet(DataBufferPtr packet) {
+void TunnelDeliveryInterface_Apple::deliverIPv6Packet(PacketPtr packet) {
 
     // I should create a Packet class...
     // Clear 4 octets of memory at the from of the buffer by shifting everything to the right

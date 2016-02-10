@@ -24,7 +24,7 @@ double Location::distanceTo(const Location& other) const {
 
 // Warning: This is rally only a measure suitable for the face routing algorithm
 // The only thing that is important is that the directional order is kept.
-const double Location::getDirectionTo(const Location &target) {
+double Location::getDirectionTo(const Location &target) const {
 
     // Convert to carthesian coordinates, Z+ is the axis goign from the South to the North Pole
     // These don't need to be multiplied by the radius, since we just want the angle.
@@ -70,21 +70,7 @@ const double Location::getDirectionTo(const Location &target) {
 
 }
 
-void Location::writeToPacket(int offset, DataBufferPtr packet) {
 
-    setPacketData<int32_t>(offset, packet, degreesToIntAngle(lat));
-    setPacketData<int32_t>(offset+4, packet, degreesToIntAngle(lon));
-
-}
-
-Location Location::readFromPacket(int offset, DataBufferPtr packet) {
-
-    return Location(
-            intAngleToDegrees(getPacketData<int32_t>(offset, packet)),
-            intAngleToDegrees(getPacketData<int32_t>(offset+4, packet))
-    );
-
-}
 
 Vector3d convertLocation(const Location &loc) {
     return convertLocation(loc.lat,loc.lon);

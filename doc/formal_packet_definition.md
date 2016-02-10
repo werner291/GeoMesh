@@ -134,7 +134,7 @@ For relay rules, see [DHT.md].
 <tr><th>Octet</th><th>0</th><th>1</th><th>2</th><th>3</th></tr>
 <tr><td>0</td><td colspan="4" rowspan="2">Timestamp</td></tr>
 <tr><td>4</td></tr>
-<tr><td>8</td><td colspan="4" rowspan="2">Valid For</td></tr>
+<tr><td>8</td><td colspan="4" rowspan="2">Valid Until</td></tr>
 <tr><td>12</td></tr>
 </table>
 
@@ -149,3 +149,42 @@ tends to travel quite far, some kind of authentication mechanism would be nice.
 
 Another proposal would be for a node to send out multiple request in multiple directions, and use the response that is
 produced most often.
+
+## Location broadcast packet
+
+This is a special type of packet. It does not have a specific destination or payload.
+I also does NOT use a standard GeoMesh header, and the specification given below is
+the full packet.
+
+<table>
+<tr>
+<th>Octet</th>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+</tr>
+<tr>
+<td>0</td>
+<td colspan="2">Protocol Version</td>
+<td>Message type</td>
+<td>Routing Mode</td>
+</tr>
+<tr><td>4</td><td colspan="4" rowspan="4">Source address</td></tr>
+<tr><td>8</td></tr>
+<tr><td>12</td></tr>
+<tr><td>16</td></tr>
+<tr><td>20</td><td colspan="4">Source latitude</td></tr>
+<tr><td>24</td><td colspan="4">Source longitude</td></tr>
+<tr><td>28</td><td colspan="4">Source altitude</td></tr>
+<tr><td>32</td><td colspan="2">Hops travelled</td><td colspan="2">Check</td></tr>
+</table>
+
+This packet is the same as a normal GeoMesh packet until octet position 32 not included.
+
+* Hops travelled: Sending node sets this to 1, relaying nodes increase the value by 1. This
+  gives an indication of cost.
+
+* Check: A 16-bit integer. The modulus 2^16 sum of all 16-bit words in the packet until octet position 36 not included
+must be equal to 0.
+

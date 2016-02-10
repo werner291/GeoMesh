@@ -6,7 +6,6 @@
 #include "Logger.h"
 
 #include "Packet.h"
-#include "PacketFunctions.h"
 
 #include <iostream>
 #include <algorithm>
@@ -15,35 +14,24 @@
 #include "constants.h"
 
 
-bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIface) {
+bool Router::handleMessage(PacketPtr data, int fromIface) {
 
-    int protocol_version = *(reinterpret_cast<int32_t *>(data->data() + PROTOCOL_VERSION_LOC));
+    int protocol_version = data->getProtocolVersion();
 
-    int messageType = *(reinterpret_cast<int32_t *>(data->data() + MESSAGE_TYPE));
+    int messageType = data->getMessageType();
 
     switch (messageType) {
 
-        case MSGTYPE_PAYLOAD: {
-            Location destination = Location::readFromPacket(DESTINATION_LOCATION, data);
+        case MSGTYPE_IPv6: {
+            Location destination = data->getDestinationLocation();
 
-            if (uniqueaddress.isDestinationOf(data)) {
+            if (data->isDestination(uniqueaddress)) {
+
                 localIface->dataReceived(data);
 
             } else {
 
-                int hopsLeft = getPacketData<unsigned char>(TTL, data);
-
-                if (hopsLeft <= 0) {
-                    std::stringstream message;
-                    message << "TTL exceeded, dropping packet destined to: " <<
-                    destination.getDescription();
-
-                    Logger::log(LogLevel::WARN, message.str());
-
-                    return false;
-                }
-
-                int routingMode = getPacketData<int32_t>(ROUTING_MODE, data);
+                int routingMode = data->getRoutingMode();
 
                 switch (routingMode) {
 
@@ -56,10 +44,11 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
                         }
                     }
                         break;
-                    case ROUTING_FACE: {
+                    case ROUTING_FACE_LEFT:
+                    case ROUTING_FACE_RIGHT: {
 
                         if (canSwitchFaceToGreedy(data, destination)) {
-                            setPacketData(ROUTING_MODE, data, ROUTING_GREEDY);
+                            data->setRoutingMode(ROUTING_GREEDY);
                             return handleMessage(data, fromIface);
                         } else {
                             return routeFaceRelay(data, fromIface, destination);
@@ -80,15 +69,14 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
         case MSGTYPE_LOCATION_INFO: {
 
             // Dangerous. TODO: use the IEEE standard for doubles.
-            Location peerLocation(*(reinterpret_cast<double *>(data->data() + PEERINFO_LOCATION_LAT)),
-                                  *(reinterpret_cast<double *>(data->data() + PEERINFO_LOCATION_LON)));
+            Location peerLocation = data->getSourceLocation();
 
-            int hops = getPacketData<int32_t>(PEERINFO_HOPS, data);
+            int hops = data->getLocationInfoHopCount();
 
-            bool isGoodSuggestion = processRoutingSuggestion(fromIface, peerLocation, hops);
+            bool isGoodSuggestion = processRoutingSuggestion(fromIface, data);
 
             if (isGoodSuggestion || hops < 3) {
-                setPacketData<int32_t>(PEERINFO_HOPS, data, hops + 1);
+                data->setLocationInfoHopCount(hops + 1);
 
                 for (auto neighbour : linkMgr->mInterfaces) {
                     if (neighbour.second->getInterfaceId() != fromIface)
@@ -100,21 +88,38 @@ bool Router::handleMessage(std::shared_ptr<std::vector<char> > data, int fromIfa
             return true;
             break;
         }
-        case MSGTYPE_DHT_ROUTETABLE_COPY: {
-            dhtRoutingTable.processRoutingTableCopy(data, fromIface);
-            return true;
-        }
-            break;
-        case MSGTYPE_DHT_ROUTETABLE_COPY_REQUEST: {
+            /*case MSGTYPE_DHT_ROUTETABLE_COPY: {
 
-        }
+                processRoutingTableCopy(data, fromIface);
+                return true;
+                break;
+            }
+                break;
+            case MSGTYPE_DHT_ROUTETABLE_COPY_REQUEST: {
+
+                RoutingLabel routeLabel = data->getRoutingLabel().append(fromIface).reverse();
+
+                return sendRoutingTableCopy(routeLabel);
+                break;
+
+            }*/
     }
 
     return false;
 
 }
 
-bool Router::processRoutingSuggestion(int fromIface, const Location &peerLocation, int hops) {
+bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket) {
+
+    assert(suggestionPacket->getMessageType() == MSGTYPE_LOCATION_INFO);
+
+    if (!suggestionPacket->verifyLocationInformation()) {
+        return false; // The location information was damaged. (TODO add falsification check)
+    }
+
+    Location peerLocation = suggestionPacket->getSourceLocation();
+
+    int hops = suggestionPacket->getLocationInfoHopCount();
 
     if (hops == 1) {
 
@@ -125,23 +130,10 @@ bool Router::processRoutingSuggestion(int fromIface, const Location &peerLocatio
         };
 
         mFaceRoutingTable.insert(entry);
+    }
 
-        /*double totalWeight = 0;
-
-        for (const DirectionalEntry& entry : mFaceRoutingTable) {
-            totalWeight += 1 / (mRealLocation.distanceTo(entry.loc) + 0.0000001);
-        }
-
-        mVirtualLocation.lat = mRealLocation.lat * 0.5;
-        mVirtualLocation.lon = mRealLocation.lon * 0.5;
-
-        for (const DirectionalEntry& entry : mFaceRoutingTable) {
-            double weight = 1 / (mRealLocation.distanceTo(entry.loc) + 0.0000001);
-
-            mVirtualLocation.lat += (weight * entry.loc.lat / totalWeight) * 0.5;
-            mVirtualLocation.lon += (weight * entry.loc.lon / totalWeight) * 0.5;
-        }*/
-
+    if (hops < 3) {
+        processDHTRoutingSuggestion(suggestionPacket->getSourceAddress(), peerLocation);
     }
 
     if (mGreedyRoutingTable.empty()) {
@@ -181,31 +173,16 @@ bool Router::processRoutingSuggestion(int fromIface, const Location &peerLocatio
 
 void Router::sendLocationInfo(int interface) {
 
-    std::shared_ptr<std::vector<char> > messageBuffer(new std::vector<char>(PEERINFO_ENTRY_UID + ADDRESS_LENGTH_OCTETS));
-
-    *reinterpret_cast<int32_t *>(messageBuffer->data() + PROTOCOL_VERSION_LOC) = PROTOCOL_VERSION;
-    *reinterpret_cast<int32_t *>(messageBuffer->data() + MESSAGE_TYPE) = MSGTYPE_LOCATION_INFO;
-
-    setPacketData<double>(PEERINFO_LOCATION_LON, messageBuffer, this->mVirtualLocation.lon);
-    setPacketData<double>(PEERINFO_LOCATION_LAT, messageBuffer, this->mVirtualLocation.lat);
-
-    setPacketData<int32_t>(PEERINFO_HOPS, messageBuffer, 1);
-
-    // TODO include UID
-    //*reinterpret_cast<int64_t *>(messageBuffer->data() + PEERINFO_ENTRIES_START +
-      //                           PEERINFO_ENTRY_UID) = this->uniqueaddress;
-
-    linkMgr->sendPacket(messageBuffer, interface);
+    PacketPtr locationPacker = Packet::createLocationInfoPacket(this->getVirtualLocation(), this->getAddress());
+    linkMgr->sendPacket(locationPacker, interface);
 
 }
 
-bool Router::routeGreedy(DataBufferPtr data, int fromIface, Location destination) {
+bool Router::routeGreedy(PacketPtr data, int fromIface, Location destination) {
 
     int outInteface = getGreedyInterface(fromIface, destination);
 
     if (outInteface != -1) {
-        *(reinterpret_cast<int32_t *>(data->data() + TTL)) = getPacketData<int32_t>(TTL, data) - 1;
-
 
         linkMgr->sendPacket(data, outInteface);
 
@@ -219,9 +196,9 @@ template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
 
-bool Router::canSwitchFaceToGreedy(DataBufferPtr data, Location destination) {
+bool Router::canSwitchFaceToGreedy(PacketPtr data, Location destination) {
 
-    double bestDistance = getPacketData<float>(ROUTING_FACE_DISTANCE, data);
+    double bestDistance = data->getPacketFaceRoutingClosestDistance();
 
     if (destination.distanceTo(mVirtualLocation) < bestDistance) return true;
 
@@ -235,14 +212,13 @@ bool Router::canSwitchFaceToGreedy(DataBufferPtr data, Location destination) {
 }
 
 // TODO: Proper analysis of the correctness of this function.
-bool Router::routeFaceBegin(DataBufferPtr data, int fromIface, Location destination) {
+bool Router::routeFaceBegin(PacketPtr data, int fromIface, Location destination) {
 
-    int routing_start_direction = FACE_ROUTE_LHR;
+    data->setRoutingMode(ROUTING_FACE_RIGHT);
 
-    setPacketData<int32_t>(ROUTING_MODE, data, ROUTING_FACE);
-    setPacketFaceRoutingDirection(data, routing_start_direction);
-    setPacketFaceRoutingClosestDistance(data, mVirtualLocation.distanceTo(destination));
-    setPacketFaceRoutingSearchRange(data, mVirtualLocation.distanceTo(destination) * FACE_ROUTING_RANGE_MULTIPLIER);
+    data->setPacketFaceRoutingClosestDistance(mVirtualLocation.distanceTo(destination));
+
+    data->setPacketFaceRoutingSearchRange(mVirtualLocation.distanceTo(destination) * FACE_ROUTING_RANGE_MULTIPLIER);
 
     // Direction in trigonometric space of the vector from the current node to the destination
     double directionToDestination = mVirtualLocation.getDirectionTo(destination);
@@ -266,8 +242,8 @@ bool Router::routeFaceBegin(DataBufferPtr data, int fromIface, Location destinat
             }
 
             if (foundRange) {
-                return linkMgr->sendPacket(data, routing_start_direction != FACE_ROUTE_RHR ? before->iFaceID
-                                                                                           : after->iFaceID);
+                return linkMgr->sendPacket(data, data->getRoutingMode() != ROUTING_FACE_RIGHT ? before->iFaceID
+                                                                                              : after->iFaceID);
             }
 
             before++;
@@ -305,20 +281,19 @@ int Router::getGreedyInterface(int fromInterface, const Location &destination) {
     return bestCandidate->iFaceID;
 }
 
-bool Router::routeFaceRelay(DataBufferPtr data, int fromIface, Location destination) {
+bool Router::routeFaceRelay(PacketPtr data, int fromIface, Location destination) {
 
     double distanceFromTarget = mVirtualLocation.distanceTo(destination);
 
-    double searchRange = getPacketFaceRoutingSearchRange(data);
+    double searchRange = data->getPacketFaceRoutingSearchRange();
 
-    int faceDirection = getPacketFaceDirection(data);
+    int routemode = data->getRoutingMode();
 
     if (distanceFromTarget > searchRange) {
 
-        setPacketFaceRoutingSearchRange(data, searchRange * FACE_ROUTING_RANGE_MULTIPLIER);
+        data->setPacketFaceRoutingSearchRange(searchRange * FACE_ROUTING_RANGE_MULTIPLIER);
 
-
-        setPacketFaceRoutingDirection(data, faceDirection == FACE_ROUTE_RHR ? FACE_ROUTE_LHR : FACE_ROUTE_RHR);
+        data->setRoutingMode(routemode == ROUTING_FACE_RIGHT ? ROUTING_FACE_LEFT : ROUTING_FACE_RIGHT);
 
         return linkMgr->sendPacket(data, fromIface);
 
@@ -332,7 +307,7 @@ bool Router::routeFaceRelay(DataBufferPtr data, int fromIface, Location destinat
         }
 
         // Neighbours are sorted counter-clickwise. Right-hand routing thus means selecting a previous neigbour
-        if (faceDirection == FACE_ROUTE_RHR) {
+        if (routemode == ROUTING_FACE_RIGHT) {
             itr++;
             if (itr == mFaceRoutingTable.end()) itr = mFaceRoutingTable.begin();
         } else {
@@ -343,4 +318,9 @@ bool Router::routeFaceRelay(DataBufferPtr data, int fromIface, Location destinat
 
         return linkMgr->sendPacket(data, itr->iFaceID);
     }
+}
+
+void Router::processDHTRoutingSuggestion(Address addr, Location loc) {
+
+
 }

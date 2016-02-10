@@ -144,7 +144,7 @@ void TunnelDeliveryInterface_Linux::pollMessages() {
 
 }
 
-void TunnelDeliveryInterface_Linux::deliverIPv6Packet(DataBufferPtr packet) {
+void TunnelDeliveryInterface_Linux::deliverIPv6Packet(PacketPtr packet) {
 
     //printf("Sock int: %i", fd);
 

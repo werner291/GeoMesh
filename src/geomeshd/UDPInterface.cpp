@@ -38,7 +38,7 @@ void UDPInterface::pollMessages() {
 
     if (nbytes > 0) {
 
-        DataBufferPtr packet(new std::vector<char>(nbytes));
+        PacketPtr packet(new std::vector<char>(nbytes));
 
         memcpy(packet->data(), mReceptionBuffer, nbytes);
 
@@ -58,7 +58,7 @@ void UDPInterface::pollMessages() {
 
 }
 
-bool UDPInterface::sendData(DataBufferPtr data) {
+bool UDPInterface::sendData(PacketPtr data) {
 
     int result = sendto(socketID,
                         data->data(),

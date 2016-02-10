@@ -6,7 +6,7 @@
 #define GEOMESH_TUNNELDELIVERYINTERFACE_LINUX_H
 
 #include "../LocalInterface.h"
-#include "../PacketFunctions.h"
+#include "../Packet.h"
 #include "../constants.h"
 
 #define TUNInterface_IFNAMSIZ 16
@@ -30,7 +30,7 @@ public:
 
     void startTunnelInterface();
 
-    void deliverIPv6Packet(DataBufferPtr packet);
+    void deliverIPv6Packet(PacketPtr packet);
 
     void pollMessages();
 

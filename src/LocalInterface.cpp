@@ -6,7 +6,7 @@
 
 #include "AbstractInterface.h"
 
-#include "constants.h"
+#include "Packet.h"
 
 #include "Router.h"
 
@@ -15,27 +15,12 @@
  */
 bool LocalInterface::sendIPv6Message(const char* ipV6packet, int bytes) {
 
-    DataBufferPtr msg(new std::vector<char>(bytes + IPv6_START));
+    PacketPtr packet = Packet::createFromIPv6(ipV6packet, bytes, router->getVirtualLocation(), Location(0, 0));
 
-    setPacketData<int32_t>(PROTOCOL_VERSION_LOC, msg, PROTOCOL_VERSION);
-    setPacketData<int32_t>(MESSAGE_TYPE, msg, MSGTYPE_PAYLOAD);
-
-    //router->getAddress().writeAsDestination(msg);
-
-    Location(0,0).writeToPacket(DESTINATION_LOCATION, msg);
-
-    setPacketData<int32_t>(TTL, msg, DEFAULT_TTL);
-
-    std::memcpy(msg->data() + IPv6_START, ipV6packet, bytes);
-
-    return router->handleMessage(msg, 0);
+    return router->handleMessage(packet, 0);
 }
 
-void LocalInterface::dataReceived(DataBufferPtr data) {
-
-    // Decapitate the packet by shifting the original IPv6 data towards the front.
-    // This will result in just an IPv6 packet, to be handles by the OS.
-    memmove(data->data(),data->data(), data->size() - IPv6_START);
+void LocalInterface::dataReceived(PacketPtr data) {
 
     dataReceivedHandler(data);
 }
