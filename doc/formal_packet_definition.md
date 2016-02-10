@@ -107,17 +107,17 @@ This packet also has an empty body.
 
 <table>
 <tr><th>Octet</th><th>0</th><th>1</th><th>2</th><th>3</th></tr>
-<tr><td>4</td><td colspan="4" rowspan="4">Requester address</td></tr>
+<tr><td>0</td><td colspan="4" rowspan="4">Requester address</td></tr>
+<tr><td>4</td></tr>
 <tr><td>8</td></tr>
 <tr><td>12</td></tr>
-<tr><td>16</td></tr>
-<tr><td>20</td><td colspan="4">Requester latitude</td></tr>
-<tr><td>24</td><td colspan="4">Requester longitude</td></tr>
-<tr><td>28</td><td colspan="4">Requester altitude</td></tr>
-<tr><td>4</td><td colspan="4" rowspan="4">Target address</td></tr>
-<tr><td>8</td></tr>
-<tr><td>12</td></tr>
-<tr><td>16</td></tr>
+<tr><td>16</td><td colspan="4">Requester latitude</td></tr>
+<tr><td>20</td><td colspan="4">Requester longitude</td></tr>
+<tr><td>24</td><td colspan="4">Requester altitude</td></tr>
+<tr><td>28</td><td colspan="4" rowspan="4">Target address</td></tr>
+<tr><td>32</td></tr>
+<tr><td>36</td></tr>
+<tr><td>40</td></tr>
 </table>
 
 * Requester address: The unique address of the node requesting the location
