@@ -5,7 +5,7 @@
 #ifndef GEOMESH_PACKET_H
 #define GEOMESH_PACKET_H
 
-#include <_types/_uint8_t.h>
+#include <stdint.h>
 #include "Location.h"
 #include "UniqueAddress.h"
 #include <assert.h>
