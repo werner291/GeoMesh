@@ -118,6 +118,14 @@ public:
         return header;
     }
 
+    uint8_t *getPayload() const {
+        return payload;
+    }
+
+    int getPayloadLength() const {
+        return MAX_PAYLOAD_SIZE;
+    }
+
     int getDataLength() const {
         return dataLength;
     }
