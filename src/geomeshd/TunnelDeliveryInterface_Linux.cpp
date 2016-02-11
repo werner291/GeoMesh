@@ -147,19 +147,17 @@ void TunnelDeliveryInterface_Linux::deliverIPv6Packet(PacketPtr packet) {
 
     //printf("Sock int: %i", fd);
 
-    // I should create a Packet class...
-    // Clear 4 octets of memory at the from of the buffer by shifting everything to the right
-    packet->resize(packet->size() + 4);
-    memmove(packet->data() + 4, packet->data(), 4);
+    uint8_t buffer[packet->getPayloadLength() + 4]
 
+    memcpy(buffer + 4, packet->getPayload(), packet->getPayloadLength());
 
-    ((uint16_t *) packet->data())[0] = htons(0);            // Always 0
-    ((uint16_t *) packet->data())[1] = htons(AF_INET6);   // Set to AF_INET6 so it is handled by the Internet stack.
+    ((uint16_t *) buffer)[0] = htons(0);            // Flags always 0
+    ((uint16_t *) buffer)[1] = htons(AF_INET6);   // Set to AF_INET6 so it is handled by the Internet stack.
 
     // Send to the local system.
     int result = send(fd,
-                      packet->data(),
-                      packet->size(),
+                      buffer,
+                      packet->getPayloadLength() + 4,
                       0);
     //(struct sockaddr*) &addr,
     //sizeof(addr));
