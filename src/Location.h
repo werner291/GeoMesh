@@ -8,7 +8,8 @@
 #include <cmath>
 #include <string>
 #include <sstream>
-#include <arpa/inet.h>
+
+#include "constants.h"
 
 const double EARTH_RAD = 6371000; // Approx earth radius in meters
 

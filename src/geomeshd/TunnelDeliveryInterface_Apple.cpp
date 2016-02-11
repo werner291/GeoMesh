@@ -103,18 +103,7 @@ void TunnelDeliveryInterface_Apple::assignIP() {
 
     std::stringstream command;
 
-    command << "ifconfig " << iFaceName << " inet6 add " << std::hex << std::setfill('0');
-
-    for (int i = 0; i+1 < ADDRESS_LENGTH_OCTETS; i += 2) {
-
-        if (i != 0) command << ":";
-        // TODO enable leading 0's
-        command << std::setw(2) << (unsigned int) iFaceAddress.getBytes()[i] << std::setw(2) <<
-        (unsigned int) iFaceAddress.getBytes()[i + 1];
-
-    }
-
-    command << "/64";
+    command << "ifconfig " << iFaceName << " inet6 add " << iFaceAddress.toString();
 
     Logger::log(LogLevel::INFO, "Assigned IPv6 address " + command.str());
 

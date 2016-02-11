@@ -64,11 +64,11 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
         close(fd);
     }
 
-    ifr.ifr_mtu = MAX_PAYLOAD_SIZE;;
+    ifr.ifr_mtu = TUN_IFACE_MTU;
 
     if ((err = ioctl(fd, SIOCSIFMTU, (void *) &ifr)) < 0) {
         Logger::log(LogLevel::ERROR, "Error setting tunnel MTU: " + std::string(strerror(errno)) + ". Tried MTU of " +
-                                     std::to_string(MAX_PAYLOAD_SIZE));
+                                     std::to_string(TUN_IFACE_MTU));
         close(fd);
     }
 
@@ -83,6 +83,24 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
 void TunnelDeliveryInterface_Linux::assignIP() {
 
+    std::regex utunReg("utun[0-9]+");
+
+    // Prevent a nasty bash injection under the root user.
+    if (!std::regex_match(std::string(iFaceName), utunReg)) {
+        Logger::log(LogLevel::ERROR, "Invalid interface name " + std::string(iFaceName));
+        return;
+    };
+
+    std::stringstream command;
+
+    command << "ip link set " << iFaceName << "up" << std::endl;
+    command << "ip -6 addr add " << iFaceAddress.toString() << " dev " << iFaceName << std::endl;
+
+    Logger::log(LogLevel::INFO, "Assigned IPv6 address " + command.str());
+
+    system(command.str().c_str());
+
+    /*
     int s;
     int err;
     struct ifreq ifRequest = {0};
@@ -121,7 +139,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     ifr6.ifr6_ifindex = ifIndex;
     ifr6.ifr6_prefixlen = 128; // Geomesh uses the full address length. (TODO check whether this is actually such a bright idea)
 
-    memcpy(&(ifr6.ifr6_addr), iFaceAddress.getBytes(), 16);
+    memcpy(&(ifr6.ifr6_addr), iFaceAddress.bytes, 16);
 
     if (err = ioctl(s, SIOCSIFADDR, &ifr6) < 0) {
         int err = errno;
@@ -130,14 +148,15 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     }
 
     close(s);
+     */
 }
 
 void TunnelDeliveryInterface_Linux::pollMessages() {
 
-    int received = receiveMessage(fd, mReceptionBuffer, MAX_PAYLOAD_SIZE);
+    int received = receiveMessage(fd, mReceptionBuffer, MAX_PACKET_SIZE);
 
     if (received > 0) {
-        mLocalInterface->sendIPv6Message(mReceptionBuffer, received);
+        mLocalInterface->sendIPv6Message(mReceptionBuffer + 4, received - 4);
     }
 
 
@@ -145,10 +164,22 @@ void TunnelDeliveryInterface_Linux::pollMessages() {
 
 void TunnelDeliveryInterface_Linux::deliverIPv6Packet(PacketPtr packet) {
 
+    //printf("Sock int: %i", fd);
+
+    // I should create a Packet class...
+    // Clear 4 octets of memory at the from of the buffer by shifting everything to the right
+    packet->resize(packet->size() + 4);
+    memmove(packet->data() + 4, packet->data(), 4);
+
+
+    ((uint16_t *) packet->data())[0] = htons(0);            // Always 0
+    ((uint16_t *) packet->data())[1] = htons(AF_INET6);   // Set to AF_INET6 so it is handled by the Internet stack.
+
     // Send to the local system.
-    int result = write(fd,
-                      packet->getPayload(),
-                      packet->getPayloadLength());
+    int result = send(fd,
+                      packet->data(),
+                      packet->size(),
+                      0);
     //(struct sockaddr*) &addr,
     //sizeof(addr));
 

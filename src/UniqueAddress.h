@@ -7,7 +7,9 @@
 
 #include <random>
 #include <cstring>
+#include <iomanip>
 #include <netinet/in.h>
+#include <sstream>
 
 const int ADDRESS_LENGTH_OCTETS = 16; // 128-bit addresses, we're optimistic.
 
@@ -54,6 +56,23 @@ public:
     static Address generateRandom();
 
     static Address fromString(std::string str);
+
+    std::string toString() {
+
+        std::stringstream ss;
+
+        ss << std::hex << std::setfill('0');
+
+        for (int i = 0; i + 1 < ADDRESS_LENGTH_OCTETS; i += 2) {
+
+            if (i != 0) ss << ":";
+            // TODO enable leading 0's
+            ss << std::setw(2) << (unsigned int) bytes[i] << std::setw(2) << (unsigned int) bytes[i + 1];
+
+        }
+
+        return ss.str();
+    }
 
     void writeToSocketAddress(struct sockaddr_in6& socketAddress) const;
 
