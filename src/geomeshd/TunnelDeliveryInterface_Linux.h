@@ -15,7 +15,7 @@ class TunnelDeliveryInterface_Linux {
 
     LocalInterface *mLocalInterface;
 
-    char mReceptionBuffer[MAX_PAYLOAD_SIZE + 4];
+    uint8_t mReceptionBuffer[MAX_PAYLOAD_SIZE + 4];
 
     char iFaceName[TUNInterface_IFNAMSIZ];
     int fd;

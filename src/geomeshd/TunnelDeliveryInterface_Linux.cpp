@@ -64,11 +64,11 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
         close(fd);
     }
 
-    ifr.ifr_mtu = TUN_IFACE_MTU;
+    ifr.ifr_mtu = MAX_PAYLOAD_SIZE;;
 
     if ((err = ioctl(fd, SIOCSIFMTU, (void *) &ifr)) < 0) {
         Logger::log(LogLevel::ERROR, "Error setting tunnel MTU: " + std::string(strerror(errno)) + ". Tried MTU of " +
-                                     std::to_string(TUN_IFACE_MTU));
+                                     std::to_string(MAX_PAYLOAD_SIZE));
         close(fd);
     }
 
@@ -121,7 +121,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     ifr6.ifr6_ifindex = ifIndex;
     ifr6.ifr6_prefixlen = 128; // Geomesh uses the full address length. (TODO check whether this is actually such a bright idea)
 
-    memcpy(&(ifr6.ifr6_addr), iFaceAddress.bytes, 16);
+    memcpy(&(ifr6.ifr6_addr), iFaceAddress.getBytes(), 16);
 
     if (err = ioctl(s, SIOCSIFADDR, &ifr6) < 0) {
         int err = errno;
@@ -134,10 +134,10 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
 void TunnelDeliveryInterface_Linux::pollMessages() {
 
-    int received = receiveMessage(fd, mReceptionBuffer, MAX_PACKET_SIZE);
+    int received = receiveMessage(fd, mReceptionBuffer, MAX_PAYLOAD_SIZE);
 
     if (received > 0) {
-        mLocalInterface->sendIPv6Message(mReceptionBuffer + 4, received - 4);
+        mLocalInterface->sendIPv6Message(mReceptionBuffer, received);
     }
 
 
@@ -145,20 +145,10 @@ void TunnelDeliveryInterface_Linux::pollMessages() {
 
 void TunnelDeliveryInterface_Linux::deliverIPv6Packet(PacketPtr packet) {
 
-    //printf("Sock int: %i", fd);
-
-    uint8_t buffer[packet->getPayloadLength() + 4]
-
-    memcpy(buffer + 4, packet->getPayload(), packet->getPayloadLength());
-
-    ((uint16_t *) buffer)[0] = htons(0);            // Flags always 0
-    ((uint16_t *) buffer)[1] = htons(AF_INET6);   // Set to AF_INET6 so it is handled by the Internet stack.
-
     // Send to the local system.
-    int result = send(fd,
-                      buffer,
-                      packet->getPayloadLength() + 4,
-                      0);
+    int result = write(fd,
+                      packet->getPayload(),
+                      packet->getPayloadLength());
     //(struct sockaddr*) &addr,
     //sizeof(addr));
 
