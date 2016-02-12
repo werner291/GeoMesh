@@ -15,6 +15,7 @@ const int ADDRESS_LENGTH_OCTETS = 16; // 128-bit addresses, we're optimistic.
 
 struct AddressDistance {
 
+    // Lower index means higher order.
     uint32_t data[ADDRESS_LENGTH_OCTETS / 4];
 
     inline bool operator<(const AddressDistance &other) const {
@@ -36,6 +37,29 @@ struct AddressDistance {
             if (data[i] != other.data[i]) return false;
         }
         return true;
+    }
+
+    inline int getDHTSlotNumber() const {
+
+        for (int index=0; index < ADDRESS_LENGTH_OCTETS / 4; ++index) {
+            if (data[index] != 0) {
+
+                uint32_t number = data[index];
+
+                int bitPos = 0;
+
+                while (number != 0) {
+                    bitPos++;
+                    number /= 2; //  How many times can we divide by two until the numbe hits 0? (This is integer division.)
+                }
+
+                return ((ADDRESS_LENGTH_OCTETS / 4 - 1) - index) * 32 + bitPos;
+
+            }
+        }
+
+        return 0;
+
     }
 
 };
@@ -92,7 +116,7 @@ public:
         for (int i = 0; i < ADDRESS_LENGTH_OCTETS; ++i) {
 
             // Take the XOR distance, multiply according to the octet position.
-            dist.data[i] = (bytes[i] ^ other.bytes[i]);
+            reinterpret_cast<uint8_t*>(dist.data)[i] = (bytes[i] ^ other.bytes[i]);
 
         }
 

@@ -114,7 +114,7 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
     assert(suggestionPacket->getMessageType() == MSGTYPE_LOCATION_INFO);
 
     if (!suggestionPacket->verifyLocationInformation()) {
-        return false; // The location information was damaged. (TODO add falsification check)
+        return false; // The location information was damaged. (TODO add intentional falsification check)
     }
 
     Location peerLocation = suggestionPacket->getSourceLocation();
@@ -130,6 +130,9 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
         };
 
         mFaceRoutingTable.insert(entry);
+
+        Logger::log(LogLevel::DEBUG, "Added face routing table entry, location " + peerLocation.getDescription()
+                                     + " from iFace " + std::to_string(fromIface) + ".");
     }
 
     if (hops < 3) {
@@ -140,6 +143,9 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
         mGreedyRoutingTable.push_back(RoutingTableEntry {
                 peerLocation, fromIface, hops
         });
+
+        Logger::log(LogLevel::DEBUG, "Added routing rule to empty primary routing table, location " + peerLocation.getDescription()
+            + " will be routed to interface " + std::to_string(fromIface) + " routing cost " + std::to_string(hops) + " hops.");
 
         return true;
     }
@@ -159,11 +165,14 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
 
     double suggestionDistanceFromMe = mVirtualLocation.distanceTo(peerLocation);
 
-    // Really need to improve this criterion, it even fails the equatorial ring scenario
+    // TODO change the pruning coefficient in acoordance to memory usage and availability
     if (closestRuleDistance > suggestionDistanceFromMe / 5) {
         mGreedyRoutingTable.push_back(RoutingTableEntry {
                 peerLocation, fromIface, hops
         });
+
+        Logger::log(LogLevel::DEBUG, "Added routing rule to non-empty primary routing table, location " + peerLocation.getDescription()
+                                     + " will be routed to interface " + std::to_string(fromIface) + " routing cost " + std::to_string(hops) + " hops.");
 
         return true;
     }
@@ -322,5 +331,21 @@ bool Router::routeFaceRelay(PacketPtr data, int fromIface, Location destination)
 
 void Router::processDHTRoutingSuggestion(Address addr, Location loc) {
 
+    AddressDistance dist = uniqueaddress.xorDistanceTo(addr);
+
+    int slotNumber = dist.getDHTSlotNumber();
+
+    for (int index=0; index < REDUNDANCY_LEVEL; index++) {
+
+        AddressDistance entryDist = dhtRoutingTable.getEntries()[slotNumber * REDUNDANCY_LEVEL + index].address.xorDistanceTo(uniqueaddress);
+
+        // TODO sorted subarray if REDUNANCY_LEVEL > 1.
+        if (dhtRoutingTable.getEntries()[slotNumber * REDUNDANCY_LEVEL + index].expires < time(NULL) && entryDist < dist) {
+            dhtRoutingTable.getEntries()[slotNumber * REDUNDANCY_LEVEL + index].address = addr;
+            dhtRoutingTable.getEntries()[slotNumber * REDUNDANCY_LEVEL + index].location = loc;
+
+            Logger::log(LogLevel::DEBUG, "Added new DHT routetable entry to " + addr.toString() + " at location " + loc.getDescription() + ".");
+        }
+    }
 
 }

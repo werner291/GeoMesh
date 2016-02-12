@@ -11,7 +11,10 @@
 
 struct DHTroutingTableEntry {
     Address address;
-    std::vector<uint8_t> route;
+    Location location;
+    time_t expires;
+
+    DHTroutingTableEntry() : location(0,0), expires(0) {}
 };
 
 const int REDUNDANCY_LEVEL = 1;
@@ -20,7 +23,20 @@ const int NONREDUNDANT_ENTRIES = ADDRESS_LENGTH_OCTETS * 8;
 
 class DHTRoutingTable {
 
+public:
+    DHTroutingTableEntry *getEntries() {
+        return entries;
+    }
+
+private:
     DHTroutingTableEntry entries[NONREDUNDANT_ENTRIES * REDUNDANCY_LEVEL];
+
+public:
+    DHTRoutingTable() {
+        for (int i=0; i< NONREDUNDANT_ENTRIES * REDUNDANCY_LEVEL; ++i) {
+            entries[i].expires = 0; // 0 indicates invalid or null.
+        }
+    };
 
     void processRoutingTableCopy(PacketPtr message, int incomingIfaceID) {
 
