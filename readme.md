@@ -1,4 +1,3 @@
-
 # GeoMesh
 
 ## What is it?
@@ -8,16 +7,17 @@ authority, while allowing any node in the network to choose their own address.
 
 ## How it is different from other meshnet protocols?
 
-GeoMesh intents to address the scalability problems that other meshnets have. Traditionally, packets are routed
-using XOR distance between node addresses, where a packet woud be greedily routed from one node to another based
-on whichever neighbour is closest in terms of XOR distance.
+GeoMesh intents to address the scalability or efficiency problems that other meshnets have. Traditionally, packets
+are routed using XOR distance between node addresses, where a packet woud be greedily routed from one node to another
+based on whichever neighbour is closest in terms of XOR distance.
 
 This works, and eventually gets the message where it needs to go in O(log(n)) hops through the network (where n is the
 number of nodes).
 
 However, there is no useful relation between the position of a node in XOR space, and the position of that node in the
 real world. A message that takes a short route through XOR space might go all the way through Timbuktu before reaching
-the house across the street. Some networks use tricks to cut down on this behaviour, but the fundamental problem remains.
+the house across the street. Some networks use tricks to cut down on this behaviour, like reducing the distance between
+nodes, but the fundamental problem remains that the path through the network is somewhat arbitrary.
 
 GeoMesh aims to solve this by using the coordinates of the location of each node (or an approximation thereof) to allow
 nodes to send packets in the right direction without forcing them to know exactly where every single recipient node is.
@@ -26,22 +26,29 @@ nodes to send packets in the right direction without forcing them to know exactl
 
 To create a network that focuses on:
 
-1. Efficent routing: get a message where it needs to go while avoiding excessive detours
+1. Efficient routing: get a message where it needs to go while avoiding excessive detours.
 
-1. Goal-centered: The primary goal of this system is to route packets from A to B. If it does something else at some point,
-                 this must be so as to improve routing.
+1. Goal-centeredness: The primary goal of this system is to route packets from A to B. If it does something else at some
+                point, this must be so as to improve routing.
 
-1. Scalability: avoid causing the router explode once the network gets big enough.
+1. Scalability: avoid causing the router to explode once the network gets big enough.
 
 1. Openness: Anyone is allowed on the network. Find a nearby peer, and you're in.
 
 1. Freedom: All nodes should be free to exchange information, as long as they do not prevent other nodes from doing the same.
 
-1. Open source: The more eyes on the codebase, the more mistakes are spotted and the more ideas are applied.
+1. Open source: The more eyes on the codebase, the more mistakes are spotted and the more ideas are applied. It is also
+                GPL-licenced, so anyone is free to create to fork the code should they wish. However, especially in
+                the early stages of the network, sticking to the reference implementation is probably best for now.
 
-1. Re-use of as much as possible of what is already there: the routing software should work on existing routing hardware, if possible even on low-end hardware with limited computing power and memory. The protocol avoids touching other layers than layer 3 of the OSI model as much as possible. Requiring the installation of special software on the nodes is permitted, but it should be possible to bridge the network over other existing networks.
+1. Re-use of as much as possible of what is already there: the routing software should work on existing routing hardware,
+   if possible even on low-end hardware with limited computing power and memory. The should avoid touching other layers
+   than layer 3 of the OSI model as much as possible. Requiring the installation of special software on the nodes is permitted,
+   but it should be possible to bridge the network over other existing networks.
 
-1. Automation and ease of use: The network should be able to automatically route packets to any destination
+1. Automation and ease of use: The routing software should be usable without requiring extensive technical knowledge.
+   Good design of the administration interface will be important, and should especially focus on the seperation of
+   simpler and more "advanced" features.
 
 ## What about anonymity?
 
