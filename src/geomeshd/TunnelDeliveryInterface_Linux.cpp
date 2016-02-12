@@ -139,7 +139,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
 void TunnelDeliveryInterface_Linux::pollMessages() {
 
-    int received = receiveMessage(fd, mReceptionBuffer, MAX_PAYLOAD_SIZE);
+    int received = read(fd, mReceptionBuffer, MAX_PAYLOAD_SIZE);
 
     if (received > 0) {
         mLocalInterface->sendIPv6Message(mReceptionBuffer, received);
