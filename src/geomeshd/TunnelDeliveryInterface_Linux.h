@@ -7,7 +7,6 @@
 
 #include "../LocalInterface.h"
 #include "../Packet.h"
-#include "../constants.h"
 
 #define TUNInterface_IFNAMSIZ 16
 
@@ -15,7 +14,7 @@ class TunnelDeliveryInterface_Linux {
 
     LocalInterface *mLocalInterface;
 
-    char mReceptionBuffer[MAX_PACKET_SIZE - IPv6_START];
+    uint8_t mReceptionBuffer[MAX_PAYLOAD_SIZE];
 
     char iFaceName[TUNInterface_IFNAMSIZ];
     int fd;

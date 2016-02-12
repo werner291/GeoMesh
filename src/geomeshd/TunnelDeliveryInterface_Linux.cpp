@@ -6,6 +6,7 @@
 
 #include "../Logger.h"
 
+#include <regex>
 #include <libexplain/ioctl.h>
 #include <linux/if.h>
 #include <linux/if_tun.h>
@@ -14,6 +15,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "UnixSocketsFunctions.h"
+
 
 TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *localInterface,
                                                              const Address &iFaceAddress)
@@ -57,14 +59,6 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
         close(fd);
     }
 
-    ifr.ifr_mtu = TUN_IFACE_MTU;
-
-    if ((err = ioctl(fd, SIOCSIFMTU, (void *) &ifr)) < 0) {
-        Logger::log(LogLevel::ERROR, "Error setting tunnel MTU: " + std::string(strerror(errno)) + ". Tried MTU of " +
-                                     std::to_string(TUN_IFACE_MTU));
-        close(fd);
-    }
-
     long flag = fcntl(fd, F_GETFL, 0);
     fcntl(fd, F_SETFL, flag | O_NONBLOCK);
 
@@ -76,7 +70,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
 void TunnelDeliveryInterface_Linux::assignIP() {
 
-    std::regex utunReg("utun[0-9]+");
+    std::regex utunReg("tun[a-zA-Z]]+");
 
     // Prevent a nasty bash injection under the root user.
     if (!std::regex_match(std::string(iFaceName), utunReg)) {
@@ -146,10 +140,10 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
 void TunnelDeliveryInterface_Linux::pollMessages() {
 
-    int received = receiveMessage(fd, mReceptionBuffer, MAX_PACKET_SIZE);
+    int received = receiveMessage(fd, mReceptionBuffer, MAX_PAYLOAD_SIZE);
 
     if (received > 0) {
-        mLocalInterface->sendIPv6Message(mReceptionBuffer + 4, received - 4);
+        mLocalInterface->sendIPv6Message(mReceptionBuffer, received);
     }
 
 
@@ -157,24 +151,11 @@ void TunnelDeliveryInterface_Linux::pollMessages() {
 
 void TunnelDeliveryInterface_Linux::deliverIPv6Packet(PacketPtr packet) {
 
-    //printf("Sock int: %i", fd);
-
-    // I should create a Packet class...
-    // Clear 4 octets of memory at the from of the buffer by shifting everything to the right
-    packet->resize(packet->size() + 4);
-    memmove(packet->data() + 4, packet->data(), 4);
-
-
-    ((uint16_t *) packet->data())[0] = htons(0);            // Always 0
-    ((uint16_t *) packet->data())[1] = htons(AF_INET6);   // Set to AF_INET6 so it is handled by the Internet stack.
-
     // Send to the local system.
     int result = send(fd,
-                      packet->data(),
-                      packet->size(),
+                      packet->getPayload(),
+                      packet->getPayloadLength(),
                       0);
-    //(struct sockaddr*) &addr,
-    //sizeof(addr));
 
     if (result == -1) {
         int err = errno;

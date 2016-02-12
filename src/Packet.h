@@ -9,6 +9,7 @@
 #include "Location.h"
 #include "UniqueAddress.h"
 #include <assert.h>
+#include <limits.h>
 
 // A few constants
 const int PROTOCOL_VERSION = 0;
