@@ -16,7 +16,6 @@
 #include <unistd.h>
 #include "UnixSocketsFunctions.h"
 
-
 TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *localInterface,
                                                              const Address &iFaceAddress)
         : mLocalInterface(localInterface), iFaceAddress(iFaceAddress), fd(-1) {
@@ -70,7 +69,7 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
 void TunnelDeliveryInterface_Linux::assignIP() {
 
-    std::regex utunReg("tun[a-zA-Z]]+");
+    std::regex utunReg("tun[a-zA-Z]+");
 
     // Prevent a nasty bash injection under the root user.
     if (!std::regex_match(std::string(iFaceName), utunReg)) {
