@@ -79,7 +79,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
     std::stringstream command;
 
-    command << "ip link set " << iFaceName << "up" << std::endl;
+    command << "ip link set " << iFaceName << " up" << std::endl;
     command << "ip -6 addr add " << iFaceAddress.toString() << " dev " << iFaceName << std::endl;
 
     Logger::log(LogLevel::INFO, "Assigned IPv6 address " + command.str());
