@@ -15,13 +15,6 @@
 #include <unistd.h>
 #include "UnixSocketsFunctions.h"
 
-// Define this here due to a duplicate definition when including ipv6.h
-struct in6_ifreq {
-    struct in6_addr ifr6_addr;
-    __u32 ifr6_prefixlen;
-    int ifr6_ifindex;
-};
-
 TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *localInterface,
                                                              const Address &iFaceAddress)
         : mLocalInterface(localInterface), iFaceAddress(iFaceAddress), fd(-1) {
