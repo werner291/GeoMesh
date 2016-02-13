@@ -100,7 +100,7 @@ void TunnelDeliveryInterface_Linux::pollMessages() {
 
 void TunnelDeliveryInterface_Linux::installRoute() {
 
-    std::regex utunReg("utun[a-zA-Z]+");
+    std::regex utunReg("tun[a-zA-Z]+");
 
     // Prevent a nasty bash injection under the root user.
     if (!std::regex_match(std::string(iFaceName), utunReg)) {
