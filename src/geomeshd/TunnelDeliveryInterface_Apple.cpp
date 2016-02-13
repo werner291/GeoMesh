@@ -125,7 +125,7 @@ void TunnelDeliveryInterface_Apple::installRoute() {
     system(("route -q add -inet6 -net fcfd: -prefixlen 16 -interface " + std::string(iFaceName)).c_str());
 
     Logger::log(LogLevel::INFO,
-                "Installed route. All traffic to fcfd:/16 will be sent through " + std::string(iFaceName));
+                "Installed route. All traffic to fcfd:/16 will be sent through " + std::string(iFaceName) + ".");
 };
 
 void TunnelDeliveryInterface_Apple::deliverIPv6Packet(PacketPtr packet) {

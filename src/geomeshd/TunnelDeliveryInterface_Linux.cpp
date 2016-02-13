@@ -75,7 +75,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
     // Prevent a nasty bash injection under the root user.
     if (!std::regex_match(std::string(iFaceName), utunReg)) {
-        Logger::log(LogLevel::ERROR, "Invalid interface name " + std::string(iFaceName));
+        Logger::log(LogLevel::ERROR, "Invalid interface name while assigning address " + std::string(iFaceName));
         return;
     };
 
@@ -104,7 +104,7 @@ void TunnelDeliveryInterface_Linux::installRoute() {
 
     // Prevent a nasty bash injection under the root user.
     if (!std::regex_match(std::string(iFaceName), utunReg)) {
-        Logger::log(LogLevel::ERROR, "Invalid interface name " + std::string(iFaceName));
+        Logger::log(LogLevel::ERROR, "Invalid interface name while installing route " + std::string(iFaceName));
         return;
     };
 
