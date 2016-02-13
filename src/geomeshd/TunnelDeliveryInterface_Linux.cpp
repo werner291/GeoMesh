@@ -65,6 +65,8 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
 
     assignIP();
+
+    installRoute();
 };
 
 void TunnelDeliveryInterface_Linux::assignIP() {
@@ -85,56 +87,6 @@ void TunnelDeliveryInterface_Linux::assignIP() {
     Logger::log(LogLevel::INFO, "Assigned IPv6 address " + command.str());
 
     system(command.str().c_str());
-
-    /*
-    int s;
-    int err;
-    struct ifreq ifRequest = {0};
-
-    // Create a temporary INET6 socket
-    if (err = (s = socket(AF_INET6, SOCK_DGRAM, 0)) < 0) {
-        Logger::log(LogLevel::ERROR, "Error creating temporary Inet6 socket: " + std::string(strerror(err)));
-    }
-
-    // Copy the iface name into the request
-    strncpy(ifRequest.ifr_name, iFaceName, IFNAMSIZ);
-
-    Logger::log(LogLevel::ERROR, "Tun interface name: " + std::string(ifRequest.ifr_name));
-
-    // Fetch the iface index
-    if (ioctl(s, SIOCGIFINDEX, ifRequest) < 0) {
-        close(s);
-        Logger::log(LogLevel::ERROR, "Error SIOCGIFINDEX: " + std::string(strerror(errno)));
-    }
-    int ifIndex = ifRequest.ifr_ifindex;
-
-    printf("ifIndex %i", ifIndex);
-
-    // Set interface up and running
-    ifRequest.ifr_flags |= IFF_UP | IFF_RUNNING;
-    if (err = ioctl(s, SIOCSIFFLAGS, ifRequest) < 0) {
-        int err = errno;
-        close(s);
-        Logger::log(LogLevel::ERROR, "Error SIOCSIFFLAGS: " + std::string(strerror(err)));
-    }
-
-
-    // The address setting
-    struct in6_ifreq ifr6 = {0};
-
-    ifr6.ifr6_ifindex = ifIndex;
-    ifr6.ifr6_prefixlen = 128; // Geomesh uses the full address length. (TODO check whether this is actually such a bright idea)
-
-    memcpy(&(ifr6.ifr6_addr), iFaceAddress.bytes, 16);
-
-    if (err = ioctl(s, SIOCSIFADDR, &ifr6) < 0) {
-        int err = errno;
-        close(s);
-        Logger::log(LogLevel::ERROR, "Error SIOCSIFADDR: " + std::string(strerror(err)));
-    }
-
-    close(s);
-     */
 }
 
 void TunnelDeliveryInterface_Linux::pollMessages() {
@@ -144,9 +96,24 @@ void TunnelDeliveryInterface_Linux::pollMessages() {
     if (received > 0) {
         mLocalInterface->sendIPv6Message(mReceptionBuffer, received);
     }
-
-
 }
+
+void TunnelDeliveryInterface_Linux::installRoute() {
+
+    std::regex utunReg("utun[a-zA-Z]+");
+
+    // Prevent a nasty bash injection under the root user.
+    if (!std::regex_match(std::string(iFaceName), utunReg)) {
+        Logger::log(LogLevel::ERROR, "Invalid interface name " + std::string(iFaceName));
+        return;
+    };
+
+    system(("ip -6 route add fcfd:/16 dev " + std::string(iFaceName)).c_str());
+
+    Logger::log(LogLevel::INFO,
+                "Installed route. All traffic to fcfd:/16 will be sent through " + std::string(iFaceName));
+
+};
 
 void TunnelDeliveryInterface_Linux::deliverIPv6Packet(PacketPtr packet) {
 

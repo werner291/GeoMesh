@@ -10,13 +10,19 @@ std::random_device rdev;
 std::mt19937 rgen(rdev());
 std::uniform_int_distribution<unsigned char> addrgen(0,255);
 
+
 Address Address::generateRandom() { // TODO use keypair for generating addresses.
     Address blank;
 
+    // Unallocated Unique Local Address range for IPv6 with prefix fc::/8
+    blank.bytes[0] = 0xfc;
+    // The "f4" octet is to distinguis from CJDNS addresses. GeoMesh doesn't claim the whole range. It doesn't claim
+    // anything really, but this should make things easier when there are conflicts with other uniquely generated
+    // addresses.
+    blank.bytes[1] = 0xf4;
 
-    blank.bytes[0] = 0xfc; // Unallocated Unique Local Address range for IPv6 with prefix fc::/8
-
-    for (int i=1; i<ADDRESS_LENGTH_OCTETS;i++)
+    // Fill the rest with random bytes. Use the full 128 bits.
+    for (int i=2; i<ADDRESS_LENGTH_OCTETS;i++)
         blank.bytes[i] = addrgen(rgen);
 
     return blank;

@@ -83,6 +83,8 @@ void TunnelDeliveryInterface_Apple::startTunnelInterface() {
 
     assignIP();
 
+    installRoute();
+
 }
 
 
@@ -109,6 +111,22 @@ void TunnelDeliveryInterface_Apple::assignIP() {
 
     system(command.str().c_str());
 }
+
+void TunnelDeliveryInterface_Apple::installRoute() {
+
+    std::regex utunReg("utun[0-9]+");
+
+    // Prevent a nasty bash injection under the root user.
+    if (!std::regex_match(std::string(iFaceName), utunReg)) {
+        Logger::log(LogLevel::ERROR, "Invalid interface name " + std::string(iFaceName));
+        return;
+    };
+
+    system(("route -q add -inet6 -net fcfd: -prefixlen 16 -interface " + std::string(iFaceName)).c_str());
+
+    Logger::log(LogLevel::INFO,
+                "Installed route. All traffic to fcfd:/16 will be sent through " + std::string(iFaceName));
+};
 
 void TunnelDeliveryInterface_Apple::deliverIPv6Packet(PacketPtr packet) {
 

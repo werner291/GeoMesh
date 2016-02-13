@@ -26,6 +26,8 @@ class TunnelDeliveryInterface_Apple {
 
     void assignIP();
 
+    void installRoute();
+
 public:
 
     TunnelDeliveryInterface_Apple(LocalInterface *localInterface, const Address &iFaceAddress);

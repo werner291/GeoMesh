@@ -23,6 +23,8 @@ class TunnelDeliveryInterface_Linux {
 
     void assignIP();
 
+    void installRoute();
+
 public:
 
     TunnelDeliveryInterface_Linux(LocalInterface *localInterface, const Address &iFaceAddress);
