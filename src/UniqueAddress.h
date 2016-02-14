@@ -70,6 +70,22 @@ class Address {
 
 public:
 
+    // Required for std::map lookups.
+
+    inline bool operator<(const Address &other) const {
+        for (int i = 0; i < ADDRESS_LENGTH_OCTETS / sizeof(uint8_t); ++i) {
+            if (bytes[i] < other.bytes[i]) return true;
+        }
+        return false;
+    }
+
+    inline bool operator>(const Address &other) const {
+        for (int i = 0; i < ADDRESS_LENGTH_OCTETS / sizeof(uint8_t); ++i) {
+            if (bytes[i] > other.bytes[i]) return true;
+        }
+        return false;
+    }
+
     /**
      * @return Whether this address exactly matches the other address.
      */

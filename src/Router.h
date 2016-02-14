@@ -22,6 +22,11 @@ struct RoutingTableEntry {
 
 };
 
+struct LocalRoutingTableEntry {
+    int iFaceID;
+    time_t lastUpdated;
+};
+
 struct DirectionalEntry {
     int iFaceID;
     double heading;
@@ -52,6 +57,8 @@ private:
     std::set<DirectionalEntry> mFaceRoutingTable; // TODO combine "interfaces" and "direct neighbours"
 
     std::vector<RoutingTableEntry> mGreedyRoutingTable;
+
+    std::map<Address, LocalRoutingTableEntry> mLocalRoutingTable;
 
     DHTRoutingTable dhtRoutingTable;
 

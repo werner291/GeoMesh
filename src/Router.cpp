@@ -23,6 +23,7 @@ bool Router::handleMessage(PacketPtr data, int fromIface) {
     switch (messageType) {
 
         case MSGTYPE_IPv6: {
+
             Location destination = data->getDestinationLocation();
 
             if (data->isDestination(uniqueaddress)) {
@@ -30,6 +31,23 @@ bool Router::handleMessage(PacketPtr data, int fromIface) {
                 localIface->dataReceived(data);
 
             } else {
+
+                Address destAddr = data->getDestinationAddress();
+
+                auto itr = mLocalRoutingTable.find(destAddr);
+
+                if (itr != mLocalRoutingTable.end()) {
+
+
+                    if (linkMgr->sendPacket(data, itr->second.iFaceID)) {
+                        return true;
+                    } else {
+                        Logger::log(LogLevel::WARN, "Trying to route packet bound for " + destAddr.toString()
+                                                       + " through interface " + std::to_string(itr->second.iFaceID)
+                                                       + " but sendPacket(...) returned false.");
+                    }
+                    // Else, try to route according to location
+                }
 
                 int routingMode = data->getRoutingMode();
 
@@ -136,6 +154,11 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
     }
 
     if (hops < 3) {
+        auto& localEntry = mLocalRoutingTable[suggestionPacket->getSourceAddress()];
+
+        localEntry.iFaceID = fromIface;
+        localEntry.lastUpdated = time(NULL);
+
         processDHTRoutingSuggestion(suggestionPacket->getSourceAddress(), peerLocation);
     }
 
@@ -144,8 +167,10 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
                 peerLocation, fromIface, hops
         });
 
-        Logger::log(LogLevel::DEBUG, "Added routing rule to empty primary routing table, location " + peerLocation.getDescription()
-            + " will be routed to interface " + std::to_string(fromIface) + " routing cost " + std::to_string(hops) + " hops.");
+        Logger::log(LogLevel::DEBUG, "Added routing rule to empty primary routing table, location "
+                                     + peerLocation.getDescription() + " will be routed to interface "
+                                     + std::to_string(fromIface) + " routing cost " + std::to_string(hops)
+                                     + " hops.");
 
         return true;
     }
