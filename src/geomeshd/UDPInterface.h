@@ -35,7 +35,7 @@ public:
 
     void setPeerAddress(const struct in_addr &addr, int remotePort) {
 
-        Logger::log(LogLevel::DEBUG, "UDP bridge interface "+ std::to_string(iFaceID) +"peer address changed.")
+        Logger::log(LogLevel::DEBUG, "UDP bridge interface "+ std::to_string(iFaceID) +"peer address changed.");
 
         peerAddress.sin_addr = addr;
         peerAddress.sin_port = remotePort;
