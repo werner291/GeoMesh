@@ -144,6 +144,10 @@ void UDPManager::pollMessages() {
             Logger::log(LogLevel::ERROR,
                         "UDPManager: receive error: " + std::string(strerror(err)));
         }
-        // Elseo there was nothing to be read, do nothing
+        // Else there was nothing to be read, do nothing
+    }
+
+    for (auto link : establishedLinks) {
+        link->pollMessages();
     }
 }
