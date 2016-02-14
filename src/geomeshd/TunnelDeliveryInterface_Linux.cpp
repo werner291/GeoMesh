@@ -108,7 +108,7 @@ void TunnelDeliveryInterface_Linux::installRoute() {
         return;
     };
 
-    system(("ip -6 route add fcfd:/16 dev " + std::string(iFaceName)).c_str());
+    system(("ip -6 route add fcfd::/16 dev " + std::string(iFaceName)).c_str());
 
     Logger::log(LogLevel::INFO,
                 "Installed route. All traffic to fcfd:/16 will be sent through " + std::string(iFaceName));
