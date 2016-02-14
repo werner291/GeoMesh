@@ -13,17 +13,17 @@ UDPInterface::UDPInterface() {
 
     socketID = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
-    sockaddr_in sin;
+    sockaddr_in localAddr;
 
-    sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = htonl(INADDR_ANY);
-    sin.sin_port = 0;
+    localAddr.sin_family = AF_INET;
+    localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    localAddr.sin_port = 0;
 
-    bind(socketID, (struct sockaddr *) &sin, sizeof(sin));
+    bind(socketID, (struct sockaddr *) &localAddr, sizeof(localAddr));
 
     /* Now bound, get the address */
-    socklen_t slen = sizeof(sin);
-    getsockname(socketID, (struct sockaddr *) &sin, &slen);
+    socklen_t slen = sizeof(localAddr);
+    getsockname(socketID, (struct sockaddr *) &localAddr, &slen);
 
     mLocalUDPport = ntohs(sin.sin_port);
     // Enable non-blocking IO.
@@ -57,6 +57,8 @@ void UDPInterface::pollMessages() {
 }
 
 bool UDPInterface::sendData(PacketPtr data) {
+    
+    assert(peerAddress.sin_family == AF_INET);
 
     int result = sendto(socketID,
                         data->getData(),

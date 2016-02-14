@@ -39,6 +39,7 @@ public:
 
         peerAddress.sin_addr = addr;
         peerAddress.sin_port = remotePort;
+        peerAddress.sin_family = AF_INET;
 
     }
 
