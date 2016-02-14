@@ -25,7 +25,7 @@ UDPInterface::UDPInterface() {
     socklen_t slen = sizeof(localAddr);
     getsockname(socketID, (struct sockaddr *) &localAddr, &slen);
 
-    mLocalUDPport = ntohs(sin.sin_port);
+    mLocalUDPport = ntohs(localAddr.sin_port);
     // Enable non-blocking IO.
     int flags = fcntl(socketID, F_GETFL, 0);
     fcntl(socketID, F_SETFL, flags | O_NONBLOCK);
