@@ -16,6 +16,8 @@
 
 bool Router::handleMessage(PacketPtr data, int fromIface) {
 
+    Logger::log(LogLevel::DEBUG, "Message received from " + data->getSourceAddress().toString());
+
     int protocol_version = data->getProtocolVersion();
 
     int messageType = data->getMessageType();
@@ -206,6 +208,9 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
 }
 
 void Router::sendLocationInfo(int interface) {
+
+    Logger::log(LogLevel::DEBUG, "Sending location info into interface " + std::to_string(interface));
+
 
     PacketPtr locationPacker = Packet::createLocationInfoPacket(this->getVirtualLocation(), this->getAddress());
     linkMgr->sendPacket(locationPacker, interface);
