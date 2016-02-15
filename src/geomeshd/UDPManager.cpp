@@ -45,7 +45,7 @@ void UDPManager::connectTo(std::string address, int port) {
 
     std::stringstream helloMsg;
 
-    helloMsg << "GeoMesh_UDP_Bridge_Hello ifaceID:" << iface->getInterfaceId();
+    helloMsg << "GeoMesh_UDP_Bridge_Hello remoteIfaceID:" << iface->getInterfaceId();
 
     std::string msg = helloMsg.str();
 
