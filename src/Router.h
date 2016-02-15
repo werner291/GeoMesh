@@ -11,16 +11,12 @@
 #include "LinkManager.h"
 #include "UniqueAddress.h"
 #include "DHTRoutingTable.h"
+#include "GreedyRoutingTable.h"
 
 #include <set>
 #include <queue>
 
-struct RoutingTableEntry {
-    Location target;
-    int iFaceID;
-    int hops;
 
-};
 
 struct LocalRoutingTableEntry {
     int iFaceID;
@@ -54,6 +50,8 @@ private:
 
     LinkManager *linkMgr;
 
+    GreedyRoutingTable greedyRoutingTable;
+
     std::set<DirectionalEntry> mFaceRoutingTable;
 
     std::map<Address, LocalRoutingTableEntry> mLocalRoutingTable;
@@ -65,10 +63,6 @@ private:
 public:
     LocalInterface *getLocalIface() const {
         return localIface;
-    }
-
-    const std::vector<RoutingTableEntry> &getRoutingTable() {
-        return mGreedyRoutingTable;
     }
 
     LinkManager *getLinkManager() const {
@@ -115,7 +109,7 @@ public:
 
     bool routeGreedy(PacketPtr data, int fromIface, Location destination);
 
-    int getGreedyInterface(int fromInterface, const Location &destination);
+
 
     void greedyToFace(PacketPtr data);
 

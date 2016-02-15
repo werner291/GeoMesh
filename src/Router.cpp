@@ -165,47 +165,8 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
         processDHTRoutingSuggestion(suggestionPacket->getSourceAddress(), peerLocation);
     }
 
-    if (GreedyRoutingTable::mGreedyRoutingTable.empty()) {
-        GreedyRoutingTable::mGreedyRoutingTable.push_back(RoutingTableEntry {
-                peerLocation, fromIface, hops
-        });
+    return greedyRoutingTable.insertIfUseful(peerLocation, fromIface, hops, mVirtualLocation);
 
-        Logger::log(LogLevel::DEBUG, "Added routing rule to empty primary routing table, location "
-                                     + peerLocation.getDescription() + " will be routed to interface "
-                                     + std::to_string(fromIface) + " routing cost " + std::to_string(hops)
-                                     + " hops.");
-
-        return true;
-    }
-
-    // How would a packet headed for the specified location be routed now?
-    // Found the routing rule that most closely matches the suggestion.
-    auto closestRule = GreedyRoutingTable::mGreedyRoutingTable.end();
-    double closestRuleDistance = INFINITY;
-
-    for (auto itr = GreedyRoutingTable::mGreedyRoutingTable.begin(); itr != GreedyRoutingTable::mGreedyRoutingTable.end(); itr++) {
-            double distance = itr->target.distanceTo(peerLocation);
-            if (distance < closestRuleDistance) {
-                closestRule = itr;
-                closestRuleDistance = distance;
-            }
-    }
-
-    double suggestionDistanceFromMe = mVirtualLocation.distanceTo(peerLocation);
-
-    // TODO change the pruning coefficient in acoordance to memory usage and availability
-    if (closestRuleDistance > suggestionDistanceFromMe / 5) {
-        GreedyRoutingTable::mGreedyRoutingTable.push_back(RoutingTableEntry {
-                peerLocation, fromIface, hops
-        });
-
-        Logger::log(LogLevel::DEBUG, "Added routing rule to non-empty primary routing table, location " + peerLocation.getDescription()
-                                     + " will be routed to interface " + std::to_string(fromIface) + " routing cost " + std::to_string(hops) + " hops.");
-
-        return true;
-    }
-
-    return false;
 }
 
 void Router::sendLocationInfo(int interface) {
@@ -220,7 +181,7 @@ void Router::sendLocationInfo(int interface) {
 
 bool Router::routeGreedy(PacketPtr data, int fromIface, Location destination) {
 
-    int outInteface = getGreedyInterface(fromIface, destination);
+    int outInteface = greedyRoutingTable.getGreedyInterface(fromIface, destination, destination.distanceTo(mVirtualLocation));
 
     if (outInteface != -1) {
 
@@ -228,6 +189,9 @@ bool Router::routeGreedy(PacketPtr data, int fromIface, Location destination) {
 
         return true;
     } else {
+
+        Logger::log(LogLevel::DEBUG, "Packet has hit local minimum, switching to face routing if possible.");
+
         return false;
     }
 }
@@ -242,10 +206,7 @@ bool Router::canSwitchFaceToGreedy(PacketPtr data, Location destination) {
 
     if (destination.distanceTo(mVirtualLocation) < bestDistance) return true;
 
-    for (auto itr = GreedyRoutingTable::mGreedyRoutingTable.begin(); itr != GreedyRoutingTable::mGreedyRoutingTable.end(); itr++) {
-        if (destination.distanceTo(itr->target) < bestDistance) return true;
-    }
-
+    if (greedyRoutingTable.hasCloserEntry(destination, bestDistance)) return true;
 
     return false;
 
@@ -301,25 +262,7 @@ bool Router::routeFaceBegin(PacketPtr data, int fromIface, Location destination)
 
 }
 
-int Router::getGreedyInterface(int fromInterface, const Location &destination) {
-    auto bestCandidate = GreedyRoutingTable::mGreedyRoutingTable.end();
-    double bestDistance = mVirtualLocation.distanceTo(destination);
 
-    for (auto itr = GreedyRoutingTable::mGreedyRoutingTable.begin(); itr != GreedyRoutingTable::mGreedyRoutingTable.end(); itr++) {
-        double distance = itr->target.distanceTo(destination);
-        if (distance < bestDistance) {
-            bestCandidate = itr;
-            bestDistance = distance;
-        }
-    }
-
-    if (bestCandidate == GreedyRoutingTable::mGreedyRoutingTable.end()) {
-
-        return -1;
-    }
-
-    return bestCandidate->iFaceID;
-}
 
 bool Router::routeFaceRelay(PacketPtr data, int fromIface, Location destination) {
 
