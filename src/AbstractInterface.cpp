@@ -4,8 +4,8 @@
 
 #include "AbstractInterface.h"
 
-int AbstractInterface::nextIfaceID = 0;
+uint16_t AbstractInterface::nextIfaceID = 1;
 
 AbstractInterface::AbstractInterface() : iFaceID(nextIfaceID++) {
-
+    assert(iFaceID != 0);
 }

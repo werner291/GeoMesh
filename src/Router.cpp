@@ -12,6 +12,7 @@
 #include <sstream>
 #include <math.h>
 #include "constants.h"
+#include "GreedyRoutingTable.h"
 
 
 bool Router::handleMessage(PacketPtr data, int fromIface) {
@@ -164,8 +165,8 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
         processDHTRoutingSuggestion(suggestionPacket->getSourceAddress(), peerLocation);
     }
 
-    if (mGreedyRoutingTable.empty()) {
-        mGreedyRoutingTable.push_back(RoutingTableEntry {
+    if (GreedyRoutingTable::mGreedyRoutingTable.empty()) {
+        GreedyRoutingTable::mGreedyRoutingTable.push_back(RoutingTableEntry {
                 peerLocation, fromIface, hops
         });
 
@@ -179,10 +180,10 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
 
     // How would a packet headed for the specified location be routed now?
     // Found the routing rule that most closely matches the suggestion.
-    auto closestRule = mGreedyRoutingTable.end();
+    auto closestRule = GreedyRoutingTable::mGreedyRoutingTable.end();
     double closestRuleDistance = INFINITY;
 
-    for (auto itr = mGreedyRoutingTable.begin(); itr != mGreedyRoutingTable.end(); itr++) {
+    for (auto itr = GreedyRoutingTable::mGreedyRoutingTable.begin(); itr != GreedyRoutingTable::mGreedyRoutingTable.end(); itr++) {
             double distance = itr->target.distanceTo(peerLocation);
             if (distance < closestRuleDistance) {
                 closestRule = itr;
@@ -194,7 +195,7 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
 
     // TODO change the pruning coefficient in acoordance to memory usage and availability
     if (closestRuleDistance > suggestionDistanceFromMe / 5) {
-        mGreedyRoutingTable.push_back(RoutingTableEntry {
+        GreedyRoutingTable::mGreedyRoutingTable.push_back(RoutingTableEntry {
                 peerLocation, fromIface, hops
         });
 
@@ -241,7 +242,7 @@ bool Router::canSwitchFaceToGreedy(PacketPtr data, Location destination) {
 
     if (destination.distanceTo(mVirtualLocation) < bestDistance) return true;
 
-    for (auto itr = mGreedyRoutingTable.begin(); itr != mGreedyRoutingTable.end(); itr++) {
+    for (auto itr = GreedyRoutingTable::mGreedyRoutingTable.begin(); itr != GreedyRoutingTable::mGreedyRoutingTable.end(); itr++) {
         if (destination.distanceTo(itr->target) < bestDistance) return true;
     }
 
@@ -301,10 +302,10 @@ bool Router::routeFaceBegin(PacketPtr data, int fromIface, Location destination)
 }
 
 int Router::getGreedyInterface(int fromInterface, const Location &destination) {
-    auto bestCandidate = mGreedyRoutingTable.end();
+    auto bestCandidate = GreedyRoutingTable::mGreedyRoutingTable.end();
     double bestDistance = mVirtualLocation.distanceTo(destination);
 
-    for (auto itr = mGreedyRoutingTable.begin(); itr != mGreedyRoutingTable.end(); itr++) {
+    for (auto itr = GreedyRoutingTable::mGreedyRoutingTable.begin(); itr != GreedyRoutingTable::mGreedyRoutingTable.end(); itr++) {
         double distance = itr->target.distanceTo(destination);
         if (distance < bestDistance) {
             bestCandidate = itr;
@@ -312,7 +313,7 @@ int Router::getGreedyInterface(int fromInterface, const Location &destination) {
         }
     }
 
-    if (bestCandidate == mGreedyRoutingTable.end()) {
+    if (bestCandidate == GreedyRoutingTable::mGreedyRoutingTable.end()) {
 
         return -1;
     }

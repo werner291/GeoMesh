@@ -14,18 +14,16 @@ class AbstractInterface;
 
 typedef std::function<void(PacketPtr, int)> DataCallback;
 
-
-
 class Router;
 
 class AbstractInterface {
 
-    static int nextIfaceID;
+    static uint16_t nextIfaceID;
 
 protected:
     DataCallback dataArrivedCallback;
 
-    int iFaceID;
+    uint16_t iFaceID;
 
 public:
     int getInterfaceId() const {
@@ -38,6 +36,14 @@ public:
 
     void setDataReceivedCallback(DataCallback const &dataArrivedCallback) {
         this->dataArrivedCallback = dataArrivedCallback;
+    }
+
+    // For those who want to store this class in a sorted container
+    bool operator>(const AbstractInterface& other) const {
+        return iFaceID > other.iFaceID;
+    }
+    bool operator<(const AbstractInterface& other) const {
+        return iFaceID < other.iFaceID;
     }
 
 };

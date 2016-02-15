@@ -13,37 +13,54 @@
 #include <string>
 #include <string.h>
 
+class UDPManager;
+
+/**
+ * A subclass of AbstractInterface that exposes UDP links to the LinkManager.
+ * This class doesn't do much on its own, amd passes any data to be sent to
+ * the UDPManager.
+ */
 class UDPInterface : public AbstractInterface {
 
-    int socketID;
+    friend UDPManager;
 
-    int mLocalUDPport;
+private:
+    int mRemoteIface;
 
     struct sockaddr_in peerAddress;
 
     uint8_t mReceptionBuffer[MAX_PACKET_SIZE];
 
+    UDPManager* udpMan;
+
 public:
 
-    UDPInterface();
+    /**
+     * Simple constructor that records the reference to the UDPManager
+     */
+    UDPInterface(UDPManager* udpMan);
 
-    void pollMessages();
-
-    int getLocalPort() {
-        return mLocalUDPport;
-    }
-
-    void setPeerAddress(const struct in_addr &addr, int remotePort) {
+    void setPeerAddress(struct sockaddr_in remoteAddr) {
 
         Logger::log(LogLevel::DEBUG, "UDP bridge interface " + std::to_string(iFaceID) + " peer address changed.");
 
-        peerAddress.sin_addr = addr;
-        peerAddress.sin_port = remotePort;
-        peerAddress.sin_family = AF_INET;
+        peerAddress = remoteAddr;
 
     }
 
     bool sendData(PacketPtr data) override;
+
+    void packetReceived(PacketPtr data) {
+        this->dataArrivedCallback(data, iFaceID);
+    }
+
+    int getMRemoteIface() const {
+        return mRemoteIface;
+    }
+
+    void setMRemoteIface(int mRemoteIface) {
+        UDPInterface::mRemoteIface = mRemoteIface;
+    }
 
 };
 

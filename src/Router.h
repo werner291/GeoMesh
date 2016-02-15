@@ -54,9 +54,7 @@ private:
 
     LinkManager *linkMgr;
 
-    std::set<DirectionalEntry> mFaceRoutingTable; // TODO combine "interfaces" and "direct neighbours"
-
-    std::vector<RoutingTableEntry> mGreedyRoutingTable;
+    std::set<DirectionalEntry> mFaceRoutingTable;
 
     std::map<Address, LocalRoutingTableEntry> mLocalRoutingTable;
 

@@ -3,14 +3,10 @@
 //
 
 #include <netinet/in.h>
-#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <sstream>
-#include <limits.h>
-#include <string.h>
 #include "UDPManager.h"
-#include "../Logger.h"
 
 UDPManager::UDPManager(LinkManager *linkMgr) : linkMgr(linkMgr) {
 
@@ -20,7 +16,8 @@ UDPManager::UDPManager(LinkManager *linkMgr) : linkMgr(linkMgr) {
 
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = htonl(INADDR_ANY);
-    sin.sin_port = htons(10976);
+    localPort = 10976;
+    sin.sin_port = htons(localPort);
 
     if (bind(socketID, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
         Logger::log(LogLevel::ERROR, "Error while binding UDP bridge control socket: " + std::string(strerror(errno)));
@@ -36,8 +33,8 @@ UDPManager::UDPManager(LinkManager *linkMgr) : linkMgr(linkMgr) {
 void UDPManager::connectTo(std::string address, int port) {
 
     // Allocate the interface
-    std::shared_ptr<UDPInterface> iface(new UDPInterface());
-    connectingLinks.push_back(iface);
+    std::shared_ptr<UDPInterface> iface(new UDPInterface(this));
+    connectingLinks.insert(std::make_pair(iface->getInterfaceId(), iface));
 
     struct sockaddr_in destAddr;
 
@@ -48,13 +45,19 @@ void UDPManager::connectTo(std::string address, int port) {
 
     std::stringstream helloMsg;
 
-    helloMsg << "GeoMesh_UDP_Bridge_Hello ifaceID:" << iface->getInterfaceId() << " UDP_port:" << iface->getLocalPort();
+    helloMsg << "GeoMesh_UDP_Bridge_Hello ifaceID:" << iface->getInterfaceId();
 
     std::string msg = helloMsg.str();
 
+    uint8_t buffer[500];
+
+    ((uint16_t *) buffer)[0] = htons(0);
+
+    strncpy(reinterpret_cast<char *>(buffer + 2), msg.c_str(), msg.length());
+
     sendto(socketID,
-           msg.c_str(),
-           msg.length(),
+           buffer,
+           500,
            0,
            (struct sockaddr *) &destAddr,
            sizeof(destAddr));
@@ -65,78 +68,28 @@ void UDPManager::connectTo(std::string address, int port) {
 
 void UDPManager::pollMessages() {
 
-    char buffer[500];
+    uint8_t buffer[MAX_PACKET_SIZE + 2];
 
     sockaddr_in sender;
     int len = sizeof(sender);
 
-    int nbytes = recvfrom(socketID, buffer, 499, 0, (struct sockaddr *) &sender, (socklen_t *) &len);
-
-    buffer[499] = 0; // Set last to 0 for safety
+    int nbytes = recvfrom(socketID, buffer, MAX_PACKET_SIZE + 2, 0, (struct sockaddr *) &sender, (socklen_t *) &len);
 
     if (nbytes > 0) { // It's a proper datagaram (not an error)
 
-        Logger::log(LogLevel::DEBUG, "Received UDP bridge control datagram!");
+        Logger::log(LogLevel::DEBUG, "Received UDP bridge datagram!");
 
-        // This is a UDP bridge hello message
-        if (strncmp(buffer, "GeoMesh_UDP_Bridge_Hello", strlen("GeoMesh_UDP_Bridge_Hello")) == 0) {
+        uint16_t localIface = ((uint16_t *) buffer)[0];
 
-            // Extract the remote interface id and port number
-            int ifaceID, port;
-            sscanf(buffer, "GeoMesh_UDP_Bridge_Hello ifaceID:%i UDP_port:%i", &ifaceID, &port);
-
-            // Store the information about our new peer, including the address and GeoMesh port (NOT the bridge control port)
-            std::shared_ptr<UDPInterface> newIface(new UDPInterface());
-            newIface->setPeerAddress(sender.sin_addr, port);
-
-            // Tell the router about the new link.
-            linkMgr->connectInterface(newIface);
-
-            // Generate a response message containing the remote interface id (NOT THE LOCAL ONE!),
-            // as well as the LOCAL GeoMesh port
-            sprintf(buffer, "GeoMesh_UDP_Bridge_Established ifaceID:%i UDP_port:%i", ifaceID, newIface->getLocalPort());
-
-            // Send it back to the remote (use the bridge control port, which is the port from which the hello was sent)
-            sendto(socketID,
-                   buffer,
-                   strlen(buffer),
-                   0,
-                   (struct sockaddr *) &sender, // Return to sender
-                   sizeof(sender));
-
-            Logger::log(LogLevel::INFO, "Received peering request, opened link on UDP port " + std::to_string(newIface->getLocalPort()));
-
-            // This is a response to a hello message we sent previously
-        } else if (strncmp(buffer, "GeoMesh_UDP_Bridge_Established", strlen("GeoMesh_UDP_Bridge_Hello")) == 0) {
-
-            // Extract the local interface id and port number
-            // The interface id allows us to identify for which local interface we sent the message.
-            int ifaceID, port;
-            sscanf(buffer, "GeoMesh_UDP_Bridge_Established ifaceID:%i UDP_port:%i", &ifaceID, &port);
-
-            for (auto itr = connectingLinks.begin(); itr != connectingLinks.end(); itr++) {
-                if ((*itr)->getInterfaceId() == ifaceID) {
-
-                    (*itr)->setPeerAddress(sender.sin_addr, port);
-
-                    establishedLinks.push_back(*itr);
-
-                    linkMgr->connectInterface(*itr);
-
-                    connectingLinks.erase(itr);
-                    break;
-                }
-            }
-
-            Logger::log(LogLevel::INFO, "Peering request confirmed.");
+        if (localIface == 0) {
+            // This is a message directed at the UDPManager
+            processBridgeControlMessage((char *) buffer + 2, sender);
         } else {
-            Logger::log(LogLevel::WARN, "Received invalid message: " + std::string(buffer));
+            // This is a message directed at one of the UDPInterfaces
+            processNormalPacket(buffer, nbytes, localIface);
         }
-
-
     } else if (nbytes == 0) {
-
-
+        // Received empty packet?
     } else {
         int err = errno;
 
@@ -146,8 +99,73 @@ void UDPManager::pollMessages() {
         }
         // Else there was nothing to be read, do nothing
     }
+}
 
-    for (auto link : establishedLinks) {
-        link->pollMessages();
+void UDPManager::processNormalPacket(const uint8_t *buffer, int nbytes, uint16_t localIface) {
+    PacketPtr packet = Packet::createFromData(buffer + 2, nbytes - 2);
+
+    auto itr = establishedLinks.find(localIface);
+
+    if (itr == establishedLinks.end()) {
+        Logger::log(WARN, "Received message for interface " + std::__1::to_string(localIface)
+                          + " but this is not a known or established UDP interface.");
+    } else {
+        itr->second->packetReceived(packet);
+    }
+}
+
+void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) {
+    if (strncmp(buffer, "GeoMesh_UDP_Bridge_Hello", strlen("GeoMesh_UDP_Bridge_Hello")) == 0) {
+
+        // Extract the remote interface id and port number
+        int remoteIfaceID;
+        sscanf(buffer, "GeoMesh_UDP_Bridge_Hello remoteIfaceID:%i", &remoteIfaceID);
+
+        // Store the information about our new peer, including the address and GeoMesh port (NOT the bridge control port)
+        std::__1::shared_ptr<UDPInterface> newIface(new UDPInterface(this));
+        newIface->setPeerAddress(sender);
+        newIface->setMRemoteIface(remoteIfaceID);
+
+        // Tell the router about the new link.
+        linkMgr->connectInterface(newIface);
+
+        // Generate a response message containing the remote interface id (NOT THE LOCAL ONE!),
+        // as well as the LOCAL GeoMesh port
+        sprintf(buffer, "GeoMesh_UDP_Bridge_Established remoteIfaceID:%i UDP_port:%i", remoteIfaceID, localPort);
+
+        // Send it back to the remote (use the bridge control port, which is the port from which the hello was sent)
+        sendto(socketID,
+               buffer,
+               strlen(buffer),
+               0,
+               (struct sockaddr *) &sender, // Return to sender
+               sizeof(sender));
+
+        Logger::log(INFO, "Received peering request, remote interface ID is " +
+                          std::__1::to_string(newIface->getMRemoteIface()));
+
+        // This is a response to a hello message we sent previously
+    } else if (strncmp(buffer, "GeoMesh_UDP_Bridge_Established", strlen("GeoMesh_UDP_Bridge_Hello")) == 0) {
+
+        // Extract the local interface id and port number
+        // The interface id allows us to identify for which local interface we sent the message.
+        int ifaceID, remoteIfaceID;
+        sscanf(buffer, "GeoMesh_UDP_Bridge_Established ifaceID:%i remoteIfaceID:%i", &ifaceID, &remoteIfaceID);
+
+        auto itr = connectingLinks.find(ifaceID);
+        if (itr != connectingLinks.end()) {
+
+            establishedLinks.insert(std::make_pair(itr->first, itr->second));
+
+            linkMgr->connectInterface(itr->second);
+
+            connectingLinks.erase(itr);
+        } else {
+            Logger::log(WARN, "Received unexpected GeoMesh_UDP_Bridge_Established: " + std::string(buffer));
+        }
+
+        Logger::log(INFO, "Peering request confirmed.");
+    } else {
+        Logger::log(WARN, "Received invalid message: " + std::__1::string(buffer));
     }
 }
