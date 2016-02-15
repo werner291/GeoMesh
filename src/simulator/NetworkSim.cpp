@@ -75,7 +75,7 @@ std::shared_ptr<Router> NetworkSim::newNodeAt(double lat, double lon) {
 }
 
 std::vector<char> NetworkSim::generateAddress() {
-    std::__1::vector<char> addr(ADDRESS_LENGTH_OCTETS);
+    std::vector<char> addr(ADDRESS_LENGTH_OCTETS);
     for (int i = 0; i < ADDRESS_LENGTH_OCTETS; i++) {
             addr[i] = addrgen(rgen);
         }
@@ -88,8 +88,8 @@ void NetworkSim::clearNetwork() {
 }
 
 void NetworkSim::linkRouters(std::shared_ptr<Router> &a, std::shared_ptr<Router> &b) {
-    Link lnk(std::__1::make_shared<SimulatorLink>(a.get()),
-             std::__1::make_shared<SimulatorLink>(b.get()));
+    Link lnk(std::make_shared<SimulatorLink>(a.get()),
+             std::make_shared<SimulatorLink>(b.get()));
 
     lnk.a->getRouter()->getLinkManager()->connectInterface(lnk.a);
     lnk.b->getRouter()->getLinkManager()->connectInterface(lnk.b);

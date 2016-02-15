@@ -107,7 +107,7 @@ void UDPManager::processNormalPacket(const uint8_t *buffer, int nbytes, uint16_t
     auto itr = establishedLinks.find(localIface);
 
     if (itr == establishedLinks.end()) {
-        Logger::log(WARN, "Received message for interface " + std::__1::to_string(localIface)
+        Logger::log(WARN, "Received message for interface " + std::to_string(localIface)
                           + " but this is not a known or established UDP interface.");
     } else {
         itr->second->packetReceived(packet);
@@ -122,7 +122,7 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
         sscanf(buffer, "GeoMesh_UDP_Bridge_Hello remoteIfaceID:%i", &remoteIfaceID);
 
         // Store the information about our new peer, including the address and GeoMesh port (NOT the bridge control port)
-        std::__1::shared_ptr<UDPInterface> newIface(new UDPInterface(this));
+        std::shared_ptr<UDPInterface> newIface(new UDPInterface(this));
         newIface->setPeerAddress(sender);
         newIface->setMRemoteIface(remoteIfaceID);
 
@@ -142,7 +142,7 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
                sizeof(sender));
 
         Logger::log(INFO, "Received peering request, remote interface ID is " +
-                          std::__1::to_string(newIface->getMRemoteIface()));
+                          std::to_string(newIface->getMRemoteIface()));
 
         // This is a response to a hello message we sent previously
     } else if (strncmp(buffer, "GeoMesh_UDP_Bridge_Established", strlen("GeoMesh_UDP_Bridge_Hello")) == 0) {
@@ -166,6 +166,6 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
 
         Logger::log(INFO, "Peering request confirmed.");
     } else {
-        Logger::log(WARN, "Received invalid message: " + std::__1::string(buffer));
+        Logger::log(WARN, "Received invalid message: " + std::string(buffer));
     }
 }
