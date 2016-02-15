@@ -60,7 +60,7 @@ public:
                             sizeof(iFace->peerAddress));
 
         if (result < 0) {
-            Logger::log(LogLevel::ERROR, "UDPInterface: error while sending: " + std::string(strerror(errno)));
+            Logger::log(LogLevel::ERROR, "UDPManager: error while sending: " + std::string(strerror(errno)));
         }
 
         return result == 0;

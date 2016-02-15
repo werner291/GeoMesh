@@ -43,6 +43,8 @@ void UDPManager::connectTo(std::string address, int port) {
     destAddr.sin_port = htons(port);
     destAddr.sin_addr.s_addr = inet_addr(address.c_str());
 
+    iface->setPeerAddress(destAddr);
+
     std::stringstream helloMsg;
 
     helloMsg << "GeoMesh_UDP_Bridge_Hello remoteIfaceID:" << iface->getInterfaceId();
@@ -79,9 +81,11 @@ void UDPManager::pollMessages() {
 
     if (nbytes > 0) { // It's a proper datagaram (not an error)
 
-        Logger::log(LogLevel::DEBUG, "Received UDP datagram!");
+
 
         uint16_t localIface = ntohs(((uint16_t *) buffer)[0]);
+
+        Logger::log(LogLevel::DEBUG, "Received UDP datagram for iFace " + std::to_string(localIface));
 
         if (localIface == 0) {
             // This is a message directed at the UDPManager
@@ -128,8 +132,7 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
         newIface->setPeerAddress(sender);
         newIface->setMRemoteIface(remoteIfaceID);
 
-        // Tell the router about the new link.
-        linkMgr->connectInterface(newIface);
+
 
         ((uint16_t *) buffer)[0] = htons(0);
 
@@ -145,6 +148,10 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
                0,
                (struct sockaddr *) &sender, // Return to sender
                sizeof(sender));
+
+        // Tell the router about the new link. (AFTER SENDING ESTABLISHED!!! or the receiver will ignore the packet
+        // and we'll have to wait for the scheduled re-send (TODO implement resending)
+        linkMgr->connectInterface(newIface);
 
         Logger::log(INFO, "Received peering request, remote interface ID is " +
                           std::to_string(newIface->getMRemoteIface()));
