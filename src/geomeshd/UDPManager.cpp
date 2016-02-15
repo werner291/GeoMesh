@@ -131,7 +131,8 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
 
         // Generate a response message containing the remote interface id (NOT THE LOCAL ONE!),
         // as well as the LOCAL GeoMesh port
-        sprintf(buffer, "GeoMesh_UDP_Bridge_Established remoteIfaceID:%i UDP_port:%i", remoteIfaceID, localPort);
+        // Note that these are swapped!
+        sprintf(buffer, "GeoMesh_UDP_Bridge_Established ifaceID:%i remoteIfaceID:%i", remoteIfaceID, newIface->getInterfaceId());
 
         // Send it back to the remote (use the bridge control port, which is the port from which the hello was sent)
         sendto(socketID,
