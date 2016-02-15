@@ -79,14 +79,14 @@ void UDPManager::pollMessages() {
 
         Logger::log(LogLevel::DEBUG, "Received UDP bridge datagram!");
 
-        uint16_t localIface = ((uint16_t *) buffer)[0];
+        uint16_t localIface = ntohs(((uint16_t *) buffer)[0]);
 
         if (localIface == 0) {
             // This is a message directed at the UDPManager
             processBridgeControlMessage((char *) buffer + 2, sender);
         } else {
             // This is a message directed at one of the UDPInterfaces
-            processNormalPacket(buffer, nbytes, localIface);
+            processNormalPacket(buffer + 2, nbytes - 2, localIface);
         }
     } else if (nbytes == 0) {
         // Received empty packet?
@@ -102,7 +102,7 @@ void UDPManager::pollMessages() {
 }
 
 void UDPManager::processNormalPacket(const uint8_t *buffer, int nbytes, uint16_t localIface) {
-    PacketPtr packet = Packet::createFromData(buffer + 2, nbytes - 2);
+    PacketPtr packet = Packet::createFromData(buffer, nbytes);
 
     auto itr = establishedLinks.find(localIface);
 
