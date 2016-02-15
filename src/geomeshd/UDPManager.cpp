@@ -55,6 +55,8 @@ void UDPManager::connectTo(std::string address, int port) {
 
     strncpy(reinterpret_cast<char *>(buffer + 2), msg.c_str(), msg.length());
 
+    buffer[2 + msg.length()] = 0;
+
     sendto(socketID,
            buffer,
            500,
@@ -77,7 +79,7 @@ void UDPManager::pollMessages() {
 
     if (nbytes > 0) { // It's a proper datagaram (not an error)
 
-        Logger::log(LogLevel::DEBUG, "Received UDP bridge datagram!");
+        Logger::log(LogLevel::DEBUG, "Received UDP datagram!");
 
         uint16_t localIface = ntohs(((uint16_t *) buffer)[0]);
 
@@ -139,7 +141,7 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
         // Send it back to the remote (use the bridge control port, which is the port from which the hello was sent)
         sendto(socketID,
                buffer,
-               strlen(buffer),
+               strlen(buffer+2)+2,
                0,
                (struct sockaddr *) &sender, // Return to sender
                sizeof(sender));
@@ -148,7 +150,7 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
                           std::to_string(newIface->getMRemoteIface()));
 
         // This is a response to a hello message we sent previously
-    } else if (strncmp(buffer, "GeoMesh_UDP_Bridge_Established", strlen("GeoMesh_UDP_Bridge_Hello")) == 0) {
+    } else if (strncmp(buffer, "GeoMesh_UDP_Bridge_Established", strlen("GeoMesh_UDP_Bridge_Established")) == 0) {
 
         // Extract the local interface id and port number
         // The interface id allows us to identify for which local interface we sent the message.
