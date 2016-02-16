@@ -122,7 +122,7 @@ void TunnelDeliveryInterface_Apple::installRoute() {
         return;
     };
 
-    system(("route -q add -inet6 -net fcfd:0000:0000:0000:0000:0000:0000:0000 -prefixlen 16 -interface "
+    system(("route -q add -inet6 -net fcf4:0000:0000:0000:0000:0000:0000:0000 -prefixlen 16 -interface "
             + std::string(iFaceName)).c_str());
 
     Logger::log(LogLevel::INFO,

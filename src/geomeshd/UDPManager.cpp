@@ -132,8 +132,6 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
         newIface->setPeerAddress(sender);
         newIface->setMRemoteIface(remoteIfaceID);
 
-
-
         ((uint16_t *) buffer)[0] = htons(0);
 
         // Generate a response message containing the remote interface id (NOT THE LOCAL ONE!),
@@ -148,6 +146,8 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
                0,
                (struct sockaddr *) &sender, // Return to sender
                sizeof(sender));
+
+        usleep(1000);
 
         // Tell the router about the new link. (AFTER SENDING ESTABLISHED!!! or the receiver will ignore the packet
         // and we'll have to wait for the scheduled re-send (TODO implement resending)
