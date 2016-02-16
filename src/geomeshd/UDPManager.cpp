@@ -47,7 +47,7 @@ void UDPManager::connectTo(std::string address, int port) {
 
     std::stringstream helloMsg;
 
-    helloMsg << "GeoMesh_UDP_Bridge_Hello remoteIfaceID:" << iface->getInterfaceId();
+    helloMsg << "GeoMesh_UDP_Bridge_Hello cientIfaceID:" << iface->getInterfaceId();
 
     std::string msg = helloMsg.str();
 
@@ -125,7 +125,7 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
 
         // Extract the remote interface id and port number
         int remoteIfaceID;
-        sscanf(buffer, "GeoMesh_UDP_Bridge_Hello remoteIfaceID:%i", &remoteIfaceID);
+        sscanf(buffer, "GeoMesh_UDP_Bridge_Hello cientIfaceID:%i", &remoteIfaceID);
 
         // Store the information about our new peer, including the address and GeoMesh port (NOT the bridge control port)
         std::shared_ptr<UDPInterface> newIface(new UDPInterface(this));
@@ -137,7 +137,7 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
         // Generate a response message containing the remote interface id (NOT THE LOCAL ONE!),
         // as well as the LOCAL GeoMesh port
         // Note that these are swapped!
-        sprintf(buffer+2, "GeoMesh_UDP_Bridge_Established ifaceID:%i remoteIfaceID:%i", remoteIfaceID, newIface->getInterfaceId());
+        sprintf(buffer+2, "GeoMesh_UDP_Bridge_Established cientIfaceID:%i serverIfaceID:%i", remoteIfaceID, newIface->getInterfaceId());
 
         // Send it back to the remote (use the bridge control port, which is the port from which the hello was sent)
         sendto(socketID,
@@ -162,12 +162,14 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
         // Extract the local interface id and port number
         // The interface id allows us to identify for which local interface we sent the message.
         int ifaceID, remoteIfaceID;
-        sscanf(buffer, "GeoMesh_UDP_Bridge_Established ifaceID:%i remoteIfaceID:%i", &ifaceID, &remoteIfaceID);
+        sscanf(buffer, "GeoMesh_UDP_Bridge_Established cientIfaceID:%i serverIfaceID:%i", &ifaceID, &remoteIfaceID);
 
         auto itr = connectingLinks.find(ifaceID);
         if (itr != connectingLinks.end()) {
 
             establishedLinks.insert(std::make_pair(itr->first, itr->second));
+
+            itr->second->setMRemoteIface(remoteIfaceID);
 
             linkMgr->connectInterface(itr->second);
 
