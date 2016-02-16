@@ -119,7 +119,7 @@ void TunnelDeliveryInterface_Linux::deliverIPv6Packet(PacketPtr packet) {
 
     // Send to the local system.
     int result = write(fd,
-                      packet->getPayload(),A
+                      packet->getPayload(),
                       packet->getPayloadLength());
 
     if (result == -1) {
