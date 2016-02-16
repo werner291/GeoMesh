@@ -63,7 +63,7 @@ public:
             Logger::log(LogLevel::ERROR, "UDPManager: error while sending: " + std::string(strerror(errno)));
         }
 
-        return result == 0;
+        return result >= 0;
     }
 
     void processNormalPacket(const uint8_t *buffer, int nbytes, uint16_t localIface);
