@@ -46,6 +46,9 @@ public:
 
     bool sendMessage(PacketPtr message, UDPInterface* iFace) {
 
+        Logger::log(LogLevel::ERROR, "UDPManager: sending UDP message to remote iFace: "
+                                     + std::to_string(iFace->mRemoteIface));
+
         uint8_t sendBuffer[message->getDataLength() + 2];
 
         ((uint16_t*)sendBuffer)[0] = htons(iFace->mRemoteIface);
