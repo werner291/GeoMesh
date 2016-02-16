@@ -82,8 +82,6 @@ void UDPManager::pollMessages() {
 
     if (nbytes > 0) { // It's a proper datagaram (not an error)
 
-
-
         uint16_t localIface = ntohs(((uint16_t *) buffer)[0]);
 
         Logger::log(LogLevel::DEBUG, "Received UDP datagram for iFace " + std::to_string(localIface));
@@ -125,20 +123,22 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
     if (strncmp(buffer, "GeoMesh_UDP_Bridge_Hello", strlen("GeoMesh_UDP_Bridge_Hello")) == 0) {
 
         // Extract the remote interface id and port number
-        int remoteIfaceID;
-        sscanf(buffer, "GeoMesh_UDP_Bridge_Hello cientIfaceID:%i", &remoteIfaceID);
+        int clientIfaceID;
+        sscanf(buffer, "GeoMesh_UDP_Bridge_Hello cientIfaceID:%i", &clientIfaceID);
 
         // Store the information about our new peer, including the address and GeoMesh port (NOT the bridge control port)
         std::shared_ptr<UDPInterface> newIface(new UDPInterface(this));
         newIface->setPeerAddress(sender);
-        newIface->setMRemoteIface(remoteIfaceID);
+        newIface->setMRemoteIface(clientIfaceID);
+
+        establishedLinks.insert(std::make_pair(newIface->getInterfaceId(), newIface));
 
         ((uint16_t *) buffer)[0] = htons(0);
 
         // Generate a response message containing the remote interface id (NOT THE LOCAL ONE!),
         // as well as the LOCAL GeoMesh port
         // Note that these are swapped!
-        sprintf(buffer+2, "GeoMesh_UDP_Bridge_Established cientIfaceID:%i serverIfaceID:%i", remoteIfaceID, newIface->getInterfaceId());
+        sprintf(buffer+2, "GeoMesh_UDP_Bridge_Established cientIfaceID:%i serverIfaceID:%i", clientIfaceID, newIface->getInterfaceId());
 
         // Send it back to the remote (use the bridge control port, which is the port from which the hello was sent)
         sendto(socketID,
