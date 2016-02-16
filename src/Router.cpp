@@ -163,6 +163,9 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
         localEntry.iFaceID = fromIface;
         localEntry.lastUpdated = time(NULL);
 
+        Logger::log(LogLevel::DEBUG, "Added peer to local routing table " + suggestionPacket->getSourceAddress().toString()
+                                    + " from iFace " + std::to_string(fromIface) + ".");
+
         processDHTRoutingSuggestion(suggestionPacket->getSourceAddress(), peerLocation);
     }
 

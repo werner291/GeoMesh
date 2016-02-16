@@ -109,6 +109,7 @@ class Packet {
         switch (msgType) {
             case MSGTYPE_LOCATION_INFO:
                 dataLength = 500;
+                break;
             default:
                 dataLength = MAX_PACKET_SIZE;
         }
