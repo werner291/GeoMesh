@@ -118,10 +118,9 @@ void TunnelDeliveryInterface_Linux::installRoute() {
 void TunnelDeliveryInterface_Linux::deliverIPv6Packet(PacketPtr packet) {
 
     // Send to the local system.
-    int result = send(fd,
-                      packet->getPayload(),
-                      packet->getPayloadLength(),
-                      0);
+    int result = write(fd,
+                      packet->getPayload(),A
+                      packet->getPayloadLength());
 
     if (result == -1) {
         int err = errno;
