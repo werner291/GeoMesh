@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <sstream>
+#include <unistd.h>
 #include "UDPManager.h"
 
 UDPManager::UDPManager(LinkManager *linkMgr) : linkMgr(linkMgr) {
