@@ -95,6 +95,7 @@ void UDPManager::pollMessages() {
         }
     } else if (nbytes == 0) {
         // Received empty packet?
+        Logger::log(LogLevel::DEBUG, "Received empty packet?!");
     } else {
         int err = errno;
 
