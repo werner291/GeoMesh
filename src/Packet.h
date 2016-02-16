@@ -105,6 +105,13 @@ class Packet {
 
         // Set protocol version to current
         *(reinterpret_cast<uint16_t *>(header + GEOMESH_HEADER_PROTOCOL_VERSION)) = htons(PROTOCOL_VERSION);
+
+        switch (msgType) {
+            case MSGTYPE_LOCATION_INFO:
+                dataLength = 500;
+            default:
+                dataLength = MAX_PACKET_SIZE;
+        }
     }
 
 public:

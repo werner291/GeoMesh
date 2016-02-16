@@ -131,6 +131,9 @@ void TunnelDeliveryInterface_Apple::installRoute() {
 
 void TunnelDeliveryInterface_Apple::deliverIPv6Packet(PacketPtr packet) {
 
+    Logger::log(LogLevel::DEBUG,
+                "TunnelDeliveryInterface_Apple: Delivering message!");
+
     uint8_t buffer[MAX_PACKET_SIZE + 4];
 
     ((uint16_t *) buffer)[0] = htons(0);            // Always 0
