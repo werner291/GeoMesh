@@ -14,6 +14,7 @@
 
 UDPInterface::UDPInterface(UDPManager* udpMan) {
     UDPInterface::udpMan = udpMan;
+    nextPacketNumber = 0;
 }
 
 bool UDPInterface::sendData(PacketPtr data) {

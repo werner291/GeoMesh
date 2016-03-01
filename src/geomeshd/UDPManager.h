@@ -23,9 +23,20 @@ class UDPManager {
 
     int localPort;
 
+    const int MAX_FRAGMENT_SIZE = 600;
+
     std::map<uint16_t, std::shared_ptr<UDPInterface> > connectingLinks;
 
     std::map<uint16_t, std::shared_ptr<UDPInterface> > establishedLinks;
+
+    /**
+     * Take the specified message, and send it over the UDP bridge.
+     * The UDPInterface is the interface that sends the message.
+     * Note: You should not call this method directly, it is usually
+     * called from UDPInterface.
+     */
+    bool sendMessage(PacketPtr message, UDPInterface* iFace);
+
 
 
 public:
@@ -33,44 +44,34 @@ public:
 
     /**
      * Send a UDP bridge hello packet to the specified address and port,
-     * and creates and connects an interface associated to that peer.
+     * and creates an interface associated to that peer. The interface is
+     * stored in the "connectingLinks", and the router is NOT notified immediately.
+     *
+     * No assumptions should be made about the state of the link after this call.
      */
     void connectTo(std::string address, int port);
 
     /**
-     * Polls the socket for new packets, and sends them to the router if there are any.
+     * Polls the socket for new packets, and processes them if there are any.
      */
     void pollMessages();
 
+    /**
+     * Datagrams directed towards interface 0 need to be processed by this method.
+     * They are abut the status of the UDP link itself.
+     */
     void processBridgeControlMessage(char *buffer, sockaddr_in &sender);
 
-    bool sendMessage(PacketPtr message, UDPInterface* iFace) {
+    /**
+     * Take the bytes representing a normal GeoMesh packet, and send it to the Router.
+     *
+     * \param buffer Pointer to the first byte of the GeoMesh packet header
+     * \param nbytes Integer representing the number of bytes in the buffer.
+     * \param localIface The interface number of the corresponding UDPInterface.
+     */
+    void processNormalPacketFragment(const uint8_t *buffer, int nbytes, uint16_t localIface);
 
-        Logger::log(LogLevel::ERROR, "UDPManager: sending UDP message to remote iFace: "
-                                     + std::to_string(iFace->mRemoteIface));
-
-        uint8_t sendBuffer[message->getDataLength() + 2];
-
-        ((uint16_t*)sendBuffer)[0] = htons(iFace->mRemoteIface);
-
-        memcpy(sendBuffer + 2, message->getData(), message->getDataLength());
-
-        int result = sendto(socketID,
-                            sendBuffer,
-                            message->getDataLength() + 2,
-                            0,
-                            (struct sockaddr *) &iFace->peerAddress,
-                            sizeof(iFace->peerAddress));
-
-        if (result < 0) {
-            Logger::log(LogLevel::ERROR, "UDPManager: error while sending: " + std::string(strerror(errno)));
-            return false;
-        }
-
-        return true;
-    }
-
-    void processNormalPacket(const uint8_t *buffer, int nbytes, uint16_t localIface);
+    static std::vector<UDPFragmentPtr> fragmentPacket(const PacketPtr &message, uint16_t packetNumber, uint16_t remoteIface);
 };
 
 

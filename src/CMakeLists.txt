@@ -28,21 +28,24 @@ IF (BUILD_SIMULATOR)
 ENDIF ()
 
 
-set(DAEMON_SRC geomeshd/GeoMeshd_main.cpp geomeshd/UDPInterface.cpp geomeshd/UDPManager.cpp geomeshd/UnixSocketsFunctions.cpp)
+set(DAEMON_SRC geomeshd/GeoMeshd_main.cpp geomeshd/UDPInterface.cpp geomeshd/UDPManager.cpp geomeshd/UnixSocketsFunctions.cpp
+        geomeshd/UDPFragment.cpp geomeshd/UDPReceptionBuffer.cpp)
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(DAEMON_SRC ${DAEMON_SRC} geomeshd/TunnelDeliveryInterface_Apple.cpp)
 ENDIF ()
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set(DAEMON_SRC ${DAEMON_SRC} geomeshd/TunnelDeliveryInterface_Linux.cpp)
+    set(DAEMON_SRC ${DAEMON_SRC} geomeshd/TunnelDeliveryInterface_Linux.cpp geomeshd/UDPFragment.cpp geomeshd/UDPFragment.h geomeshd/UDPReceptionBuffer.cpp geomeshd/UDPReceptionBuffer.h)
 ENDIF ()
 
-add_executable(geomeshd ${DAEMON_SRC})
+add_library(daemon_core ${DAEMON_SRC})
 
-set_property(TARGET geomeshd PROPERTY CXX_STANDARD 11)
-set_property(TARGET geomeshd PROPERTY CXX_STANDARD_REQUIRED ON)
+add_executable(geomeshd geomeshd/GeoMeshd_main.cpp)
 
-TARGET_LINK_LIBRARIES(geomeshd core)# LIBRARY_asio)
+set_property(TARGET daemon_core PROPERTY CXX_STANDARD 11)
+set_property(TARGET daemon_core PROPERTY CXX_STANDARD_REQUIRED ON)
+
+TARGET_LINK_LIBRARIES(geomeshd core daemon_core)# LIBRARY_asio)
 
 

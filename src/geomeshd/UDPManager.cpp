@@ -91,7 +91,7 @@ void UDPManager::pollMessages() {
             processBridgeControlMessage((char *) buffer + 2, sender);
         } else {
             // This is a message directed at one of the UDPInterfaces
-            processNormalPacket(buffer + 2, nbytes - 2, localIface);
+            processNormalPacketFragment(buffer + 2, nbytes - 2, localIface);
         }
     } else if (nbytes == 0) {
         // Received empty packet?
@@ -107,8 +107,8 @@ void UDPManager::pollMessages() {
     }
 }
 
-void UDPManager::processNormalPacket(const uint8_t *buffer, int nbytes, uint16_t localIface) {
-    PacketPtr packet = Packet::createFromData(buffer, nbytes);
+void UDPManager::processNormalPacketFragment(const uint8_t *buffer, int nbytes, uint16_t localIface) {
+    UDPFragmentPtr fragment(new UDPFragment(buffer, nbytes, true));
 
     auto itr = establishedLinks.find(localIface);
 
@@ -116,7 +116,7 @@ void UDPManager::processNormalPacket(const uint8_t *buffer, int nbytes, uint16_t
         Logger::log(WARN, "Received message for interface " + std::to_string(localIface)
                           + " but this is not a known or established UDP interface.");
     } else {
-        itr->second->packetReceived(packet);
+        itr->second->fragmentReceived(fragment);
     }
 }
 
@@ -184,4 +184,58 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
     } else {
         Logger::log(WARN, "Received invalid message: " + std::string(buffer));
     }
+}
+
+bool UDPManager::sendMessage(PacketPtr message, UDPInterface* iFace) {
+
+    Logger::log(LogLevel::ERROR, "UDPManager: sending UDP message to remote iFace: "
+                                 + std::to_string(iFace->mRemoteIface));
+
+    std::vector<UDPFragmentPtr> fragments = fragmentPacket(message, iFace->getNextPacketNumber(), iFace->mRemoteIface);
+
+    for (UDPFragmentPtr frag : fragments) {
+
+        int result = sendto(socketID,
+                            frag->getPayloadData(),
+                            frag->getDataLength(),
+                            0,
+                            (struct sockaddr *) &iFace->peerAddress,
+                            sizeof(iFace->peerAddress));
+
+        if (result < 0) {
+            Logger::log(LogLevel::ERROR, "UDPManager: error while sending: " + std::string(strerror(errno)));
+            return false;
+        }
+    }
+
+
+
+    return true;
+}
+
+std::vector<UDPFragmentPtr> UDPManager::fragmentPacket(const PacketPtr &message, uint16_t packetNum, uint16_t remoteIface) {
+
+    std::vector<UDPFragmentPtr> fragments;
+
+    int maxFragSize = 500;
+
+    for (int fragStart = 0; fragStart < message->getDataLength(); fragStart += maxFragSize) {
+
+        int fragLength = std::__1::min(maxFragSize, message->getDataLength() - fragStart);
+
+        UDPFragmentPtr frag(new UDPFragment(message->getData()+fragStart, fragLength, false));
+
+        frag->setPacketNumber(packetNum);
+
+        frag->setPacketLength(message->getDataLength());
+
+        frag->setDestinationInterfaceID(remoteIface);
+
+        frag->setFragmentStart(fragStart);
+
+        frag->setFragmentLength(fragLength);
+
+        fragments.push_back(frag);
+    }
+    return fragments;
 }
