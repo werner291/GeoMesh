@@ -95,12 +95,12 @@ typedef std::shared_ptr<Packet> PacketPtr;
 class Packet {
 
     uint8_t data[MAX_PACKET_SIZE];
-    int dataLength = MAX_PACKET_SIZE;
+    int dataLength;
     uint8_t *header;
     uint8_t *payload;
 
     // Private on purpose. Use the factory methods.
-    Packet(int msgType) : header(data), payload(header + GEOMESH_PAYLOAD_START) {
+    Packet(int msgType) : header(data), payload(header + GEOMESH_PAYLOAD_START), dataLength(MAX_PACKET_SIZE) {
         setMessageType(msgType);
 
         // Set protocol version to current

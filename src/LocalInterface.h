@@ -12,6 +12,11 @@
 #include "Location.h"
 #include "UniqueAddress.h"
 
+/**
+ * An intermediary between the Router and the system-specific delivery interface.
+ *
+ * Proposal: Use this as a superclass for the delivery interface?
+ */
 class LocalInterface {
 
     Router *router;

@@ -26,9 +26,17 @@ static double inline intAngleToDegrees(int32_t intAngle) {
     return intAngle * 180.0 / (double) INT32_MAX;
 }
 
+/**
+ * A class representing a specific location somewhere on Earth.
+ *
+ * Should sending to different planets be necessary, please open an issue on GitHub.
+ */
 class Location {
 
-    double inline rad(double angle) const {
+    /**
+     * Convert degrees to radians.
+     */
+    static double inline rad(double angle) {
         return angle * M_PI / 180.0;
     }
 
@@ -40,6 +48,10 @@ public:
 
     Location(double lat, double lon) : lon(lon), lat(lat) { }
 
+    /**
+     * Convert this location infto an std::string representation
+     * for debugging purposed. (lat,lon).
+     */
     const std::string getDescription() const {
         std::stringstream ss;
 
@@ -48,12 +60,23 @@ public:
         return ss.str();
     }
 
+    /**
+     * Get a direction to the target location.
+     *
+     * The only guarantee is that the angle will be bewteen -PI and PI,
+     * and the values returned will be consistent when performed by the same node.
+     *
+     * This is useful when you need to know how locations are ordered when arranged on a compass.
+     */
     double getDirectionTo(const Location &target) const;
 
     inline bool operator==(const Location &other) const {
         return lon == other.lon && lat == other.lat;
     }
 
+    /**
+     * Extract a Location from 16 octets of binary information.
+     */
     inline static Location fromBytes(const uint8_t *buffer) {
 
         uint32_t latInt = ntohl(((uint32_t *) buffer)[0]);
@@ -66,7 +89,10 @@ public:
 
     }
 
-
+    /**
+     * Write this location into the buffer.
+     * 16 bytes must be available in the buffer, and will be overwritten.
+     */
     inline void toBytes(const uint8_t *buffer) const {
 
         uint32_t latInt = degreesToIntAngle(lat);
@@ -78,8 +104,20 @@ public:
     }
 };
 
+/**
+ * Convert a Location (which is in spherical coordinates) to a Euclidian represenentation.
+ * This vector is of length 1, and does not take Earth's radius into account.
+ *
+ * (Lat = 0, Lon = 0) = (1,0,0)
+ * (Lat = 90, Lon = any) = (0,0,1)
+ * (Lat = 0, Lon = 90) = (0,1,0)
+ */
 Vector3d convertLocation(const Location &loc);
 
+/**
+ * Same as convertLocation(const Location &loc),
+ * but now without the latitude and longitude being packed into a Location object.
+ */
 Vector3d convertLocation(double lat, double lon);
 
 

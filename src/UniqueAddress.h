@@ -13,6 +13,9 @@
 
 const int ADDRESS_LENGTH_OCTETS = 16; // 128-bit addresses, we're optimistic.
 
+/**
+ * Short class / struct representing the XOR distance between two 128-bit addresses.
+ */
 struct AddressDistance {
 
     // Lower index means higher order.
@@ -32,6 +35,9 @@ struct AddressDistance {
         return false;
     }
 
+    /**
+     * Whether this distance exactly matches the other, byte for byte.
+     */
     inline bool operator==(const AddressDistance &other) const {
         for (int i = 0; i < ADDRESS_LENGTH_OCTETS / 4; ++i) {
             if (data[i] != other.data[i]) return false;
@@ -39,6 +45,9 @@ struct AddressDistance {
         return true;
     }
 
+    /**
+     * Which index the
+     */
     inline int getDHTSlotNumber() const {
 
         for (int index=0; index < ADDRESS_LENGTH_OCTETS / 4; ++index) {
@@ -64,6 +73,9 @@ struct AddressDistance {
 
 };
 
+/**
+ * Represents a 128-bit GeoMesh address.
+ */
 class Address {
 
     uint8_t bytes[ADDRESS_LENGTH_OCTETS];
