@@ -5,6 +5,10 @@ project(GeoMesh)
 option(BUILD_SIMULATOR "build_simulator" OFF)
 option(BUILD_TESTS "build_tests" OFF)
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 add_subdirectory(src)
 
 IF (BUILD_TESTS)
