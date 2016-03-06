@@ -62,8 +62,6 @@ public:
         *reinterpret_cast<uint16_t*>(data.data() + 8) = htons(start);
     }
 
-
-
     inline int getPayloadLength() {
         return ntohs(*reinterpret_cast<uint16_t*>(data.data() + 10));
     }

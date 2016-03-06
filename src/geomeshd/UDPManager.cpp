@@ -199,7 +199,7 @@ bool UDPManager::sendMessage(PacketPtr message, UDPInterface* iFace) {
     for (UDPFragmentPtr frag : fragments) {
 
         int result = sendto(socketID,
-                            frag->getPayloadData(),
+                            frag->getDataBuffer(),
                             frag->getDataLength(),
                             0,
                             (struct sockaddr *) &iFace->peerAddress,
