@@ -40,7 +40,7 @@ class UDPManager {
 
 
 public:
-    UDPManager(LinkManager *linkMgr);
+    UDPManager(LinkManager *linkMgr, int localPort);
 
     /**
      * Send a UDP bridge hello packet to the specified address and port,

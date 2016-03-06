@@ -31,7 +31,9 @@ int main(int argc, char **argv) {
 
     char* givenAddress = NULL;
 
-    char* peerAddress = NULL;
+    std::vector< std::string > peers;
+
+    int udpPort = 10976;
 
     for (int i=0; i < argc; i++) {
         if (strcmp(argv[i], "-ip6") == 0) {
@@ -39,7 +41,11 @@ int main(int argc, char **argv) {
         }
 
         if (strcmp(argv[i], "-peer") == 0) {
-            peerAddress = argv[++i];
+            peers.emplace_back(std::string(argv[++i]));
+        }
+
+        if (strcmp(argv[i], "-port") == 0) {
+            sscanf(argv[++i], "%i", &udpPort);
         }
     }
 
@@ -56,10 +62,17 @@ int main(int argc, char **argv) {
 
     tunIface->startTunnelInterface();
 
-    UDPManager *udpMan = new UDPManager(routerCore->getLinkManager());
+    UDPManager *udpMan = new UDPManager(routerCore->getLinkManager(), udpPort);
 
-    if (peerAddress) {
-        udpMan->connectTo(peerAddress, 10976);
+    for (std::string& str : peers) {
+
+        // TODO distinguish between ipv4 and ipv6 addresses
+        // and do some checking
+        std::string address = str.substr(0,str.find(":"));
+
+        int port = std::stoi(str.substr(str.find(":")));
+
+        udpMan->connectTo(address, port);
     }
 
     while (1) {

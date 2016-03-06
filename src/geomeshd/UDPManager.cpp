@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include "UDPManager.h"
 
-UDPManager::UDPManager(LinkManager *linkMgr) : linkMgr(linkMgr) {
+UDPManager::UDPManager(LinkManager *linkMgr, int localPort) : linkMgr(linkMgr) {
 
     socketID = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -17,7 +17,7 @@ UDPManager::UDPManager(LinkManager *linkMgr) : linkMgr(linkMgr) {
 
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = htonl(INADDR_ANY);
-    localPort = 10976;
+    localPort = localPort;
     sin.sin_port = htons(localPort);
 
     if (bind(socketID, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
