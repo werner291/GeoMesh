@@ -46,6 +46,9 @@ add_executable(geomeshd geomeshd/GeoMeshd_main.cpp)
 set_property(TARGET daemon_core PROPERTY CXX_STANDARD 11)
 set_property(TARGET daemon_core PROPERTY CXX_STANDARD_REQUIRED ON)
 
+set_property(TARGET geomeshd PROPERTY CXX_STANDARD 11)
+set_property(TARGET geomeshd PROPERTY CXX_STANDARD_REQUIRED ON)
+
 TARGET_LINK_LIBRARIES(geomeshd core daemon_core)# LIBRARY_asio)
 
 
