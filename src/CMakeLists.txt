@@ -40,6 +40,7 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 ENDIF ()
 
 add_library(daemon_core ${DAEMON_SRC})
+TARGET_LINK_LIBRARIES(daemon_core core)
 
 add_executable(geomeshd geomeshd/GeoMeshd_main.cpp)
 
