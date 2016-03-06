@@ -29,13 +29,12 @@ public:
         return ntohs(*reinterpret_cast<uint16_t*>(data.data()));
     }
 
-    inline int getPacketLength() {
+    inline uint16_t getDestinationInterfaceID() {
         return ntohs(*reinterpret_cast<uint16_t*>(data.data() + 2));
     }
 
-    inline void setPacketLength(int length) {
-        assert(length <= MAX_PACKET_SIZE);
-        *reinterpret_cast<uint16_t*>(data.data() + 2) = htons(length);
+    inline void setDestinationInterfaceID(uint16_t packetNum) {
+        *reinterpret_cast<uint16_t*>(data.data() + 2) = htons(packetNum);
     }
 
     inline uint16_t getPacketNumber() {
@@ -46,12 +45,13 @@ public:
         *reinterpret_cast<uint16_t*>(data.data() + 4) = htons(packetNum);
     }
 
-    inline uint16_t getDestinationInterfaceID() {
+    inline int getPacketLength() {
         return ntohs(*reinterpret_cast<uint16_t*>(data.data() + 6));
     }
 
-    inline void setDestinationInterfaceID(uint16_t packetNum) {
-        *reinterpret_cast<uint16_t*>(data.data() + 4) = htons(packetNum);
+    inline void setPacketLength(int length) {
+        assert(length <= MAX_PACKET_SIZE);
+        *reinterpret_cast<uint16_t*>(data.data() + 6) = htons(length);
     }
 
     inline int getFragmentStart() {

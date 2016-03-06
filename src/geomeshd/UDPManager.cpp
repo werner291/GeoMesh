@@ -55,10 +55,11 @@ void UDPManager::connectTo(std::string address, int port) {
     uint8_t buffer[500];
 
     ((uint16_t *) buffer)[0] = htons(0);
+    ((uint16_t *) buffer)[1] = htons(0);
 
-    strncpy(reinterpret_cast<char *>(buffer + 2), msg.c_str(), msg.length());
+    strncpy(reinterpret_cast<char *>(buffer + 4), msg.c_str(), msg.length());
 
-    buffer[2 + msg.length()] = 0;
+    buffer[4 + msg.length()] = 0;
 
     sendto(socketID,
            buffer,
@@ -73,25 +74,26 @@ void UDPManager::connectTo(std::string address, int port) {
 
 void UDPManager::pollMessages() {
 
-    uint8_t buffer[MAX_PACKET_SIZE + 2];
+    uint8_t buffer[MAX_PACKET_SIZE + 4];
 
     sockaddr_in sender;
     int len = sizeof(sender);
 
-    int nbytes = recvfrom(socketID, buffer, MAX_PACKET_SIZE + 2, 0, (struct sockaddr *) &sender, (socklen_t *) &len);
+    int nbytes = recvfrom(socketID, buffer, MAX_PACKET_SIZE + 4, 0, (struct sockaddr *) &sender, (socklen_t *) &len);
 
     if (nbytes > 0) { // It's a proper datagaram (not an error)
 
-        uint16_t localIface = ntohs(((uint16_t *) buffer)[0]);
+        uint16_t protVersion = ntohs(((uint16_t *) buffer)[0]);
+        uint16_t localIface = ntohs(((uint16_t *) buffer)[1]);
 
         Logger::log(LogLevel::DEBUG, "Received UDP datagram for iFace " + std::to_string(localIface));
 
         if (localIface == 0) {
             // This is a message directed at the UDPManager
-            processBridgeControlMessage((char *) buffer + 2, sender);
+            processBridgeControlMessage((char *) buffer + 4, sender);
         } else {
             // This is a message directed at one of the UDPInterfaces
-            processNormalPacketFragment(buffer + 2, nbytes - 2, localIface);
+            processNormalPacketFragment(buffer + 4, nbytes - 4, localIface);
         }
     } else if (nbytes == 0) {
         // Received empty packet?
@@ -135,16 +137,17 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
         establishedLinks.insert(std::make_pair(newIface->getInterfaceId(), newIface));
 
         ((uint16_t *) buffer)[0] = htons(0);
+        ((uint16_t *) buffer)[1] = htons(0);
 
         // Generate a response message containing the remote interface id (NOT THE LOCAL ONE!),
         // as well as the LOCAL GeoMesh port
         // Note that these are swapped!
-        sprintf(buffer+2, "GeoMesh_UDP_Bridge_Established cientIfaceID:%i serverIfaceID:%i", clientIfaceID, newIface->getInterfaceId());
+        sprintf(buffer+4, "GeoMesh_UDP_Bridge_Established cientIfaceID:%i serverIfaceID:%i", clientIfaceID, newIface->getInterfaceId());
 
         // Send it back to the remote (use the bridge control port, which is the port from which the hello was sent)
         sendto(socketID,
                buffer,
-               strlen(buffer+2)+2,
+               strlen(buffer+4)+4,
                0,
                (struct sockaddr *) &sender, // Return to sender
                sizeof(sender));

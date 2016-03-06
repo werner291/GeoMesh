@@ -26,6 +26,8 @@ using namespace std;
 
 #include "../Router.h"
 
+#include <regex>
+
 
 int main(int argc, char **argv) {
 
@@ -66,13 +68,19 @@ int main(int argc, char **argv) {
 
     for (std::string& str : peers) {
 
-        // TODO distinguish between ipv4 and ipv6 addresses
-        // and do some checking
-        std::string address = str.substr(0,str.find(":"));
+        std::regex reg("([0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}):([0-9]+)");
+        std::smatch match;
 
-        int port = std::stoi(str.substr(str.find(":")));
+        if (std::regex_search(str, match, reg) && match.size() > 1) {
+            std::string address(match.str(1).c_str());
+            int port = std::atoi(match.str(2).c_str());
 
-        udpMan->connectTo(address, port);
+            udpMan->connectTo(address, port);
+        } else {
+            Logger::log(LogLevel::WARN, "Invalid peer address: " + str);
+        }
+
+
     }
 
     while (1) {
