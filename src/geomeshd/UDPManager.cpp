@@ -221,7 +221,7 @@ std::vector<UDPFragmentPtr> UDPManager::fragmentPacket(const PacketPtr &message,
 
     for (int fragStart = 0; fragStart < message->getDataLength(); fragStart += maxFragSize) {
 
-        int fragLength = std::__1::min(maxFragSize, message->getDataLength() - fragStart);
+        int fragLength = std::min(maxFragSize, message->getDataLength() - fragStart);
 
         UDPFragmentPtr frag(new UDPFragment(message->getData()+fragStart, fragLength, false));
 
