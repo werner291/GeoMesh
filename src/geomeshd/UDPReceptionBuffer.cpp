@@ -36,15 +36,19 @@ bool UDPReceptionBuffer::receive(UDPFragmentPtr frag) {
 }
 
 void UDPReceptionBuffer::markReceived(int begin, int end) {
+
+    bool inserted = false;
+
     for (int index=0; index < receivedRanges.size(); ++index) {
         if (begin < receivedRanges[index].first) {
             receivedRanges.insert(receivedRanges.begin() + index,
                                   std::make_pair(begin,end));
+            inserted = true;
             break;
         }
     }
 
-    if (receivedRanges.empty()) {
+    if (! inserted) {
         receivedRanges.push_back(std::make_pair(begin,end));
     }
 
