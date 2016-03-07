@@ -92,6 +92,7 @@ public:
         reception.receive(frag);
 
         if (reception.isFullPacketAvailable()) {
+            Logger::log(DEBUG, "Reconstructed packet " + std::to_string(frag->getPacketNumber()));
             packetReceived(reception.getReconstructedPacket());
         }
     }
