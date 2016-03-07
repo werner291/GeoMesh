@@ -24,6 +24,7 @@ bool UDPReceptionBuffer::receive(UDPFragmentPtr frag) {
         buffer.resize(frag->getPacketLength());
         expectedSize = frag->getPacketLength();
         packetNumber = frag->getPacketNumber();
+        receivedRanges.clear();
     }
 
     valid = false;

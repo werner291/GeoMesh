@@ -23,3 +23,14 @@ bool UDPInterface::sendData(PacketPtr data) {
 
 
 }
+
+void UDPInterface::fragmentReceived(UDPFragmentPtr frag) {
+    UDPReceptionBuffer& reception = receptionBuffers[frag->getPacketNumber() % UDP_RECEPTION_BUFFER_COUNT];
+
+    reception.receive(frag);
+
+    if (reception.isFullPacketAvailable()) {
+        Logger::log(DEBUG, "Reconstructed packet " + std::to_string(frag->getPacketNumber()));
+        packetReceived(reception.getReconstructedPacket());
+    }
+}

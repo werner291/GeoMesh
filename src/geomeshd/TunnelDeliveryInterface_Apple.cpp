@@ -139,7 +139,7 @@ void TunnelDeliveryInterface_Apple::deliverIPv6Packet(PacketPtr packet) {
     ((uint16_t *) buffer)[0] = htons(0);            // Always 0
     ((uint16_t *) buffer)[1] = htons(AF_INET6);   // Set to AF_INET6 so it is handled by the Internet stack.
 
-    memcpy(buffer + 4, packet->getData(), packet->getDataLength());
+    memcpy(buffer + 4, packet->getPayload(), packet->getPayloadLength());
 
     // Send to the local system.
     int result = send(mSocketId,
@@ -149,7 +149,7 @@ void TunnelDeliveryInterface_Apple::deliverIPv6Packet(PacketPtr packet) {
     //(struct sockaddr*) &addr,
     //sizeof(addr));
 
-    if (result == -1) {
+    if (result < 0) {
         int err = errno;
         Logger::log(LogLevel::ERROR,
                     "TunnelDeliveryInterface_Apple: error while sending: " + std::string(strerror(err)));

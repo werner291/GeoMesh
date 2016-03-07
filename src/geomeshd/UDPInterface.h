@@ -86,16 +86,7 @@ public:
      */
     bool sendData(PacketPtr data) override;
 
-    void fragmentReceived(UDPFragmentPtr frag) {
-        UDPReceptionBuffer& reception = receptionBuffers[frag->getPacketNumber() % UDP_RECEPTION_BUFFER_COUNT];
-
-        reception.receive(frag);
-
-        if (reception.isFullPacketAvailable()) {
-            Logger::log(DEBUG, "Reconstructed packet " + std::to_string(frag->getPacketNumber()));
-            packetReceived(reception.getReconstructedPacket());
-        }
-    }
+    void fragmentReceived(UDPFragmentPtr frag);
 
     /**
      * Called when a full GeoMesh packet is received from the wire side.
