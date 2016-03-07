@@ -93,7 +93,7 @@ void UDPManager::pollMessages() {
             processBridgeControlMessage((char *) buffer + 4, sender);
         } else {
             // This is a message directed at one of the UDPInterfaces
-            processNormalPacketFragment(buffer + 4, nbytes - 4, localIface);
+            processNormalPacketFragment(buffer, nbytes, localIface);
         }
     } else if (nbytes == 0) {
         // Received empty packet?

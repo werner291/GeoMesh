@@ -17,8 +17,9 @@
 
 bool Router::handleMessage(PacketPtr data, int fromIface) {
 
-    Logger::log(LogLevel::DEBUG, "Message received from " + data->getSourceAddress().toString() + "of type "
-                                 + std::to_string(data->getMessageType()));
+    Logger::log(LogLevel::DEBUG, "Message received from " + data->getSourceAddress().toString()
+                                 + " destined to " + data->getDestinationAddress().toString()
+                                 + " of type " + std::to_string(data->getMessageType()));
 
     int protocol_version = data->getProtocolVersion();
 
