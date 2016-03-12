@@ -125,7 +125,7 @@ public:
     }
 
     int getPayloadLength() const {
-        return MAX_PAYLOAD_SIZE;
+        return dataLength - GEOMESH_PAYLOAD_START;
     }
 
     int getDataLength() const {
