@@ -11,6 +11,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/LinkManager.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Router.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/my_htonll.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/GreedyRoutingTable.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/geomeshd/UDPFragment.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/geomeshd/GeoMeshd_main.cpp" isTestSource="false" />
@@ -29,14 +30,14 @@
       <sourceFolder url="file://$MODULE_DIR$/src/DHTRoutingTable.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/LinkManager.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/LocalInterface.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/htonll.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/my_htonll.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Packet.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Location.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/UniqueAddress.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Location.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Router.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/LocalInterface.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/AbstractInterface.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/Packet.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test/gtest.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test/googletest/googlemock/src/gmock-all.cc" isTestSource="false" />
