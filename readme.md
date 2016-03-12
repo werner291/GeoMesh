@@ -42,13 +42,15 @@ To create a network that focuses on:
                 the early stages of the network, sticking to the reference implementation is probably best for now.
 
 1. Re-use of as much as possible of what is already there: the routing software should work on existing routing hardware,
-   if possible even on low-end hardware with limited computing power and memory. The should avoid touching other layers
+   if possible even on low-end hardware with limited computing power and memory. It should avoid touching other layers
    than layer 3 of the OSI model as much as possible. Requiring the installation of special software on the nodes is permitted,
    but it should be possible to bridge the network over other existing networks.
 
 1. Automation and ease of use: The routing software should be usable without requiring extensive technical knowledge.
    Good design of the administration interface will be important, and should especially focus on the seperation of
-   simpler and more "advanced" features.
+   simpler and more "advanced" features. Documentation will be important, both technical as well as step-by-step guides.
+
+1. Clean code and quality: A clean code base with proper modularisation and abstraction are important.
 
 ## What about anonymity?
 
@@ -71,25 +73,29 @@ appropriate as a fundamental part of GeoMesh.
 
 ## What's the current status?
 
-Packet delivery is now guaranteed in a planar graph, and the greedy algorithm is already quite smart.
+Routing works quite well in most cases, even when the graph is not perfectly planar. It still has trouble
+with certain shapes in the network, but those shouldn't be too much of a problem with a few additions to
+the protocol. Detecting those strange shapes is all that's needed, the greedy algorithm itself doesn't
+need to change.
 
-The smart location advertisement relay / retention seems to work quite well in simple cases.
+The first pings have already been sent and received over a direct connection between two hosts, albeit very
+slow ones. The DHT for location lookup is currently being implemented, and the web interface is planned
+as next on the agenda once we get a simple node-to-node interface going.
 
 ## How does routing work?
 
-It's mainly based on greedy routing, with Face routing as a backup. This guarantees delivery in planar graphs.
+It's mainly based on greedy routing, with face routing as a backup. This guarantees delivery in planar graphs.
 
-However, I'm currently working on making the greedy routing a while lot smarter, where nodes
-relay and store location adversiting in an intelligent selective way, instead of simply routing
-to the nearest neigbour. Face routing will therfore mostly be used as a last resort if the greedy 
-routing fails despite best efforts.
+However, the plan is to use face routing mostly as a backup, with the greedy algorithm being used 99% by letting
+the nodes talk to eachother to auto-discover network topology, nd make smart guesses as to which nodes will get
+a message closer to where it needs to go.
 
 ## Can I get in?
 
 You may have noticed the "Openness" bit in the project ideals.
 
-At the moment, there isn't really a network to speak of, it only runs in a simulator. The code is there, though,
-and it's GPL-licenced, so grab a copy and start playing!
+At the moment, there isn't really a network to speak of, it only runs in a simulator and occasionally on simple
+direct node-to-node connections. The code is there, though, and it's GPL-licenced, so grab a copy!
 
 By the way, if you manage to get it to compile on your system, please tell me!
 
