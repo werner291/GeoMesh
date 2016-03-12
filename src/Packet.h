@@ -96,26 +96,21 @@ class Packet {
 
     uint8_t data[MAX_PACKET_SIZE];
     int dataLength;
+    // Pointer to the buffer position where the header starts. (usually just at the start of the buffer)
     uint8_t *header;
+    // Pointer to a position within the buffer where the payload starts
     uint8_t *payload;
 
-    // Private on purpose. Use the factory methods.
-    Packet(int msgType) : header(data), payload(header + GEOMESH_PAYLOAD_START), dataLength(MAX_PACKET_SIZE) {
-        setMessageType(msgType);
+public:
+    /**
+     * Create a packet with a buffer of packet_size length, contents undefined.
+     */
+    Packet(size_t packet_size = MAX_PACKET_SIZE) : header(data), payload(header + GEOMESH_PAYLOAD_START),
+                                                   dataLength(packet_size) {
 
         // Set protocol version to current
         *(reinterpret_cast<uint16_t *>(header + GEOMESH_HEADER_PROTOCOL_VERSION)) = htons(PROTOCOL_VERSION);
-
-        switch (msgType) {
-            case MSGTYPE_LOCATION_INFO:
-                dataLength = 500;
-                break;
-            default:
-                dataLength = MAX_PACKET_SIZE;
-        }
     }
-
-public:
 
     const uint8_t *getData() const {
         return data;

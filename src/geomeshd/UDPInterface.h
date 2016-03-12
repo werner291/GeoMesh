@@ -6,7 +6,6 @@
 #define GEOMESH_UDPINTERFACE_H
 
 #include "../AbstractInterface.h"
-#include "../constants.h"
 #include "UDPInterface.h"
 #include "../Logger.h"
 #include <netinet/in.h>

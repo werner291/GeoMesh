@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <sstream>
 #include <math.h>
-#include "constants.h"
 #include "GreedyRoutingTable.h"
 
 
@@ -113,7 +112,7 @@ bool Router::handleMessage(PacketPtr data, int fromIface) {
         }
             case MSGTYPE_DHT_ROUTETABLE_COPY: {
 
-                processRoutingTableCopy(data, fromIface);
+                dhtRoutingTable.processRoutingTableCopy(data, fromIface);
                 return true;
                 break;
             }
@@ -169,8 +168,6 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
 
         Logger::log(LogLevel::DEBUG, "Added peer to local routing table " + suggestionPacket->getSourceAddress().toString()
                                     + " from iFace " + std::to_string(fromIface) + ".");
-
-        processDHTRoutingSuggestion(suggestionPacket->getSourceAddress(), peerLocation);
     }
 
     return greedyRoutingTable.insertIfUseful(peerLocation, fromIface, hops, mVirtualLocation);
@@ -220,7 +217,6 @@ bool Router::canSwitchFaceToGreedy(PacketPtr data, Location destination) {
 
 }
 
-// TODO: Proper analysis of the correctness of this function.
 bool Router::routeFaceBegin(PacketPtr data, int fromIface, Location destination) {
 
     data->setRoutingMode(ROUTING_FACE_RIGHT);
@@ -305,25 +301,4 @@ bool Router::routeFaceRelay(PacketPtr data, int fromIface, Location destination)
 
         return linkMgr->sendPacket(data, itr->iFaceID);
     }
-}
-
-void Router::processDHTRoutingSuggestion(Address addr, Location loc) {
-
-    AddressDistance dist = uniqueaddress.xorDistanceTo(addr);
-
-    int slotNumber = dist.getDHTSlotNumber();
-
-    for (int index=0; index < REDUNDANCY_LEVEL; index++) {
-
-        AddressDistance entryDist = dhtRoutingTable.getEntries()[slotNumber * REDUNDANCY_LEVEL + index].address.xorDistanceTo(uniqueaddress);
-
-        // TODO sorted subarray if REDUNANCY_LEVEL > 1.
-        if (dhtRoutingTable.getEntries()[slotNumber * REDUNDANCY_LEVEL + index].expires < time(NULL) && entryDist < dist) {
-            dhtRoutingTable.getEntries()[slotNumber * REDUNDANCY_LEVEL + index].address = addr;
-            dhtRoutingTable.getEntries()[slotNumber * REDUNDANCY_LEVEL + index].location = loc;
-
-            Logger::log(LogLevel::DEBUG, "Added new DHT routetable entry to " + addr.toString() + " at location " + loc.getDescription() + ".");
-        }
-    }
-
 }

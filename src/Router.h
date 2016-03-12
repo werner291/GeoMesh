@@ -77,7 +77,8 @@ public:
     Router(Address uniqueaddress, Location location) : uniqueaddress(uniqueaddress), mVirtualLocation(location),
                                                        mRealLocation(location),
                                                        localIface(new LocalInterface(this)),
-                                                       linkMgr(new LinkManager(this)) {
+                                                       linkMgr(new LinkManager(this)),
+                                                       dhtRoutingTable(uniqueaddress){
 
         linkMgr->addLinkListener([this](std::shared_ptr<AbstractInterface> iFace, LinkEvent event) {
 
@@ -125,12 +126,6 @@ public:
      * Relay a packet that is currently in face routing mode. Will NOT change the routing mode.
      */
     bool routeFaceRelay(PacketPtr data, int fromIface, Location destination);
-
-    /**
-     * Check whether this information would improve the DHT routing table,
-     * and insert it if so.
-     */
-    void processDHTRoutingSuggestion(Address addr, Location loc);
 };
 
 

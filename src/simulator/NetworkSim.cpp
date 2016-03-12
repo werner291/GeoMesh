@@ -6,7 +6,6 @@
 #include "NetworkSim.h"
 #include "../Location.h"
 #include "../Router.h"
-#include "../constants.h"
 #include "../Logger.h"
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_utils.hpp"

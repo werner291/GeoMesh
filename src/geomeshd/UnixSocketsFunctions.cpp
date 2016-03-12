@@ -8,7 +8,6 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include "UnixSocketsFunctions.h"
-#include "../constants.h"
 #include "../Logger.h"
 
 int receiveMessage(int sock, uint8_t *buffer, size_t buffSize) {

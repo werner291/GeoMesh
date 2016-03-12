@@ -37,8 +37,6 @@ class UDPManager {
      */
     bool sendMessage(PacketPtr message, UDPInterface* iFace);
 
-
-
 public:
     UDPManager(LinkManager *linkMgr, int localPort);
 

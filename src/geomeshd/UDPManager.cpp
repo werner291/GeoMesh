@@ -10,7 +10,7 @@
 #include <time.h>
 #include "UDPManager.h"
 
-UDPManager::UDPManager(LinkManager *linkMgr, int localPort) : linkMgr(linkMgr), lastMessage(time(null)) {
+UDPManager::UDPManager(LinkManager *linkMgr, int localPort) : linkMgr(linkMgr) {
 
     socketID = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 

@@ -7,7 +7,6 @@
 
 #include <iostream>
 
-#include "constants.h"
 #include "AbstractInterface.h"
 #include "Location.h"
 #include "UniqueAddress.h"

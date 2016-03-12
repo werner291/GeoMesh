@@ -16,7 +16,7 @@ int canSend;
 int sendTotal;
 int sendDelay;
 
-void update(void*) {
+void update() {
 
     float simulation_speed = 1.f;
 
@@ -26,8 +26,6 @@ void update(void*) {
     std::mt19937 rgen(rdev());
 
     std::uniform_int_distribution<int> displacement(0, simulator->getNodes().size()-1);
-
-
 
     std::string message = "Hello!";
 

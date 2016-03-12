@@ -128,7 +128,7 @@ public:
 
     void writeToSocketAddress(struct sockaddr_in6& socketAddress) const;
 
-    void setBytes(uint8_t *newBytes) {
+    void setBytes(const uint8_t *newBytes) {
         memcpy(bytes, newBytes, ADDRESS_LENGTH_OCTETS);
     }
 

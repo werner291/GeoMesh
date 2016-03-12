@@ -10,7 +10,9 @@ const int FACE_ROUTE_DIRECTION_BITMASK = 128;
 PacketPtr Packet::createFromIPv6(const uint8_t *IPv6packet, size_t length, const Location &sourceLocation,
                                  const Location &destinationLocation) {
 
-    PacketPtr pack(new Packet(MSGTYPE_IPv6));
+    PacketPtr pack(new Packet(length));
+
+    pack->setMessageType(MSGTYPE_IPv6);
 
     // Check whether it will fit. (Should be checked before calling, this is just for debugging.)
     assert(length <= MAX_PAYLOAD_SIZE);
@@ -31,8 +33,9 @@ PacketPtr Packet::createFromIPv6(const uint8_t *IPv6packet, size_t length, const
 }
 
 PacketPtr Packet::createLocationInfoPacket(const Location &loc, const Address &addr) {
-    PacketPtr pack(new Packet(MSGTYPE_LOCATION_INFO));
+    PacketPtr pack(new Packet(500));
 
+    pack->setMessageType(MSGTYPE_LOCATION_INFO);
     loc.toBytes(pack->header + GEOMESH_HEADER_SOURCE_LOCATION);
 
     memcpy(pack->header + GEOMESH_HEADER_SOURCE_ADDRESS, addr.getBytes(), ADDRESS_LENGTH_OCTETS);
@@ -76,7 +79,7 @@ PacketPtr Packet::createFromData(const uint8_t *data, size_t length) {
 
     assert(length <= MAX_PACKET_SIZE);
 
-    PacketPtr pack(new Packet(0));
+    PacketPtr pack(new Packet(length));
 
     memcpy(pack->data, data, length);
 

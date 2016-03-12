@@ -5,7 +5,6 @@
 #ifndef GEOMESH_DHTROUTINGTABLE_H
 #define GEOMESH_DHTROUTINGTABLE_H
 
-#include "constants.h"
 #include "UniqueAddress.h"
 #include "Packet.h"
 
@@ -19,30 +18,30 @@ struct DHTroutingTableEntry {
 
     DHTroutingTableEntry() : location(0,0), expires(0) {}
 
-    static DHTroutingTableEntry fromBytes(const void* bytes) {
+    static DHTroutingTableEntry fromBytes(const uint8_t* bytes) {
         DHTroutingTableEntry entry;
 
-        memcpy(entry.address.getBytes(),bytes,ADDRESS_LENGTH_OCTETS);
+        entry.address.setBytes(bytes);
         entry.location = Location::fromBytes(bytes + ADDRESS_LENGTH_OCTETS);
-        entry.expires = ntohll(* reinterpret_cast<uint64_t*>(bytes + ADDRESS_LENGTH_OCTETS + Location::SERIALIZED_SIZE));
+        entry.expires = ntohll(* reinterpret_cast<const uint64_t*>(bytes + ADDRESS_LENGTH_OCTETS + Location::SERIALIZED_SIZE));
 
         return entry;
     }
 
-    void toBytes(void* buffer) {
+    void toBytes(uint8_t* buffer) {
         memcpy(buffer, address.getBytes(), ADDRESS_LENGTH_OCTETS);
-        location.toBytes(buffer + ADDRESS_LENGTH_OCTETS);
-        *(reinterpret_cast<uint64_t*>(bytes + ADDRESS_LENGTH_OCTETS + 8)) = htonll(expires);
+        location.toBytes((uint8_t*)buffer + ADDRESS_LENGTH_OCTETS);
+        *(reinterpret_cast<uint64_t*>(buffer + ADDRESS_LENGTH_OCTETS + 8)) = htonll(expires);
     }
 };
 
 class DHTRoutingTable {
 
-    const int REDUNDANCY_LEVEL = 2;
+    static const int REDUNDANCY_LEVEL = 2;
 
-    const int NONREDUNDANT_ENTRIES = ADDRESS_LENGTH_OCTETS * 8;
+    static const int NONREDUNDANT_ENTRIES = ADDRESS_LENGTH_OCTETS * 8;
 
-    const int NUM_ENTRIES = REDUNDANCY_LEVEL * NONREDUNDANT_ENTRIES;
+    static const int NUM_ENTRIES = REDUNDANCY_LEVEL * NONREDUNDANT_ENTRIES;
 
     Address selfAddress;
 
@@ -55,7 +54,7 @@ private:
     DHTroutingTableEntry entries[NONREDUNDANT_ENTRIES * REDUNDANCY_LEVEL];
 
 public:
-    DHTRoutingTable(Address originAddress) : originAddress(selfAddress) {
+    DHTRoutingTable(Address originAddress) : selfAddress(originAddress) {
         for (int i=0; i< NONREDUNDANT_ENTRIES * REDUNDANCY_LEVEL; ++i) {
             entries[i].expires = 0; // 0 indicates invalid or null.
         }
@@ -65,7 +64,7 @@ public:
 
     void processRoutingTableCopy(const PacketPtr message, const int incomingIfaceID);
 
-    PacketPtr getRoutingTableCopyMessage();
+    std::vector<PacketPtr> getRoutingTableCopyMessages();
 
 };
 
