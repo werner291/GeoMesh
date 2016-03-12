@@ -7,6 +7,7 @@
 
 #include "UniqueAddress.h"
 #include "Packet.h"
+#include "my_htonll.h"
 
 struct DHTroutingTableEntry {
 
@@ -23,7 +24,7 @@ struct DHTroutingTableEntry {
 
         entry.address.setBytes(bytes);
         entry.location = Location::fromBytes(bytes + ADDRESS_LENGTH_OCTETS);
-        entry.expires = ntohll(* reinterpret_cast<const uint64_t*>(bytes + ADDRESS_LENGTH_OCTETS + Location::SERIALIZED_SIZE));
+        entry.expires = my_htonll(* reinterpret_cast<const uint64_t*>(bytes + ADDRESS_LENGTH_OCTETS + Location::SERIALIZED_SIZE));
 
         return entry;
     }
@@ -31,7 +32,7 @@ struct DHTroutingTableEntry {
     void toBytes(uint8_t* buffer) {
         memcpy(buffer, address.getBytes(), ADDRESS_LENGTH_OCTETS);
         location.toBytes((uint8_t*)buffer + ADDRESS_LENGTH_OCTETS);
-        *(reinterpret_cast<uint64_t*>(buffer + ADDRESS_LENGTH_OCTETS + 8)) = htonll(expires);
+        *(reinterpret_cast<uint64_t*>(buffer + ADDRESS_LENGTH_OCTETS + 8)) = my_htonll(expires);
     }
 };
 
