@@ -21,19 +21,22 @@
 TunnelDeliveryInterface_Apple::TunnelDeliveryInterface_Apple(LocalInterface *localInterface,
                                                              const Address &iFaceAddress)
         : mLocalInterface(localInterface), iFaceAddress(iFaceAddress) {
+
+    // Callback when the Router wants to deliver a message to the local system
     localInterface->setDataReceivedHandler(
             std::bind(&TunnelDeliveryInterface_Apple::deliverIPv6Packet, this, std::placeholders::_1));
 }
 
 void TunnelDeliveryInterface_Apple::startTunnelInterface() {
 
+    // Open a system-specific socket
     mSocketId = socket(PF_SYSTEM, SOCK_DGRAM, SYSPROTO_CONTROL);
 
     if (mSocketId < 0) {
         Logger::log(LogLevel::ERROR, "socket(PF_SYSTEM, SOCK_DGRAM, SYSPROTO_CONTROL) " + std::string(strerror(errno)));
     }
 
-    /* get/set the id */
+    // Ask the system to allocate a utun device ID for us. (utun0, utun1, ...)
     struct ctl_info info;
     memset(&info, 0, sizeof(info));
     strncpy(info.ctl_name, UTUN_CONTROL_NAME, strlen(UTUN_CONTROL_NAME));
@@ -44,6 +47,7 @@ void TunnelDeliveryInterface_Apple::startTunnelInterface() {
         Logger::log(LogLevel::ERROR, "getting utun device id " + std::string(strerror(errno)));
     }
 
+    // Connect with a utun device
     addr.sc_id = info.ctl_id;
 
     addr.sc_len = sizeof(addr);
@@ -81,8 +85,10 @@ void TunnelDeliveryInterface_Apple::startTunnelInterface() {
         close(mSocketId);
     }
 
+    // Assign the node's unique ID as if it were the computer's IPv6 address
     assignIP();
 
+    // Thell the system to send traffic bound for fcfd::/16 to us.
     installRoute();
 
 }
@@ -94,7 +100,6 @@ void TunnelDeliveryInterface_Apple::startTunnelInterface() {
  * If anyone reading this feels courageous... IMHO this works just fine
  */
 void TunnelDeliveryInterface_Apple::assignIP() {
-
     std::regex utunReg("utun[0-9]+");
 
     // Prevent a nasty bash injection under the root user.
@@ -160,7 +165,7 @@ void TunnelDeliveryInterface_Apple::deliverIPv6Packet(PacketPtr packet) {
 
 void TunnelDeliveryInterface_Apple::pollMessages() {
 
-    int received = receiveMessage(mSocketId, mReceptionBuffer, MAX_PACKET_SIZE);
+    int received = receiveMessage(mSocketId, mReceptionBuffer, MAX_PAYLOAD_SIZE);
 
     if (received > 0) {
         mLocalInterface->sendIPv6Message(mReceptionBuffer + 4, received - 4);

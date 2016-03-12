@@ -42,6 +42,8 @@ private:
 
     int nextPacketNumber;
 
+    time_t lastMessage;
+
     // The address of the peer at the other end of the link.
     struct sockaddr_in peerAddress;
 
@@ -86,11 +88,16 @@ public:
      */
     bool sendData(PacketPtr data) override;
 
+    /**
+     * Called by the UDPManager to notify this interface of the arrival of a new fragment over the UDP bridge
+     * destined to this iterface. The UDPInterface will insert the fragment in a reception buffer and try
+     * to reconstruct a packet.
+     */
     void fragmentReceived(UDPFragmentPtr frag);
 
     /**
      * Called when a full GeoMesh packet is received from the wire side.
-     * Not to be confused with UDP link packets.
+     * Not to be confused with UDP bridge fragment packets.
      */
     void packetReceived(PacketPtr data) {
         this->dataArrivedCallback(data, iFaceID);
@@ -110,6 +117,10 @@ public:
         UDPInterface::mRemoteIface = mRemoteIface;
     }
 
+    /**
+     * Used to distinguish different packets after fragmenting them. Please note that these numbers
+     * are NOT unique, but should be unique enough to know which packets are being sent across.
+     */
     uint16_t getNextPacketNumber() {
         return ++nextPacketNumber;
     }

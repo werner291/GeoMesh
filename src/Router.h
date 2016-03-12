@@ -115,10 +115,21 @@ public:
 
     bool routeFaceBegin(PacketPtr data, int fromIface, Location destination);
 
+    /**
+     * Check whether a packet that is currently in face routing mode
+     * can be switched back into greedy routing mode.
+     */
     bool canSwitchFaceToGreedy(PacketPtr data, Location destination);
 
+    /**
+     * Relay a packet that is currently in face routing mode. Will NOT change the routing mode.
+     */
     bool routeFaceRelay(PacketPtr data, int fromIface, Location destination);
 
+    /**
+     * Check whether this information would improve the DHT routing table,
+     * and insert it if so.
+     */
     void processDHTRoutingSuggestion(Address addr, Location loc);
 };
 

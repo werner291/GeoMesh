@@ -41,6 +41,9 @@ class Location {
     }
 
 public:
+
+    const size_t SERIALIZED_SIZE = 8;
+
     double lon; // From -180 to 180 degrees, with 0 at IERS Reference Meridian, + towards East
     double lat; // From -90 to 90 degrees, + towards North
 

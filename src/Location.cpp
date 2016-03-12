@@ -53,15 +53,19 @@ double Location::getDirectionTo(const Location &target) const {
     cartOther.y /= projLength;
     cartOther.z /= projLength;
 
+    // Take a perpendicular by rotating 90 degrees (easy with spherical coordinates)
+    // We can take any vector that is perpendicular, as long as it is consistent.
     Vector3d perp = convertLocation(lat + 90, lon);
 
+    // Find the angle between the perpendicular to the normal and the other location
     double angle = acos(perp.x * cartOther.x + perp.y * cartOther.y + perp.z * cartOther.z);
 
+    // Find the sign of that angle
     double sign = cartSelf.x * (cartOther.y * perp.z - cartOther.z * perp.y)
                   + cartSelf.y * (cartOther.z * perp.x - cartOther.x * perp.z)
                   + cartSelf.z * (cartOther.x * perp.y - cartOther.y * perp.x);
 
-    if (sign > 0) { // TODO check whether the sign should be reversed or not.
+    if (sign > 0) {
         return angle;
     } else {
         return -angle;
@@ -69,8 +73,6 @@ double Location::getDirectionTo(const Location &target) const {
 
 
 }
-
-
 
 Vector3d convertLocation(const Location &loc) {
     return convertLocation(loc.lat,loc.lon);

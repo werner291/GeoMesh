@@ -111,13 +111,14 @@ bool Router::handleMessage(PacketPtr data, int fromIface) {
             return true;
             break;
         }
-            /*case MSGTYPE_DHT_ROUTETABLE_COPY: {
+            case MSGTYPE_DHT_ROUTETABLE_COPY: {
 
                 processRoutingTableCopy(data, fromIface);
                 return true;
                 break;
             }
                 break;
+            /*
             case MSGTYPE_DHT_ROUTETABLE_COPY_REQUEST: {
 
                 RoutingLabel routeLabel = data->getRoutingLabel().append(fromIface).reverse();
@@ -134,6 +135,7 @@ bool Router::handleMessage(PacketPtr data, int fromIface) {
 
 bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket) {
 
+    // Sanity check...
     assert(suggestionPacket->getMessageType() == MSGTYPE_LOCATION_INFO);
 
     if (!suggestionPacket->verifyLocationInformation()) {
@@ -145,6 +147,7 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
     int hops = suggestionPacket->getLocationInfoHopCount();
 
     if (hops == 1) {
+        // This is a direct neighbour
 
         int before = mFaceRoutingTable.size();
 
@@ -258,16 +261,12 @@ bool Router::routeFaceBegin(PacketPtr data, int fromIface, Location destination)
             if (after == mFaceRoutingTable.end()) after = mFaceRoutingTable.begin();
 
         }
-
-
     }
 
     //Logger::log(LogLevel::WARN, "Could not find a suitable neighbour to relay face routing packet to.");
     return false; // Drop packet. (Better suggestions?)
 
 }
-
-
 
 bool Router::routeFaceRelay(PacketPtr data, int fromIface, Location destination) {
 
@@ -294,7 +293,7 @@ bool Router::routeFaceRelay(PacketPtr data, int fromIface, Location destination)
             return false; // Drop.
         }
 
-        // Neighbours are sorted counter-clickwise. Right-hand routing thus means selecting a previous neigbour
+        // Neighbours are sorted counter-clockwise. Right-hand routing thus means selecting a previous neigbour
         if (routemode == ROUTING_FACE_RIGHT) {
             itr++;
             if (itr == mFaceRoutingTable.end()) itr = mFaceRoutingTable.begin();

@@ -12,16 +12,19 @@ PacketPtr Packet::createFromIPv6(const uint8_t *IPv6packet, size_t length, const
 
     PacketPtr pack(new Packet(MSGTYPE_IPv6));
 
+    // Check whether it will fit. (Should be checked before calling, this is just for debugging.)
     assert(length <= MAX_PAYLOAD_SIZE);
 
+    // Copy the IPv6 packet into the payload of the GeoMesh packet
     memcpy(pack->payload, IPv6packet, length);
 
+    // Copy the source and destination addresses into the GeoMesh packet header
     memcpy(pack->header + GEOMESH_HEADER_DESTINATION_ADDRESS, IPv6packet + IPv6_DESTINATION, ADDRESS_LENGTH_OCTETS);
     memcpy(pack->header + GEOMESH_HEADER_SOURCE_ADDRESS, IPv6packet + IPv6_SOURCE, ADDRESS_LENGTH_OCTETS);
 
+    // Inscribe the source and destination location coordinates into the GeoMesh header
     sourceLocation.toBytes(pack->header + GEOMESH_HEADER_SOURCE_LOCATION);
     destinationLocation.toBytes(pack->header + GEOMESH_HEADER_DESTINATION_LOCATION);
-
 
     return pack;
 
@@ -37,7 +40,6 @@ PacketPtr Packet::createLocationInfoPacket(const Location &loc, const Address &a
     pack->setLocationInfoHopCount(1);
 
     // Compute checksum
-
     uint16_t *toVerify = reinterpret_cast<uint16_t *>(pack->header);
 
     uint16_t sum = 0;

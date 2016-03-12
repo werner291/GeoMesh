@@ -71,6 +71,16 @@ public:
      */
     void processNormalPacketFragment(const uint8_t *buffer, int nbytes, uint16_t localIface);
 
+
+    /**
+     * Transform the provided {@param message} into a vector of fragments.
+     *
+     * @param message The message to fragment
+     * @param packetNumber A 16-bit number that is incremented for each interface for each packet.
+     * @param remoteIface The interface number on the other end of the UDP bridge
+     *
+     * @returns A vector of UDPFragmentPtrs, which all point to a fragment of the original packet.
+     */
     static std::vector<UDPFragmentPtr> fragmentPacket(const PacketPtr &message, uint16_t packetNumber, uint16_t remoteIface);
 };
 

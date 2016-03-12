@@ -4,8 +4,6 @@
 
 #include "SimulatorLink.h"
 
-int AbstractInterface::nextIfaceID = 1; // Not 0 since that's reserved. Need to use a proper interface manager.
-
 bool SimulatorLink::sendData(std::shared_ptr<std::vector<char> > data) {
 
     // Create a copy, or we get the really wierd situation where opdating the number of
@@ -15,9 +13,9 @@ bool SimulatorLink::sendData(std::shared_ptr<std::vector<char> > data) {
     return true;
 }
 
-std::shared_ptr<std::vector<char> > SimulatorLink::pullNextInSendQueue() {
+PacketPtr SimulatorLink::pullNextInSendQueue() {
 
-    std::shared_ptr<std::vector<char> > data = sendQueue.front();
+    std::shared_ptr< PacketPtr > data = sendQueue.front();
     sendQueue.pop();
     return data;
 }

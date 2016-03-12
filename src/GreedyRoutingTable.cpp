@@ -8,6 +8,8 @@ const double GreedyRoutingTable::PRUNING_COEFFICIENT = 0.1;
 
 int GreedyRoutingTable::getGreedyInterface(int fromInterface, const Location &destination, double maxDistance) {
 
+    // A simple linear search for the closest item.
+    // Perhaps I could use something lika a KD-tree to accelerate things?
     auto bestCandidate = GreedyRoutingTable::mGreedyRoutingTable.end();
     double bestDistance = maxDistance;
 

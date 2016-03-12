@@ -37,6 +37,9 @@ public:
      */
     bool sendIPv6Message(const uint8_t *ipV6packet, int bytes);
 
+    /**
+     *
+     */
     void dataReceived(PacketPtr data);
 
 };

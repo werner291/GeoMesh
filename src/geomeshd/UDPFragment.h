@@ -9,10 +9,37 @@
 #include <netinet/in.h>
 #include "../Packet.h"
 
+/**
+ * Represents a fragment of a packet to be sent over a UDP bridge.
+ *
+ */
 class UDPFragment {
 
+    /**
+     * A 12-byte header followed by payload information.
+     *
+     * Data structure pecification:
+     *
+     *      +-------------------+-------------------+
+     *      | 0       | 1       | 2       | 3       |
+     *      +-------------------+-------------------+
+     *    0 | Protocol version  | Dest interface ID |
+     *      +-------------------+-------------------+
+     *    4 | Packet number     | Packet length     |
+     *      +-------------------+-------------------+
+     *    8 | Fragment start    | Fragment length   |
+     *      +-------------------+-------------------+
+     *   12 | Payload...                            |
+     *      +---------------------------------------+
+     *
+     * @see "internet_bridge.md" for more details.
+     *
+     */
     std::vector<uint8_t> data;
-
+    
+    /**
+     * Assign protocol version number to byte positions
+     */
     inline void setProtocolVersion(uint16_t version) {
         *reinterpret_cast<uint16_t*>(data.data()) = htons(version);
     }
