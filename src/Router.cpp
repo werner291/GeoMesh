@@ -41,7 +41,7 @@ bool Router::handleMessage(PacketPtr data, int fromIface) {
                 auto itr = mLocalRoutingTable.find(destAddr);
 
                 if (itr != mLocalRoutingTable.end()) {
-
+                    Logger::log(LogLevel::WARN, "Address in local routetable.");
 
                     if (linkMgr->sendPacket(data, itr->second.iFaceID)) {
                         return true;
