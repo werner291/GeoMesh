@@ -11,8 +11,9 @@ TEST(udpbridge,fragmentation) {
 
     uint8_t data[MAX_PACKET_SIZE-1];
 
-    for (int i=0; i< MAX_PACKET_SIZE-1; ++i)
+    for (int i=0; i< MAX_PACKET_SIZE-1; ++i) {
         data[i] = i % 256;
+    }
 
     PacketPtr packet = Packet::createFromData(data, MAX_PACKET_SIZE-1);
 

@@ -10,7 +10,7 @@ const int FACE_ROUTE_DIRECTION_BITMASK = 128;
 PacketPtr Packet::createFromIPv6(const uint8_t *IPv6packet, size_t length, const Location &sourceLocation,
                                  const Location &destinationLocation) {
 
-    PacketPtr pack(new Packet(length));
+    PacketPtr pack(new Packet(length + GEOMESH_PAYLOAD_START));
 
     pack->setMessageType(MSGTYPE_IPv6);
 
