@@ -110,7 +110,8 @@ void TunnelDeliveryInterface_Apple::assignIP() {
 
     std::stringstream command;
 
-    command << "ifconfig " << iFaceName << " inet6 add " << iFaceAddress.toString();
+    command << "ifconfig " << iFaceName << " inet6 add " << iFaceAddress.toString() << ";";
+    command << "ifconfig " << iFaceName << " mtu " << MAX_PAYLOAD_SIZE;
 
     Logger::log(LogLevel::INFO, "Assigned IPv6 address " + command.str());
 

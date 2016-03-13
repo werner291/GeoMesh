@@ -83,6 +83,7 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
     command << "ip link set " << iFaceName << " up" << std::endl;
     command << "ip -6 addr add " << iFaceAddress.toString() << " dev " << iFaceName << std::endl;
+    command << "ip link set dev " << iFaceName << " mtu " << MAX_APAYLOAD_SIZE;
 
     Logger::log(LogLevel::INFO, "Assigned IPv6 address " + command.str());
 
