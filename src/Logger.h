@@ -8,14 +8,16 @@
 #include <string>
 
 enum LogLevel {
-    DEBUG,
-    INFO,
-    WARN,
-    ERROR
+    DEBUG = 0,
+    INFO = 1,
+    WARN = 2,
+    ERROR = 3
 };
 
 class Logger {
+    static LogLevel minLevel;
 public:
+    static void setLogLevel(LogLevel level);
     static void log(LogLevel level, std::string message);
 };
 

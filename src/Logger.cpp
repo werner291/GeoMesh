@@ -6,6 +6,11 @@
 #include <ctime>
 #include "Logger.h"
 
+LogLevel Logger::minLevel = LogLevel::INFO;
+
 void Logger::log(LogLevel level, std::string message) {
-    std::cout << std::to_string(std::time(NULL)) << ": " << message << std::endl;
+
+    if (level >= minLevel) {
+        std::cout << std::to_string(std::time(NULL)) << ": " << message << std::endl;
+    }
 }

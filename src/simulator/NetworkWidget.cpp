@@ -103,34 +103,30 @@ void NetworkWidget::draw() {
             Vector3d packetPos = convertLocation(intermediate);
 
 
-            if (getPacketData<int32_t>(MESSAGE_TYPE, packet.data) == MSGTYPE_PAYLOAD) {
-                double destinationX = getPacketData<double>(LOCATION_COORDINATE_LON, packet.data);
-                double destinationY = getPacketData<double>(LOCATION_COORDINATE_LAT, packet.data);
+            if (packet.data->getMessageType() == MSGTYPE_IPv6) {
 
-                if (getPacketData<int32_t>(ROUTING_MODE, packet.data) == ROUTING_GREEDY) {
+                Location dest = packet.data->getDestinationLocation();
+
+                if (packet.data->getRoutingMode() == ROUTING_GREEDY) {
                     glColor3f(0.5, 1, 0.5);
 
                     glBegin(GL_POINTS); glVertex3f(packetPos.x, packetPos.y, packetPos.z); glEnd();
+
+                    drawDirectLineBetweenLocations(intermediate, dest);
 
                 } else {
                     glColor3f(1, 0, 0);
 
                     glBegin(GL_POINTS); glVertex3f(packetPos.x, packetPos.y, packetPos.z); glEnd();
 
-                    drawDirectLineBetweenLocations(intermediate, Location(destinationY, destinationX));
+                    drawDirectLineBetweenLocations(intermediate, dest);
 
                 }
-            } else if (getPacketData<int32_t>(MESSAGE_TYPE, packet.data) == MSGTYPE_LOCATION_INFO) {
+            } else if (packet.data->getMessageType() == MSGTYPE_LOCATION_INFO) {
                 glColor3f(0.5, 0, 1);
                 glBegin(GL_POINTS);
                 glVertex3f(packetPos.x, packetPos.y, packetPos.z);
                 glEnd();
-
-                double targetLon = getPacketData<double>(PEERINFO_LOCATION_LON, packet.data);
-                double targetLat = getPacketData<double>(PEERINFO_LOCATION_LAT, packet.data);
-
-                glColor3f(0, 0, 1);
-                //drawDirectLineBetweenLocations(intermediate, Location(targetLat, targetLon));
             }
         }
 
@@ -141,7 +137,7 @@ void NetworkWidget::draw() {
 
     glColor3f(0, 0, 1);
 
-    for (auto itr = router->getRoutingTable().begin(); itr != router->getRoutingTable().end(); itr++) {
+    for (auto itr = router->getGreedyRoutingTable().begin(); itr != router->getGreedyRoutingTable().end(); itr++) {
 
         drawDirectLineBetweenLocations(router->getVirtualLocation(), itr->target);
     }

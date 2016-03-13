@@ -50,6 +50,12 @@ private:
 
     LinkManager *linkMgr;
 
+public:
+    const GreedyRoutingTable &getGreedyRoutingTable() const {
+        return greedyRoutingTable;
+    }
+
+private:
     GreedyRoutingTable greedyRoutingTable;
 
     std::set<DirectionalEntry> mFaceRoutingTable;

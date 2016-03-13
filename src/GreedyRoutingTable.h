@@ -140,6 +140,25 @@ public:
         }
         return false;
     }
+
+    typedef std::vector<GreedyRoutingTableEntry>::iterator iterator;
+    typedef std::vector<GreedyRoutingTableEntry>::const_iterator const_iterator;
+
+    iterator begin() {
+        return mGreedyRoutingTable.begin();
+    }
+
+    iterator end() {
+        return mGreedyRoutingTable.end();
+    }
+
+    const_iterator begin() const {
+        return mGreedyRoutingTable.begin();
+    }
+
+    const_iterator end() const {
+        return mGreedyRoutingTable.end();
+    }
 };
 
 

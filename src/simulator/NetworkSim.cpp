@@ -52,9 +52,6 @@ void NetworkSim::updateSimulation(long timeDeltaMilliseconds) {
             link.packetsOnLine.emplace_back(packet);
         }
     }
-
-
-
 }
 
 template <typename T>
@@ -103,9 +100,16 @@ bool NetworkSim::sendMessage(std::string message, int startNodeID, int endNodeID
     std::shared_ptr<Router> begin = this->nodes[startNodeID];
     std::shared_ptr<Router> end = this->nodes[endNodeID];
 
-    begin->getLocalIface()->sendMessage(end->getAddress(),
-                                        std::make_shared<std::vector<char> >(message.begin(), message.end()),
-                                        end->getVirtualLocation());
+    uint8_t buffer[MAX_PACKET_SIZE];
+
+    memcpy(buffer + IPv6_SOURCE, begin->getAddress().getBytes(), ADDRESS_LENGTH_OCTETS);
+    memcpy(buffer + IPv6_DESTINATION, end->getAddress().getBytes(), ADDRESS_LENGTH_OCTETS);
+
+    *reinterpret_cast<uint16_t*>(buffer + IPv6_PAYLOAD_LENGTH) = htons(message.length());
+
+    memcpy(buffer + IPv6_PAYLOAD, message.data(), message.length());
+
+    begin->getLocalIface()->sendIPv6Message(buffer, message.length());
 
     packetsSent += 1;
 

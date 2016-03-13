@@ -51,7 +51,8 @@ const int GEOMESH_PAYLOAD_START = 68;
 // Relative to start of packet (usually GeoMesh payload start)
 const int IPv6_SOURCE = 8;
 const int IPv6_DESTINATION = 24;
-
+const int IPv6_PAYLOAD_LENGTH = 4;
+const int IPv6_PAYLOAD = 40;
 
 // DHT routing table copy response field positions.
 // Relative to payload start.

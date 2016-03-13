@@ -16,7 +16,7 @@ int canSend;
 int sendTotal;
 int sendDelay;
 
-void update() {
+void update(void*) {
 
     float simulation_speed = 1.f;
 
@@ -36,7 +36,7 @@ void update() {
                 int node2 = displacement(rgen);
                 simulator->sendMessage(message, node1, node2);
 
-                canSend = 0;
+                canSend = 5;
             } else {
                 canSend--;
             }
@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 
     //simulator->createLongitudinalGridNetwork(100, 12);
 
-    simulator->networkFromOSM("/Users/werner/Ontwikkeling/C++/MeshnetSim/testdata/Eindhoven.osm");
+    simulator->networkFromOSM("/Users/werner/Ontwikkeling/C++/GeoMesh/testdata/Eindhoven.osm");
 
     std::unique_ptr< Fl_Window > window(new Fl_Window(1100, 900));
 

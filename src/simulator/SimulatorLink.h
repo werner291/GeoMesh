@@ -19,18 +19,18 @@ public:
 private:
     Router* router;
 
-    std::queue<std::shared_ptr<std::vector<char> > > sendQueue;
+    std::queue<PacketPtr> sendQueue;
 
 public:
 
     SimulatorLink(Router *router) : router(router) {
     }
 
-    virtual bool sendData(std::shared_ptr<std::vector<char> > data);
+    virtual bool sendData(PacketPtr data);
 
     bool hasNextInSendQueue();
 
-    std::shared_ptr<std::vector<char> > pullNextInSendQueue();
+    PacketPtr pullNextInSendQueue();
 
     void handlePacketArrival(PacketPtr data) {
         this->dataArrivedCallback(data, this->iFaceID);
