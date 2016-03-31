@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <netinet/in.h>
 #include <sstream>
+#include <iostream>
 
 const int ADDRESS_LENGTH_OCTETS = 16; // 128-bit addresses, we're optimistic.
 
@@ -45,30 +46,8 @@ struct AddressDistance {
         return true;
     }
 
-    /**
-     * Which index the
-     */
-    inline int getDHTSlotNumber() const {
-
-        for (int index=0; index < ADDRESS_LENGTH_OCTETS / 4; ++index) {
-            if (data[index] != 0) {
-
-                uint32_t number = data[index];
-
-                int bitPos = 0;
-
-                while (number != 0) {
-                    bitPos++;
-                    number /= 2; //  How many times can we divide by two until the numbe hits 0? (This is integer division.)
-                }
-
-                return ((ADDRESS_LENGTH_OCTETS / 4 - 1) - index) * 32 + bitPos;
-
-            }
-        }
-
-        return 0;
-
+    inline bool operator <=(const AddressDistance &other) const {
+        return *this < other || *this == other;
     }
 
 };
@@ -85,15 +64,19 @@ public:
     // Required for std::map lookups.
 
     inline bool operator<(const Address &other) const {
-        for (int i = 0; i < ADDRESS_LENGTH_OCTETS / sizeof(uint8_t); ++i) {
-            if (bytes[i] < other.bytes[i]) return true;
+        for (int i = 0; i < ADDRESS_LENGTH_OCTETS; ++i) {
+            if (bytes[i] != other.bytes[i]) {
+                return bytes[i] < other.bytes[i];
+            }
         }
         return false;
     }
 
     inline bool operator>(const Address &other) const {
-        for (int i = 0; i < ADDRESS_LENGTH_OCTETS / sizeof(uint8_t); ++i) {
-            if (bytes[i] > other.bytes[i]) return true;
+        for (int i = 0; i < ADDRESS_LENGTH_OCTETS; ++i) {
+            if (bytes[i] != other.bytes[i]) {
+                return bytes[i] > other.bytes[i];
+            }
         }
         return false;
     }
@@ -105,11 +88,13 @@ public:
         return memcmp(bytes,other.bytes,ADDRESS_LENGTH_OCTETS) == 0;
     }
 
+    inline bool operator!=(const Address& other) const { return ! this->operator==(other); }
+
     static Address generateRandom();
 
     static Address fromString(std::string str);
 
-    std::string toString() {
+    const std::string toString() const {
 
         std::stringstream ss;
 
@@ -124,6 +109,14 @@ public:
         }
 
         return ss.str();
+    }
+
+    static Address fromBytes(const uint8_t* bytes) {
+        Address addr;
+
+        memcpy(addr.bytes, bytes, ADDRESS_LENGTH_OCTETS);
+
+        return addr;
     }
 
     void writeToSocketAddress(struct sockaddr_in6& socketAddress) const;
@@ -143,7 +136,7 @@ public:
         // Iterate over all the octets
         for (int i = 0; i < ADDRESS_LENGTH_OCTETS; ++i) {
 
-            // Take the XOR distance, multiply according to the octet position.
+            // Take the XOR distance.
             reinterpret_cast<uint8_t*>(dist.data)[i] = (bytes[i] ^ other.bytes[i]);
 
         }
