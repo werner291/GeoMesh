@@ -4,8 +4,11 @@ project(MeshnetSim)
 include_directories(/opt/local/include)
 
 set(CORE_SRC AbstractInterface.cpp Router.cpp Location.cpp Logger.cpp LinkManager.cpp LocalInterface.cpp
-        UniqueAddress.cpp Packet.cpp geomeshd/UDPManager.cpp DHTRoutingTable.cpp GreedyRoutingTable.cpp
-        my_htonll.cpp)
+        UniqueAddress.cpp Packet.cpp LocationLookupManager.cpp GreedyRoutingTable.cpp
+        my_htonll.cpp VirtualLocationManager.cpp LocalPacketHandler.cpp AbstractInterface.hpp Router.hpp Location.hpp
+        Logger.hpp LinkManager.hpp LocalInterface.hpp
+        UniqueAddress.hpp Packet.cpp LocationLookupManager.hpp GreedyRoutingTable.hpp
+        my_htonll.hpp VirtualLocationManager.hpp LocalPacketHandler.hpp)
 add_library(core ${CORE_SRC})
 
 set_property(TARGET core PROPERTY CXX_STANDARD 11)
@@ -37,7 +40,7 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 ENDIF ()
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set(DAEMON_SRC ${DAEMON_SRC} geomeshd/TunnelDeliveryInterface_Linux.cpp geomeshd/UDPFragment.cpp geomeshd/UDPFragment.h geomeshd/UDPReceptionBuffer.cpp geomeshd/UDPReceptionBuffer.h)
+    set(DAEMON_SRC ${DAEMON_SRC} geomeshd/TunnelDeliveryInterface_Linux.cpp geomeshd/UDPFragment.cpp geomeshd/UDPReceptionBuffer.cpp)
 ENDIF ()
 
 add_library(daemon_core ${DAEMON_SRC})
@@ -52,5 +55,3 @@ set_property(TARGET geomeshd PROPERTY CXX_STANDARD 11)
 set_property(TARGET geomeshd PROPERTY CXX_STANDARD_REQUIRED ON)
 
 TARGET_LINK_LIBRARIES(geomeshd core daemon_core)# LIBRARY_asio)
-
-
