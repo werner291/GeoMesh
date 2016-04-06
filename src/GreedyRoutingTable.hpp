@@ -5,9 +5,9 @@
 #ifndef GEOMESH_GREEDYROUTINGTABLE_H
 #define GEOMESH_GREEDYROUTINGTABLE_H
 
-#include "Location.h"
-#include "AbstractInterface.h"
-#include "Logger.h"
+#include "Location.hpp"
+#include "AbstractInterface.hpp"
+#include "Logger.hpp"
 
 /**
  * An entry in the greedy routing table.
@@ -17,7 +17,6 @@
  * the packet closer."
  */
 struct GreedyRoutingTableEntry {
-
     Location target; // Where this routing table entry will lead.
     int iFaceID; // Widh interface to send the messages bound for the target location to.
     int hops; // An estimate on how long the path to that location is. Don't make too many assumptions on this value.
@@ -60,70 +59,7 @@ public:
      */
     int getGreedyInterface(int fromInterface, const Location &destination, double maxDistance);
 
-    /**
-     * Inserts this suggestion into the routing table if and only if it is useful.
-     * It is useful if there is no known routing rule that has a target location
-     * similar to the proposal, where similarity is whether the suggested location
-     * is within a certain distance from another target location, the threshold for
-     * this distance itself being depedant on distance from the reference location
-     * and memory usage.
-     *
-     * \param suggestionTarget Where the suggestion says the routing rule will go.
-     * \param iFaceID Which interface to send the messages bound for the suggestionTarget to.
-     * \param hops An estimate on how many hops it takes to get to suggestionTarget, usually the hop counter
-     *        of the Location Info message.
-     *
-     * \param referenceLoc Which location to use when determining the similarity threshold, usually the location
-     *        of the node that this program is running on.
-     *
-     * \return Whether the suggestion was inserted in the table, useful to know whether to re-broadcast
-     *         the location info message.
-     */
-    bool insertIfUseful(Location suggestionTarget, int iFaceID, int hops, const Location& referenceLoc) {
-
-        // Always insert if empty.
-        if (mGreedyRoutingTable.empty()) {
-
-            mGreedyRoutingTable.push_back(GreedyRoutingTableEntry {
-                    suggestionTarget, iFaceID, hops
-            });
-
-            Logger::log(LogLevel::DEBUG, "Added routing rule to empty primary routing table, location "
-                                         + suggestionTarget.getDescription() + " will be routed to interface "
-                                         + std::to_string(iFaceID) + " routing cost " + std::to_string(hops)
-                                         + " hops.");
-
-            return true;
-        }
-
-        // Find the entry whose location is closest to the suggestion
-        auto closestEntry = getClosestEntry(suggestionTarget);
-
-        // How far are they apart?
-        double bestRuleDistance = closestEntry->target.distanceTo(suggestionTarget);
-
-        // How far is the suggestion to me?
-        double suggestionDistanceFromMe = referenceLoc.distanceTo(suggestionTarget);
-
-        // TODO change the pruning coefficient in acoordance to memory usage and availability
-        // Insert only if they are different enough.
-        if (bestRuleDistance > suggestionDistanceFromMe * PRUNING_COEFFICIENT) {
-
-            mGreedyRoutingTable.push_back(GreedyRoutingTableEntry {
-                    suggestionTarget, iFaceID, hops
-            });
-
-            Logger::log(LogLevel::DEBUG, "Added routing rule to non-empty primary routing table, location "
-                                         + suggestionTarget.getDescription() + " will be routed to interface "
-                                         + std::to_string(iFaceID) + " routing cost " + std::to_string(hops)
-                                         + " hops.");
-
-            return true;
-        }
-
-        // The suggestion was not recorded.
-        return false;
-    }
+    bool insertIfUseful(Location suggestionTarget, int iFaceID, int hops, const Location& referenceLoc);
 
     /**
      *

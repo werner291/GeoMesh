@@ -3,7 +3,7 @@
 //
 
 #include <cmath>
-#include "Location.h"
+#include "Location.hpp"
 
 // Haversine formula based on JavaScript implementation found on http://www.movable-type.co.uk/scripts/latlong.html
 double Location::distanceTo(const Location& other) const {

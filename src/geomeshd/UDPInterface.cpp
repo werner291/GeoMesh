@@ -2,14 +2,14 @@
 // Created by Werner Kroneman on 28-01-16.
 //
 
-#include "UDPInterface.h"
+#include "UDPInterface.hpp"
 
-#include "UDPManager.h"
+#include "UDPManager.hpp"
 
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <errno.h>
-#include "../Logger.h"
+#include "../Logger.hpp"
 
 
 UDPInterface::UDPInterface(UDPManager* udpMan) {

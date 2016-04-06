@@ -5,18 +5,17 @@
 #ifndef MESHNETSIM_ROUTER_H
 #define MESHNETSIM_ROUTER_H
 
-#include "Location.h"
-#include "AbstractInterface.h"
-#include "LocalInterface.h"
-#include "LinkManager.h"
-#include "UniqueAddress.h"
-#include "DHTRoutingTable.h"
-#include "GreedyRoutingTable.h"
+#include "Location.hpp"
+#include "AbstractInterface.hpp"
+#include "LocalInterface.hpp"
+#include "LinkManager.hpp"
+#include "UniqueAddress.hpp"
+#include "LocationLookupManager.hpp"
+#include "GreedyRoutingTable.hpp"
+#include "LocalPacketHandler.hpp"
 
 #include <set>
 #include <queue>
-
-
 
 struct LocalRoutingTableEntry {
     int iFaceID;
@@ -42,36 +41,33 @@ class Router {
     Address uniqueaddress;
 
 private:
-    Location mVirtualLocation;
-
-    Location mRealLocation;
-
-    LocalInterface *localIface;
-
-    LinkManager *linkMgr;
-
-public:
-    const GreedyRoutingTable &getGreedyRoutingTable() const {
-        return greedyRoutingTable;
-    }
+    VirtualLocationManager locationMgr;
 
 private:
+    LocalPacketHandler localHandler;
+
+    LinkManager linkMgr;
+
     GreedyRoutingTable greedyRoutingTable;
 
     std::set<DirectionalEntry> mFaceRoutingTable;
 
     std::map<Address, LocalRoutingTableEntry> mLocalRoutingTable;
 
-    DHTRoutingTable dhtRoutingTable;
+    LocationLookupManager dhtRoutingTable;
 
     std::queue<PacketPtr> routingQueue;
 
 public:
-    LocalInterface *getLocalIface() const {
-        return localIface;
+    GreedyRoutingTable &getGreedyRoutingTable() {
+        return greedyRoutingTable;
     }
 
-    LinkManager *getLinkManager() const {
+    LocationLookupManager &getDhtRoutingTable() {
+        return dhtRoutingTable;
+    }
+
+    LinkManager& getLinkManager() {
         return linkMgr;
     }
 
@@ -79,32 +75,19 @@ public:
         return uniqueaddress;
     }
 
-    // TODO make the allocation of the local interface and link manager a bit more elegant
-    Router(Address uniqueaddress, Location location) : uniqueaddress(uniqueaddress), mVirtualLocation(location),
-                                                       mRealLocation(location),
-                                                       localIface(new LocalInterface(this)),
-                                                       linkMgr(new LinkManager(this)),
-                                                       dhtRoutingTable(uniqueaddress){
-
-        linkMgr->addLinkListener([this](std::shared_ptr<AbstractInterface> iFace, LinkEvent event) {
-
-            if (event == LINKEVENT_CREATED) {
-                this->sendLocationInfo(iFace->getInterfaceId()); // Maybe the router should decide what should be done?
-            }
-        });
-
-    };
+    Router(Address uniqueaddress, Location location);
 
     ~Router() {
-        delete localIface;
-        delete linkMgr;
     }
+
+    void sendMessageFromLocal(PacketPtr packet);
 
     bool handleMessage(PacketPtr data, int fromIface);
 
-    const Location&getVirtualLocation() const {
-        return mVirtualLocation;
-    }
+    /**
+     * Call when diecided this packet won't be handles by the local host.
+     */
+    bool forwardPacket(PacketPtr data, int fromIface);
 
     const int getNumNeighbours() const {
         return mFaceRoutingTable.size();
@@ -115,8 +98,6 @@ public:
     bool processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket);
 
     bool routeGreedy(PacketPtr data, int fromIface, Location destination);
-
-
 
     void greedyToFace(PacketPtr data);
 
@@ -132,6 +113,14 @@ public:
      * Relay a packet that is currently in face routing mode. Will NOT change the routing mode.
      */
     bool routeFaceRelay(PacketPtr data, int fromIface, Location destination);
+
+    const VirtualLocationManager &getLocationMgr() const {
+        return locationMgr;
+    }
+
+    LocalPacketHandler &getLocalHandler() {
+        return localHandler;
+    }
 };
 
 

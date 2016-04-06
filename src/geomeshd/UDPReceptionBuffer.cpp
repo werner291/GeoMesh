@@ -2,7 +2,7 @@
 // Created by System Administrator on 2/29/16.
 //
 
-#include "UDPReceptionBuffer.h"
+#include "UDPReceptionBuffer.hpp"
 #include <cmath>
 
 void UDPReceptionBuffer::removeOverlappingRanges() {
@@ -103,5 +103,5 @@ bool UDPReceptionBuffer::isFullPacketAvailable() {
 
 PacketPtr UDPReceptionBuffer::getReconstructedPacket() {
     assert(isFullPacketAvailable());
-    return Packet::createFromData(buffer.data(), buffer.size());
+    return std::make_shared<Packet>(buffer.data(), buffer.size());
 }

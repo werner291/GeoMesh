@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <functional>
-#include "Packet.h"
+#include "Packet.hpp"
 
 
 class AbstractInterface;

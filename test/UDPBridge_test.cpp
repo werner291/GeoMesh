@@ -4,8 +4,8 @@
 
 #include <algorithm>
 #include <gtest/gtest.h>
-#include "../src/Packet.h"
-#include "../src/geomeshd/UDPManager.h"
+#include "../src/Packet.hpp"
+#include "../src/geomeshd/UDPManager.hpp"
 
 TEST(udpbridge,fragmentation) {
 
@@ -15,7 +15,7 @@ TEST(udpbridge,fragmentation) {
         data[i] = i % 256;
     }
 
-    PacketPtr packet = Packet::createFromData(data, MAX_PACKET_SIZE-1);
+    PacketPtr packet = std::make_shared<Packet>(data, MAX_PACKET_SIZE-1);
 
     auto fragments = UDPManager::fragmentPacket(packet, 375, 7);
 

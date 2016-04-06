@@ -2,7 +2,7 @@
 // Created by Werner Kroneman on 27-01-16.
 //
 
-#include "draw3d.h"
+#include "draw3d.hpp"
 #include <FL/gl.h>
 #include <math.h>
 

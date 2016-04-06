@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/MeshnetSim.iml" filepath="$PROJECT_DIR$/.idea/MeshnetSim.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/GeoMesh.iml" filepath="$PROJECT_DIR$/.idea/GeoMesh.iml" />
     </modules>
   </component>
 </project>

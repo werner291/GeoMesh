@@ -5,9 +5,9 @@
 #ifndef GEOMESH_UDPRECEPTIONBUFFER_H
 #define GEOMESH_UDPRECEPTIONBUFFER_H
 
-#include "UDPFragment.h"
+#include "UDPFragment.hpp"
 
-#include "../Packet.h"
+#include "../Packet.hpp"
 
 /**
  * The UDPReceptionBuffer helps to combine a number of UDPFragment objects into a packet.
@@ -50,7 +50,7 @@ public:
     /*
      * Create a new empty reception buffer.
      */
-    UDPReceptionBuffer() : valid(false), expectedSize(0), packetNumber(0) {}
+    UDPReceptionBuffer() : packetNumber(0), expectedSize(0), valid(false) {}
 
     /**
      * Receive and store a fragment of data.

@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include "../src/Location.h"
+#include "../src/Location.hpp"
 
 const double EPSILON = 0.00000001;
 

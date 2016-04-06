@@ -2,7 +2,7 @@
 // Created by Werner Kroneman on 22-01-16.
 //
 
-#include "AbstractInterface.h"
+#include "AbstractInterface.hpp"
 
 uint16_t AbstractInterface::nextIfaceID = 1;
 

@@ -6,7 +6,7 @@ include_directories(/opt/local/include)
 set(CORE_SRC AbstractInterface.cpp Router.cpp Location.cpp Logger.cpp LinkManager.cpp LocalInterface.cpp
         UniqueAddress.cpp Packet.cpp LocationLookupManager.cpp GreedyRoutingTable.cpp
         my_htonll.cpp VirtualLocationManager.cpp LocalPacketHandler.cpp AbstractInterface.hpp Router.hpp Location.hpp
-        Logger.hpp LinkManager.hpp LocalInterface.hpp
+        Logger.hpp LinkManager.hpp LocalInterface.hpp ContactsSet.cpp ContactsSet.hpp
         UniqueAddress.hpp Packet.cpp LocationLookupManager.hpp GreedyRoutingTable.hpp
         my_htonll.hpp VirtualLocationManager.hpp LocalPacketHandler.hpp)
 add_library(core ${CORE_SRC})

@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <ctime>
-#include "Logger.h"
+#include "Logger.hpp"
 
 LogLevel Logger::minLevel = LogLevel::INFO;
 

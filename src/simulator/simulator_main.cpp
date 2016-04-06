@@ -3,11 +3,11 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <random>
-#include "NetworkSim.h"
-#include "../Router.h"
-#include "ActionButton.h"
+#include "NetworkSim.hpp"
+#include "../Router.hpp"
+#include "ActionButton.hpp"
 
-#include "NetworkWidget.h"
+#include "NetworkWidget.hpp"
 
 NetworkWidget* nw;
 NetworkSim* simulator;
@@ -18,7 +18,7 @@ int sendDelay;
 
 void update(void*) {
 
-    float simulation_speed = 1.f;
+    float simulation_speed = 0.5f;
 
     simulator->updateSimulation((1000.f*simulation_speed/60.f));
 
@@ -30,7 +30,7 @@ void update(void*) {
     std::string message = "Hello!";
 
     if (sendDelay-- <= 0) {
-        if (sendTotal-- > 0) {
+        //if (sendTotal-- > 0) {
             if (canSend <= 0) {
                 int node1 = displacement(rgen);
                 int node2 = displacement(rgen);
@@ -40,12 +40,12 @@ void update(void*) {
             } else {
                 canSend--;
             }
-        }
+        //}
     }
 
     nw->redraw();
 
-    Fl::repeat_timeout(1/10.f, update);
+    Fl::repeat_timeout(1/30.f, update);
 }
 
 int main(int argc, char **argv) {

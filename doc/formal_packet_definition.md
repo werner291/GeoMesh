@@ -187,4 +187,3 @@ This packet is the same as a normal GeoMesh packet until octet position 32 not i
 
 * Check: A 16-bit integer. The modulus 2^16 sum of all 16-bit words in the packet until octet position 36 not included
 must be equal to 0.
-

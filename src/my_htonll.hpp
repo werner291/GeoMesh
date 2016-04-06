@@ -7,6 +7,6 @@
 
 unsigned long long int my_htonll(unsigned long long int value);
 
-#include "UniqueAddress.h"
+#include "UniqueAddress.hpp"
 
 #endif //GEOMESH_MY_HTONLL_H

@@ -2,14 +2,14 @@
 // Created by Werner Kroneman on 22-01-16.
 //
 
-#include "SimulatorLink.h"
+#include "SimulatorLink.hpp"
 
 bool SimulatorLink::sendData(PacketPtr data) {
 
     // Create a copy, or we get the really wierd situation where updating the number of
     // hops on one router will change all copies of the packet, even those in transit!
 
-    PacketPtr ptr = Packet::createFromData(data->getData(), data->getDataLength());
+    PacketPtr ptr = std::make_shared<Packet>(data->getData(), data->getDataLength());
 
     sendQueue.push(ptr);
 

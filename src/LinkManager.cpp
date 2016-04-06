@@ -2,9 +2,9 @@
 // Created by Werner Kroneman on 23-01-16.
 //
 
-#include "LinkManager.h"
-#include "Logger.h"
-#include "Router.h"
+#include "LinkManager.hpp"
+#include "Logger.hpp"
+#include "Router.hpp"
 
 bool LinkManager::sendPacket(const PacketPtr &data, int iFace) {
     auto itr = mInterfaces.find(iFace);
@@ -20,8 +20,7 @@ bool LinkManager::sendPacket(const PacketPtr &data, int iFace) {
 void LinkManager::connectInterface(std::shared_ptr<AbstractInterface> iFace) {
 
     mInterfaces.insert(std::make_pair(iFace->getInterfaceId(), iFace));
-    iFace->setDataReceivedCallback(std::bind(&Router::handleMessage, // Ugly...
-                                             router, std::placeholders::_1, std::placeholders::_2));
+    iFace->setDataReceivedCallback(routeInboundPacket);
 
     for (auto listener : linkEventListeners) {
         listener(iFace, LINKEVENT_CREATED);

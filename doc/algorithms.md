@@ -84,7 +84,7 @@ A[a][match] == 0 && A[b][match] == 1 && a < b
 ##### Postcondition (to prove)
 
 1. A[c][match] == 0 && A[d][match] == 1
-2. c = d + 1
+2. d = c + 1
 3. a <= c,d <= b.
 
 ##### Loop invariant
@@ -106,7 +106,7 @@ Maintenance:
         c is changed to the value of *middle*.
         A[c_new][match] == 0 is still true since c_new == middle and A[middle][match] == 0.
         d is unmodified, so A[d][match] == 1 is still true.
-        The loop guard guarantees that c_old < d + 1. Therefore:
+        The loop guard guarantees that c_old + 1 < d. Therefore:
             c_new = middle = floor( (c_old + d) / 2 ) 
                 < floor( ((d-1) + d) / 2 ) 
                 = floor( (2*d-1) / 2 )
@@ -119,7 +119,7 @@ Maintenance:
     Case A[middle][match] == 1:
         d is changed to the value of *middle*. 
         A[d_new][match] == 1 is true since A[middle][match] == 1 and d_new == middle.
-        The loop guard guarantees that c < d_old + 1. Therefore:
+        The loop guard guarantees that c_old + 1 < d. Therefore:
             d_new = floor( (c + d_old)/2)
                   > floor( (c + c + 1)/2 )
                   = floor( c + 1/2 ) { c is an integer}

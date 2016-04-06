@@ -7,7 +7,7 @@
 
 #include <memory>
 #include <sys/kern_control.h>
-#include "../LocalInterface.h"
+#include "../LocalInterface.hpp"
 
 // No need for aome #IF APPLE since this include file is already only used on Apple
 #define TUNInterface_IFNAMSIZ 16
@@ -56,7 +56,7 @@ public:
      * To be called by the Router's LocalInterface. The GeoMesh packet will be unwrapped
      * and delivered to the host system through the utun device.
      */
-    void deliverIPv6Packet(PacketPtr packet);
+    void deliverIPv6Packet(uint8_t* data, size_t length);
 
     /**
      * Poll the utun interface for new messages.

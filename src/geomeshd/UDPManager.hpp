@@ -5,8 +5,8 @@
 #ifndef GEOMESH_UDPCONNECTIONMANAGER_H
 #define GEOMESH_UDPCONNECTIONMANAGER_H
 
-#include "../LinkManager.h"
-#include "UDPInterface.h"
+#include "../LinkManager.hpp"
+#include "UDPInterface.hpp"
 #include <string>
 #include <string.h>
 
@@ -17,7 +17,7 @@ class UDPManager {
 
     friend UDPInterface;
 
-    LinkManager* linkMgr;
+    LinkManager& linkMgr;
 
     int socketID;
 
@@ -38,7 +38,7 @@ class UDPManager {
     bool sendMessage(PacketPtr message, UDPInterface* iFace);
 
 public:
-    UDPManager(LinkManager *linkMgr, int localPort);
+    UDPManager(LinkManager &linkMgr, int localPort);
 
     /**
      * Send a UDP bridge hello packet to the specified address and port,

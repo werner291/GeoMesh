@@ -3,7 +3,50 @@
 //
 
 #include <gtest/gtest.h>
-#include "../src/UniqueAddress.h"
+#include "../src/UniqueAddress.hpp"
+
+TEST(address_base, equality) {
+
+    Address a = Address::generateRandom();
+
+    Address b = Address::fromBytes(a.getBytes());
+
+    EXPECT_EQ(a,b);
+
+    EXPECT_FALSE(a<b);
+    EXPECT_FALSE(b<a);
+}
+
+TEST(address_base, equality_false) {
+
+    Address a = Address::generateRandom();
+
+    Address b = Address::generateRandom();
+
+    EXPECT_FALSE(a == b);
+}
+
+TEST(address_base, inequality) {
+
+    Address a = Address::fromString("aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa");
+
+    Address b = Address::fromString("aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaab");
+
+    EXPECT_LT(a,b);
+
+    EXPECT_GT(b,a);
+}
+
+TEST(address_base, inequality_2) {
+
+    Address a = Address::fromString("aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa");
+
+    Address b = Address::fromString("aaaa:aaaa:aaaa:abaa:aaaa:aaaa:aaaa:aaaa");
+
+    EXPECT_LT(a,b);
+
+    EXPECT_GT(b,a);
+}
 
 TEST(distance_xor_compute, identity_random) {
 
@@ -39,73 +82,44 @@ TEST(distance_xor_compute, extremes_order) {
 
     AddressDistance d = a.xorDistanceTo(b);
 
+    EXPECT_EQ(64, d.getDifferingBits());
+
     EXPECT_EQ(d.data[0],UINT32_MAX);
     EXPECT_EQ(d.data[1],UINT32_MAX);
     EXPECT_EQ(d.data[2],0);
     EXPECT_EQ(d.data[3],0);
 }
 
-TEST(distance_slot, zero) {
+TEST(address,map_of_addresses) {
 
-    AddressDistance dist;
+    std::vector<Address> addresses;
+    std::map<Address,int> addressesMap;
 
-    dist.data[0] = 0;
-    dist.data[1] = 0;
-    dist.data[2] = 0;
-    dist.data[3] = 0;
+    for (int i = 0; i < 10; ++i) {
+        addresses.push_back(Address::generateRandom());
+        addressesMap[addresses[i]] = i;
+        //EXPECT_EQ(i, addressesMap[addresses[i]]);
+    }
 
-    EXPECT_EQ(dist.getDHTSlotNumber(), 0);
+    for (int i = 0; i < 10; ++i) {
+        auto itr = addressesMap.find(addresses[i]);
 
-}
 
-TEST(distance_slot, one) {
 
-    AddressDistance dist;
+        EXPECT_FALSE(itr == addressesMap.end());
+        EXPECT_EQ(i, itr->second);
+    }
 
-    dist.data[0] = 0;
-    dist.data[1] = 0;
-    dist.data[2] = 0;
-    dist.data[3] = 1;
 
-    EXPECT_EQ(dist.getDHTSlotNumber(), 1);
 
 }
 
-TEST(distance_slot, max_matched) {
+TEST(address, getBit) {
 
-    AddressDistance dist;
+    Address addr = Address::fromString("0000:0000:0002:0001:0000:0000:0002:0001");
 
-    dist.data[0] = 0x80000000;
-    dist.data[1] = 0;
-    dist.data[2] = 0;
-    dist.data[3] = 0;
-
-    EXPECT_EQ(dist.getDHTSlotNumber(), 128);
-
-}
-
-TEST(distance_slot, max_just_over_same_int) {
-
-    AddressDistance dist;
-
-    dist.data[0] = 0x80000001;
-    dist.data[1] = 0;
-    dist.data[2] = 0;
-    dist.data[3] = 0;
-
-    EXPECT_EQ(dist.getDHTSlotNumber(), 128);
-
-}
-
-TEST(distance_slot, max_just_over_different_int) {
-
-    AddressDistance dist;
-
-    dist.data[0] = 0x80000000;
-    dist.data[1] = 0;
-    dist.data[2] = 0;
-    dist.data[3] = 1;
-
-    EXPECT_EQ(dist.getDHTSlotNumber(), 128);
+    EXPECT_EQ(1, addr.getBit(127));
+    EXPECT_EQ(0, addr.getBit(111));
+    EXPECT_EQ(1, addr.getBit(110));
 
 }

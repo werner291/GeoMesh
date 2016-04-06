@@ -6,8 +6,8 @@
 #define GEOMESH_PACKET_H
 
 #include <stdint.h>
-#include "Location.h"
-#include "UniqueAddress.h"
+#include "Location.hpp"
+#include "UniqueAddress.hpp"
 #include <assert.h>
 #include <limits.h>
 
@@ -22,11 +22,10 @@ typedef double location_scalar;
 // Different message types.
 const uint8_t MSGTYPE_IPv6 = 0;          // A regular message containing actual data to be transmitted
 const uint8_t MSGTYPE_LOCATION_INFO = 1;    // A message containing information about the sender and their direct peers
-const uint8_t MSGTYPE_DHT_JOIN = 10;    //
-const uint8_t MSGTYPE_DHT_LEAVE = 11;
-const uint8_t MSGTYPE_DHT_FIND_CLOSEST = 12;
-const uint8_t MSGTYPE_DHT_ROUTETABLE_COPY = 13;
-const uint8_t MSGTYPE_DHT_ROUTETABLE_COPY_REQUEST = 14;
+
+const uint8_t MSGTYPE_DHT_FIND_CLOSEST = 10;
+const uint8_t MSGTYPE_DHT_FIND_RESPONSE = 11;
+const uint8_t MSGTYPE_DHT_LEAVE = 12;
 
 // Different routing modes
 const int ROUTING_GREEDY = 0;
@@ -106,8 +105,11 @@ public:
     /**
      * Create a packet with a buffer of packet_size length, contents undefined.
      */
-    Packet(size_t packet_size = MAX_PACKET_SIZE) : header(data), payload(header + GEOMESH_PAYLOAD_START),
-                                                   dataLength(packet_size) {
+    Packet(size_t packet_size = MAX_PACKET_SIZE) : dataLength(packet_size),
+                                                   header(data),
+                                                   payload(header + GEOMESH_PAYLOAD_START) {
+
+        assert(packet_size <= MAX_PACKET_SIZE);
 
         // Set protocol version to current
         *(reinterpret_cast<uint16_t *>(header + GEOMESH_HEADER_PROTOCOL_VERSION)) = htons(PROTOCOL_VERSION);
@@ -194,13 +196,6 @@ public:
         loc.toBytes(header + GEOMESH_HEADER_SOURCE_LOCATION);
     }
 
-    static PacketPtr createFromIPv6(const uint8_t *IPv6packet, size_t length, const Location &sourceLocation,
-                                    const Location &destinationLocation);
-
-    static PacketPtr createLocationInfoPacket(const Location &loc, const Address &addr);
-
-    static PacketPtr createFromData(const uint8_t *data, size_t length);
-
     /**
      * @return Whether the specified address is equal to the address in the IPv6 destination header field.
      */
@@ -228,6 +223,10 @@ public:
         return addr;
     }
 
+    inline void setSource(const Address &address) const {
+        memcpy(header + GEOMESH_HEADER_SOURCE_ADDRESS, address.getBytes(), ADDRESS_LENGTH_OCTETS);
+    }
+
     inline void setDestination(const Address &address) const {
         memcpy(header + GEOMESH_HEADER_DESTINATION_ADDRESS, address.getBytes(), ADDRESS_LENGTH_OCTETS);
     }
@@ -236,8 +235,33 @@ public:
         return Location::fromBytes(header + GEOMESH_HEADER_DESTINATION_LOCATION);
     }
 
+    void setDestinationLocation(const Location &loc) {
+
+        loc.toBytes(header + GEOMESH_HEADER_DESTINATION_LOCATION);
+    }
+
     bool verifyLocationInformation();
 
+    void recomputeLocationInfoChecksum();
+
+    static PacketPtr createFromIPv6(const uint8_t *IPv6packet, size_t length,
+                                    const Location &sourceLocation,
+                                    const Location &destinationLocation);
+
+    static PacketPtr createLocationInfoPacket(const Location &loc,
+                                              const Address &addr);
+
+    Packet(const uint8_t *data, size_t length);
+
+    /**
+     * Create a packet with a pre-filled header and an empty payload buffer of the specified size.
+     */
+    Packet(const Address &source,
+           const Location &sourceLocation,
+           const Address &destination,
+           const Location &destinationLocation,
+           int messageType,
+           size_t payloadSize);
 };
 
 

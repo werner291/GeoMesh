@@ -6,7 +6,7 @@
 #define MESHNETSIM_INTERFACEMANAGER_H
 
 #include <map>
-#include "AbstractInterface.h"
+#include "AbstractInterface.hpp"
 
 class Router;
 
@@ -23,12 +23,13 @@ typedef std::function<void(std::shared_ptr<AbstractInterface>, LinkEvent)> LinkC
  */
 class LinkManager {
 
-    Router *router;
-
     std::vector<LinkChangeListener> linkEventListeners;
 
+    std::function< void (const PacketPtr& packet, int fromIface) > routeInboundPacket;
+
 public:
-    LinkManager(Router *router) : router(router) { };
+    LinkManager(std::function< void (const PacketPtr& packet, int fromIface) > routeInboundPacket)
+      : routeInboundPacket(routeInboundPacket) { };
 
     std::map<int, std::shared_ptr<AbstractInterface> > mInterfaces;
 

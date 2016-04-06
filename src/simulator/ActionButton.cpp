@@ -2,7 +2,7 @@
 // Created by Werner Kroneman on 26-01-16.
 //
 
-#include "ActionButton.h"
+#include "ActionButton.hpp"
 
 int ActionButton::handle(int event) {
 

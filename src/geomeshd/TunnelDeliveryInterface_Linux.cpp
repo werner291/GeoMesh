@@ -2,9 +2,9 @@
 // Created by System Administrator on 2/2/16.
 //
 
-#include "TunnelDeliveryInterface_Linux.h"
+#include "TunnelDeliveryInterface_Linux.hpp"
 
-#include "../Logger.h"
+#include "../Logger.hpp"
 
 #include <regex>
 #include <libexplain/ioctl.h>
@@ -14,7 +14,7 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "UnixSocketsFunctions.h"
+#include "UnixSocketsFunctions.hpp"
 
 TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *localInterface,
                                                              const Address &iFaceAddress)

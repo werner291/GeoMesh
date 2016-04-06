@@ -2,7 +2,7 @@
 // Created by System Administrator on 2/5/16.
 //
 
-#include "Packet.h"
+#include "Packet.hpp"
 
 const int FACE_ROUTE_DIRECTION_BITMASK = 128;
 
@@ -41,9 +41,13 @@ PacketPtr Packet::createLocationInfoPacket(const Location &loc, const Address &a
     memcpy(pack->header + GEOMESH_HEADER_SOURCE_ADDRESS, addr.getBytes(), ADDRESS_LENGTH_OCTETS);
 
     pack->setLocationInfoHopCount(1);
+    pack->recomputeLocationInfoChecksum();
 
-    // Compute checksum
-    uint16_t *toVerify = reinterpret_cast<uint16_t *>(pack->header);
+    return pack;
+}
+
+void Packet::recomputeLocationInfoChecksum() {// Compute checksum
+    uint16_t *toVerify = reinterpret_cast<uint16_t *>(header);
 
     uint16_t sum = 0;
 
@@ -53,9 +57,7 @@ PacketPtr Packet::createLocationInfoPacket(const Location &loc, const Address &a
 
     sum = 0 - sum; // These numbers are unsigned
 
-    *(reinterpret_cast<uint16_t *>(pack->header + LOCATION_INFO_CHECK)) = htons(sum);
-
-    return pack;
+    *(reinterpret_cast<uint16_t *>(header + LOCATION_INFO_CHECK)) = htons(sum);
 }
 
 bool Packet::verifyLocationInformation() {
@@ -74,15 +76,25 @@ bool Packet::verifyLocationInformation() {
 
 }
 
-// Perhaps just a constructor would be better here?
-PacketPtr Packet::createFromData(const uint8_t *data, size_t length) {
 
-    assert(length <= MAX_PACKET_SIZE);
+Packet::Packet(const uint8_t *data, size_t length) : Packet(length) {
+    if (data != nullptr) {
+        memcpy(Packet::data, data, length);
+    }
+}
 
-    PacketPtr pack(new Packet(length));
+Packet::Packet(const Address &source,
+                 const Location &sourceLocation,
+                 const Address &destination,
+                 const Location &destinationLocation,
+                 int messageType,
+                 size_t payloadSize) : Packet(GEOMESH_PAYLOAD_START + payloadSize) {
 
-    memcpy(pack->data, data, length);
+    setMessageType(messageType);
 
-    return pack;
+    setDestination(destination);
+    setDestinationLocation(destinationLocation);
 
+    setSource(source);
+    setSourceLocation(sourceLocation);
 }

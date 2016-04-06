@@ -36,7 +36,7 @@ If, for example, node 1000 didn't exist, node 0000 would store a reference to 10
 ## Comparison to Kademlia
  
 The system is similar to Kademlia in that it uses the XOR-distance metric between addresses to route packets and the way
-it chooses which entries to keep in the routing table, but will differs on certain major points:
+it chooses which entries to keep in the routing table is somewhat similar, but it differs on certain major points:
 
 The most important difference is that Kademlia uses an iterative approach where the original requester keeps sending FIND
 requests based on the responses given to it by the nodes it queried previously while the location lookup service instead

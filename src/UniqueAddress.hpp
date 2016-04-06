@@ -24,14 +24,18 @@ struct AddressDistance {
 
     inline bool operator<(const AddressDistance &other) const {
         for (int i = 0; i < ADDRESS_LENGTH_OCTETS / 4; ++i) {
-            if (data[i] < other.data[i]) return true;
+            if (data[i] != other.data[i]) {
+                return (data[i] < other.data[i]);
+            }
         }
         return false;
     }
 
     inline bool operator>(const AddressDistance &other) const {
         for (int i = 0; i < ADDRESS_LENGTH_OCTETS / 4; ++i) {
-            if (data[i] > other.data[i]) return true;
+            if (data[i] != other.data[i]) {
+                return (data[i] > other.data[i]);
+            }
         }
         return false;
     }
@@ -50,6 +54,21 @@ struct AddressDistance {
         return *this < other || *this == other;
     }
 
+    int getDifferingBits() {
+        int count = 0;
+        for (uint32_t i : data) {
+            while (i != 0) { // Keep at it until the number reaches 0.
+                if ((i & 1) == 1) {
+                    count += 1;
+                }
+                i = i >> 1;
+            }
+        }
+        return count;
+    }
+
+
+
 };
 
 /**
@@ -63,23 +82,18 @@ public:
 
     // Required for std::map lookups.
 
-    inline bool operator<(const Address &other) const {
-        for (int i = 0; i < ADDRESS_LENGTH_OCTETS; ++i) {
-            if (bytes[i] != other.bytes[i]) {
-                return bytes[i] < other.bytes[i];
-            }
-        }
-        return false;
+    inline int compare(const Address &other) const {
+        return memcmp(bytes,other.bytes,ADDRESS_LENGTH_OCTETS);
     }
 
-    inline bool operator>(const Address &other) const {
-        for (int i = 0; i < ADDRESS_LENGTH_OCTETS; ++i) {
-            if (bytes[i] != other.bytes[i]) {
-                return bytes[i] > other.bytes[i];
-            }
-        }
-        return false;
-    }
+    inline bool operator<(const Address &other) const { return compare(other) < 0; }
+
+    inline bool operator<=(const Address &other) const { return compare(other) <= 0; }
+
+    inline bool operator>(const Address &other) const { return compare(other) > 0; }
+
+    inline bool operator>=(const Address &other) const { return compare(other) >= 0; }
+
 
     /**
      * @return Whether this address exactly matches the other address.
@@ -109,6 +123,14 @@ public:
         }
 
         return ss.str();
+    }
+
+    const std::string toBitString() const {
+        std::stringstream str;
+        for (int bit = 0; bit < ADDRESS_LENGTH_OCTETS * 8; ++bit) {
+            str << (getBit(bit) ? '1' : '0');
+        }
+        return str.str();
     }
 
     static Address fromBytes(const uint8_t* bytes) {
@@ -142,6 +164,13 @@ public:
         }
 
         return dist;
+    }
+
+    inline int getBit(const int& position) const {
+
+        uint8_t byte = bytes[position / 8];
+
+        return (byte >> (7 - (position % 8))) & 1;
     }
 };
 

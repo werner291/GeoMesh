@@ -10,10 +10,10 @@
 #include <sys/un.h>
 #include <regex>
 #include <errno.h>
-#include "TunnelDeliveryInterface_Apple.h"
-#include "../Logger.h"
+#include "TunnelDeliveryInterface_Apple.hpp"
+#include "../Logger.hpp"
 #include <iomanip>
-#include "UnixSocketsFunctions.h"
+#include "UnixSocketsFunctions.hpp"
 
 #define UTUN_CONTROL_NAME "com.apple.net.utun_control"
 #define UTUN_OPT_IFNAME 2
@@ -24,7 +24,7 @@ TunnelDeliveryInterface_Apple::TunnelDeliveryInterface_Apple(LocalInterface *loc
 
     // Callback when the Router wants to deliver a message to the local system
     localInterface->setDataReceivedHandler(
-            std::bind(&TunnelDeliveryInterface_Apple::deliverIPv6Packet, this, std::placeholders::_1));
+            std::bind(&TunnelDeliveryInterface_Apple::deliverIPv6Packet, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 void TunnelDeliveryInterface_Apple::startTunnelInterface() {
@@ -135,22 +135,22 @@ void TunnelDeliveryInterface_Apple::installRoute() {
                 "Installed route. All traffic to fcfd:/16 will be sent through " + std::string(iFaceName) + ".");
 };
 
-void TunnelDeliveryInterface_Apple::deliverIPv6Packet(PacketPtr packet) {
+void TunnelDeliveryInterface_Apple::deliverIPv6Packet(uint8_t* data, size_t length) {
 
     Logger::log(LogLevel::DEBUG,
                 "TunnelDeliveryInterface_Apple: Delivering message!");
 
-    uint8_t buffer[MAX_PACKET_SIZE + 4];
+    uint8_t buffer[length + 4];
 
     ((uint16_t *) buffer)[0] = htons(0);            // Always 0
     ((uint16_t *) buffer)[1] = htons(AF_INET6);   // Set to AF_INET6 so it is handled by the Internet stack.
 
-    memcpy(buffer + 4, packet->getPayload(), packet->getPayloadLength());
+    memcpy(buffer + 4, data, length);
 
     // Send to the local system.
     int result = send(mSocketId,
                       buffer,
-                      packet->getDataLength() + 4,
+                      length + 4,
                       0);
     //(struct sockaddr*) &addr,
     //sizeof(addr));

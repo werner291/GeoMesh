@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 #include <cstring>
-#include "../src/UniqueAddress.h"
-#include "../src/Packet.h"
+#include "../src/UniqueAddress.hpp"
+#include "../src/Packet.hpp"
 
 TEST(packet_creation_from_ipv6, from_ipv6) {
 

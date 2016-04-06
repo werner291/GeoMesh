@@ -10,8 +10,8 @@
 #include <FL/glut.h>
 #include <FL/glu.h>
 #include <FL/gl.h>
-#include "NetworkSim.h"
-#include "../Location.h"
+#include "NetworkSim.hpp"
+#include "../Location.hpp"
 
 class NetworkWidget : public Fl_Gl_Window {
 

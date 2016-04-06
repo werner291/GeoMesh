@@ -7,8 +7,8 @@
 #include <sys/errno.h>
 #include <string.h>
 #include <arpa/inet.h>
-#include "UnixSocketsFunctions.h"
-#include "../Logger.h"
+#include "UnixSocketsFunctions.hpp"
+#include "../Logger.hpp"
 
 int receiveMessage(int sock, uint8_t *buffer, size_t buffSize) {
 

@@ -8,9 +8,9 @@
 #include <sstream>
 #include <unistd.h>
 #include <time.h>
-#include "UDPManager.h"
+#include "UDPManager.hpp"
 
-UDPManager::UDPManager(LinkManager *linkMgr, int localPort) : linkMgr(linkMgr) {
+UDPManager::UDPManager(LinkManager& linkMgr, int localPort) : linkMgr(linkMgr) {
 
     socketID = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -157,7 +157,7 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
 
         // Tell the router about the new link. (AFTER SENDING ESTABLISHED!!! or the receiver will ignore the packet
         // and we'll have to wait for the scheduled re-send (TODO implement resending)
-        linkMgr->connectInterface(newIface);
+        linkMgr.connectInterface(newIface);
 
         Logger::log(INFO, "Received peering request, remote interface ID is " +
                           std::to_string(newIface->getMRemoteIface()));
@@ -177,7 +177,7 @@ void UDPManager::processBridgeControlMessage(char *buffer, sockaddr_in &sender) 
 
             itr->second->setMRemoteIface(remoteIfaceID);
 
-            linkMgr->connectInterface(itr->second);
+            linkMgr.connectInterface(itr->second);
 
             connectingLinks.erase(itr);
         } else {

@@ -2,11 +2,11 @@
 // Created by System Administrator on 2/29/16.
 //
 
-#include "UDPFragment.h"
+#include "UDPFragment.hpp"
 
 #include <exception>
 
-#include "../Logger.h"
+#include "../Logger.hpp"
 
 UDPFragment::UDPFragment(const uint8_t* buffer, int bufferLength, bool includesHeader) {
 

@@ -12,22 +12,18 @@
 using namespace std;
 
 #ifdef __linux__
-#include "TunnelDeliveryInterface_Linux.h"
+#include "TunnelDeliveryInterface_Linux.hpp"
 #endif
 #ifdef __APPLE__
-#include "TunnelDeliveryInterface_Apple.h"
+#include "TunnelDeliveryInterface_Apple.hpp"
 #endif
 
-#include "../UniqueAddress.h"
-
-#include "../Logger.h"
-
-#include "UDPManager.h"
-
-#include "../Router.h"
+#include "../UniqueAddress.hpp"
+#include "../Logger.hpp"
+#include "UDPManager.hpp"
+#include "../Router.hpp"
 
 #include <regex>
-
 
 int main(int argc, char **argv) {
 
@@ -55,16 +51,23 @@ int main(int argc, char **argv) {
     }
 
     // Create a new router core
-    Router* routerCore = new Router(givenAddress ? Address::fromString(givenAddress) : Address::generateRandom(), Location(0,0));
+    Router* routerCore = new Router(givenAddress ? Address::fromString(givenAddress) : Address::generateRandom(),
+                                    Location(0, 0));
+
+    LocationLookupManager llm(routerCore->getLocalHandler(),
+                              routerCore->getAddress(),
+                              routerCore->getLocationMgr());
+
+    LocalInterface localIface(routerCore->getLocalHandler(), llm);
 
     // Start the tunnel interface (platform-specific)
 
 #ifdef __APPLE__
-    TunnelDeliveryInterface_Apple *tunIface = new TunnelDeliveryInterface_Apple(routerCore->getLocalIface(),
+    TunnelDeliveryInterface_Apple *tunIface = new TunnelDeliveryInterface_Apple(&localIface,
                                                                                 routerCore->getAddress());
 #endif
 #ifdef __linux__
-    TunnelDeliveryInterface_Linux *tunIface = new TunnelDeliveryInterface_Linux(routerCore->getLocalIface(),
+    TunnelDeliveryInterface_Linux *tunIface = new TunnelDeliveryInterface_Linux(&localIface,
                                                                                 routerCore->getAddress());
 #endif
 

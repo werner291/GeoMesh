@@ -5,13 +5,13 @@
 #ifndef GEOMESH_UDPINTERFACE_H
 #define GEOMESH_UDPINTERFACE_H
 
-#include "../AbstractInterface.h"
-#include "UDPInterface.h"
-#include "../Logger.h"
+#include "../AbstractInterface.hpp"
+#include "UDPInterface.hpp"
+#include "../Logger.hpp"
 #include <netinet/in.h>
 #include <string>
 #include <string.h>
-#include "UDPReceptionBuffer.h"
+#include "UDPReceptionBuffer.hpp"
 
 class UDPManager;
 
