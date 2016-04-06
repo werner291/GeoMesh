@@ -167,7 +167,7 @@ TEST(location_serialisation, ser_deser) {
 
     Location locDeser = Location::fromBytes(buffer);
 
-    EXPECT_EQ(loc, locDeser);
+    EXPECT_NEAR(loc, locDeser, 0.01);
 
 
 }
