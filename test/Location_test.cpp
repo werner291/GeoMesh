@@ -2,6 +2,7 @@
 // Created by Werner Kroneman on 27-01-16.
 //
 
+#include <limits.h>
 #include <gtest/gtest.h>
 #include "../src/Location.hpp"
 
