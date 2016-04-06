@@ -6,11 +6,22 @@ enable_testing()
 
 add_subdirectory(googletest)
 
-set(test_SRCS Location_test.cpp Packet_test.cpp Address_test.cpp UDPBridge_test.cpp ContactsSetTest.cpp DHTTest.cpp)
+# Core-only tests
 
-add_executable(runUnitTests gtest.cpp ${test_SRCS})
+set(core_test_SRCS Location_test.cpp Packet_test.cpp Address_test.cpp ContactsSetTest.cpp DHTTest.cpp)
 
-set_property(TARGET runUnitTests PROPERTY CXX_STANDARD 11)
-set_property(TARGET runUnitTests PROPERTY CXX_STANDARD_REQUIRED ON)
+add_executable(runCoreTests gtest.cpp ${core_test_SRCS})
+target_link_libraries(runCoreTests gtest gmock core)
 
-target_link_libraries(runUnitTests gtest gmock core daemon_core)
+set_property(TARGET runCoreTests PROPERTY CXX_STANDARD 11)
+set_property(TARGET runCoreTests PROPERTY CXX_STANDARD_REQUIRED ON)
+
+# Full tests
+
+set(daemon_test_SRCS UDPBridge_test.cpp)
+
+add_executable(runFullTests gtest.cpp ${core_test_SRCS} ${daemon_test_SRCS})
+target_link_libraries(runFullTests gtest gmock core daemon_core)
+
+set_property(TARGET runFullTests PROPERTY CXX_STANDARD 11)
+set_property(TARGET runFullTests PROPERTY CXX_STANDARD_REQUIRED ON)
