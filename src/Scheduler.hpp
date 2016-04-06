@@ -69,8 +69,10 @@ public:
 
     ~Scheduler() {
         stop = true;
-        asyncThread->join();
-        delete asyncThread;
+        if (asyncThread != nullptr) {
+            asyncThread->join();
+            delete asyncThread;
+        }
     }
 
     void scheduleTask(const Task& task) {
