@@ -54,6 +54,7 @@ void LocationLookupManager::refreshRoutingTable() {
 
 void LocationLookupManager::requestLocationLookup(const Address& toLookUp) {
 
+	Logger::log(LogLevel::DEBUG, "Requested location lookup for address " + toLookUp.toString());
     waitingForLookup.insert(toLookUp);
 
     uint8_t message[FIND_CLOSEST_MESSAGE_SIZE];
@@ -132,10 +133,27 @@ void LocationLookupManager::handleDHTPacket(int messageType,
                                            requesterLocation,
                                            message,
                                            messageSize);
+		processEntrySuggestion(requesterAddress,requesterLocation,0);
             }
 
         }
             break;
+	case MSGTYPE_DHT_FIND_RESPONSE: {
+	    auto itr = waitingForLookup.find(from);
+
+	    if (itr == waitingForLookup.end()) {
+		// Perhaps the node was not reachable?
+		// Put it in the contacts anyway
+		// TODO: Add a request ID to the message and
+		// check whether the message was asked for or not.
+	    } else {
+		for (Listener& listener : updateListeners) {
+			listener(from,fromLocation,0); // TODO better expiry time
+	    	}
+	    }
+	    processEntrySuggestion(from,fromLocation,0);
+        }
+        break;
         default:
             Logger::log(LogLevel::WARN, "LocationLookupManager.handleDHTPacket received message with unknown type "
                                         + std::to_string(messageType));
