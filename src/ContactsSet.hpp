@@ -66,7 +66,12 @@ public:
         return entries.empty();
     }
 
+    size_t size() const {
+	    return entries.size();
+    }
+
     void recomputeSharedPrefix();
+
 };
 
 

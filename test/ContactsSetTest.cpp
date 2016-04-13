@@ -23,6 +23,16 @@ TEST(ContactsSetTest, insert_order_duplicates) {
         EXPECT_EQ(addr, itr->address);
     }
 
+    for (int i = 0; i < 50; i++) {
+    	
+    // Add an address twice to see if it correctly prevents duplicates
+    Address duplicate = Address::generateRandom();
+    addresses.insert(duplicate);
+    contacts.insert(ContactsSet::Entry(duplicate,Location(0,0),0));
+    contacts.insert(ContactsSet::Entry(duplicate,Location(0,0),0));
+
+    }
+
     Address lastAddr;
     bool first = true;
 

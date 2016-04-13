@@ -4,7 +4,7 @@
 
 #include "ContactsSet.hpp"
 
-ContactsSet::const_iterator ContactsSet::findClosestEntry(const Address& query) const {
+ContactsSet::const_iterator ContactsSet::findClosestEntry(const Address &query) const {
 
     auto a = entries.begin(); // Take an iterator to begin
 
@@ -28,7 +28,7 @@ ContactsSet::const_iterator ContactsSet::findClosestEntry(const Address& query) 
 
             int dist;
 
-            while ((dist = std::distance(c,d)) > 1) {
+            while ((dist = std::distance(c, d)) > 1) {
 
                 auto middle = c + dist / 2; // Take average.
 
@@ -51,7 +51,7 @@ ContactsSet::const_iterator ContactsSet::findClosestEntry(const Address& query) 
     return a;
 }
 
-ContactsSet::iterator ContactsSet::insert(const Entry& entry) {
+ContactsSet::iterator ContactsSet::insert(const Entry &entry) {
 
     // http://stackoverflow.com/a/31294973/1582024
 
@@ -67,8 +67,8 @@ ContactsSet::iterator ContactsSet::insert(const Entry& entry) {
 
         bool equal = first > last;
 
-        int distance = std::distance(first,last);
-        auto mid = first + distance/2;
+        int distance = std::distance(first, last);
+        auto mid = first + distance / 2;
 
         if (mid->address == entry.address) {
             *mid = entry;
@@ -81,9 +81,14 @@ ContactsSet::iterator ContactsSet::insert(const Entry& entry) {
     }
     if (first == entries.end()) {
         return entries.insert(entries.end(), entry);
-    } else if(first->address > entry.address) {
+    } else if (first->address > entry.address) {
         return entries.insert(first, entry);
+    } else if (first->address == entry.address) {
+        *first = entry;
+        return first;
     } else {
         return entries.insert(first + 1, entry);
+
+        return first;
     }
 }
