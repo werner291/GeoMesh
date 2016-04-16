@@ -125,8 +125,7 @@ void LocationLookupManager::handleDHTPacket(int messageType,
 
             auto itr = contacts.findClosestEntry(query);
 
-	    bool closerThanSelf = selfAddress.xorDistanceTo(query) > itr->address.xorDistanceTo(query);
-            if (itr != contacts.end() && closerThanSelf) {
+            if (itr != contacts.end() && selfAddress.xorDistanceTo(query) > itr->address.xorDistanceTo(query)) {
                 // The contact is closer in xor space to the query, forward the query to the contact
                 // TODO: route choice number
                 localHandler.sendFromLocal(messageType,

@@ -116,7 +116,6 @@ TEST(dhtTest, respond_find) {
     DHTSimplifiedNode node(Address::fromString("5555:5555:5555:5555:5555:5555:5555:5555"), Location(10, -56));
 
     int sent = 0;
-
     node.lh.setSendPacketStrategy([&](PacketPtr packet) -> bool {
 
         EXPECT_EQ(MSGTYPE_DHT_FIND_RESPONSE, packet->getMessageType());
@@ -242,7 +241,7 @@ std::cout << "}" << std::endl;
  */
 TEST(DHTTest, routingTest) {
 
-    const int MAX_NODES = 50;
+    const int MAX_NODES = 4;
 
     std::vector<std::shared_ptr<DHTSimplifiedNode>> nodes;
     std::map<Address, std::shared_ptr<DHTSimplifiedNode>> nodesByAddress;
