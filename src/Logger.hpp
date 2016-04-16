@@ -17,7 +17,9 @@ enum LogLevel {
 class Logger {
     static LogLevel minLevel;
 public:
-    static void setLogLevel(LogLevel level);
+    static void setLogLevel(LogLevel level) {
+	    minLevel = level;
+    }
     static void log(LogLevel level, std::string message);
 };
 

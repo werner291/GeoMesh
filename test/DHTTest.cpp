@@ -153,7 +153,7 @@ TEST(dhtTest, refresh_procedure) {
     DHTSimplifiedNode node(Address::fromString("5555:5555:5555:5555:5555:5555:5555:5555"), Location(0, 0));
 
     // And many random contacts
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 50; ++i) {
         node.llm.processEntrySuggestion(Address::generateRandom(), Location(0, 0), 0);
     }
 
@@ -184,7 +184,7 @@ TEST(dhtTest, local_minimum_response) {
     DHTSimplifiedNode node(Address::fromString("5555:5555:5555:5555:5555:5555:5555:5555"), Location(0, 0));
 
     // And many random contacts
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 50; ++i) {
         node.llm.processEntrySuggestion(Address::generateRandom(), Location(0, 0), 0);
     }
 
@@ -220,6 +220,19 @@ TEST(dhtTest, local_minimum_response) {
     EXPECT_EQ(1, sent);
 }
 
+typedef std::vector<std::shared_ptr<DHTSimplifiedNode> >::iterator NodeItr;
+void printNodeGraph(NodeItr begin, NodeItr end) {
+    
+std::cout << "digraph knows {" << std::endl;
+
+    for (auto itr = begin; itr != end; ++itr) {
+	for (const  ContactsSet::Entry& entry : (*itr)->llm.getContacts()) {
+	    std::cout << "\"" << (*itr)->addr.toBitString().substr(16,8) 
+		    << "\" -> \""<< entry.address.toBitString().substr(16,8) << "\"" << std::endl;
+	}
+    }
+std::cout << "}" << std::endl;
+}
 
 /*
  * Test to see whether what is initially a chain of nodes
@@ -229,7 +242,7 @@ TEST(dhtTest, local_minimum_response) {
  */
 TEST(DHTTest, routingTest) {
 
-    const int MAX_NODES = 2;
+    const int MAX_NODES = 50;
 
     std::vector<std::shared_ptr<DHTSimplifiedNode>> nodes;
     std::map<Address, std::shared_ptr<DHTSimplifiedNode>> nodesByAddress;
@@ -238,6 +251,16 @@ TEST(DHTTest, routingTest) {
         std::shared_ptr<DHTSimplifiedNode> node = std::make_shared<DHTSimplifiedNode>(
                 Address::generateRandom(), Location(0, 0),
                 [&](const PacketPtr &packet) -> bool {
+
+	            if (packet->getMessageType() == MSGTYPE_DHT_FIND_CLOSEST) {
+
+		         Address query = Address::fromBytes(packet->getPayload() + FIND_CLOSEST_QUERY); 
+			 int matching = query.xorDistanceTo(packet->getDestinationAddress()).getMatchingPrefixLength();
+			 //std::cout << "Forwarding query for " << query.toString() << 
+			   //           " to " << packet->getDestinationAddress().toString() << 
+			     //         " Matching: " << matching <<  std::endl;
+		    }
+
                     Address destination = packet->getDestinationAddress();
 
                     auto itr = nodesByAddress.find(destination);
@@ -248,9 +271,6 @@ TEST(DHTTest, routingTest) {
                         destination.toString() << std::endl;
                         return false;
                     }
-
-                    std::cout << "Sending packet from " << packet->getSourceAddress().toString() <<
-                    " to " << destination.toString() << std::endl;
 
                     itr->second->lh.handleLocalPacket(packet);
                     return true;
@@ -274,38 +294,55 @@ TEST(DHTTest, routingTest) {
     nodes.front()->llm.processEntrySuggestion(nodes.back()->addr, Location(0, 0), time(nullptr) + 500);
 
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 10; ++i) {
+	    printNodeGraph(nodes.begin(),nodes.end());
         for (std::shared_ptr<DHTSimplifiedNode> node : nodes) {
             node->llm.refreshRoutingTable();
         }
     }
-    std::cout << "Contacts of node " << nodes.front()->addr.toString() << std::endl;
-    for (const ContactsSet::Entry &entry : nodes.front()->llm.getContacts()) {
-        std::cout << entry.address.toString() << std::endl;
-    }
-    Address addr = nodes.back()->addr;
-    Location expected = nodes.back()->vlm.getLocation();
+
+    const int TESTS = 1;
+    for (int t=0;t<TESTS;++t) {
+
+	    int a = rand() % nodes.size();
+		    int b = rand() % nodes.size();
+	    auto origin = nodes[a];
+            auto target = nodes[b];
+
+	    std::cout << "Testing location lookup of " << target->addr.toString() 
+		    << " by " << origin->addr.toString() << " (initial distance " << abs(a-b) << ")" << std::endl;
+    Address addr = target->addr;
+    Location expected = target->vlm.getLocation();
 
     bool received = false;
 
-    nodes.front()->llm.addListener(
+    origin->llm.addListener(
             [&](const Address &address, const Location &loc, time_t expires) {
                 if (address == addr) {
                     if (loc == expected) {
-                        std::cout << "Yay!" << std::endl;
+                        std::cout << "Correct location lookup response!" << std::endl;
                         received = true;
                     } else {
-                        std::cout << "Wtf?" << std::endl;
+                        std::cout << "Received response to request with wrong location!" << std::endl;
                     }
                 } else {
                     std::cout << "Ok, but not what we asked for..." << std::endl;
                     std::cout << "Received response from: " << address.toString() << std::endl;
+
+		    for (const ContactsSet::Entry& entry : nodesByAddress[address]->llm.getContacts()) {
+		        std::cout << entry.address.toString() << " - " << addr.xorDistanceTo(address).getMatchingPrefixLength() << std::endl;
+		    }
                 }
             });
 
 
     Logger::setLogLevel(LogLevel::DEBUG);
 
-    nodes.front()->llm.requestLocationLookup(addr);
+    origin->llm.requestLocationLookup(addr);
     EXPECT_TRUE(received);
+    
+    origin->llm.removeAllListeners();
+    }
 }
+
+

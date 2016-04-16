@@ -10,7 +10,10 @@
 
 bool LocationLookupManager::processEntrySuggestion(const Address& address, const Location& loc, time_t expires) {
 
+	if (address != selfAddress) {
+		// Do not add ourselves as a contact
     addEntry(address, loc, expires);
+	}
 
     waitingForLookup.erase(address);
 
@@ -55,18 +58,25 @@ void LocationLookupManager::refreshRoutingTable() {
 void LocationLookupManager::requestLocationLookup(const Address& toLookUp) {
 
 	Logger::log(LogLevel::DEBUG, "Requested location lookup for address " + toLookUp.toString());
+
     waitingForLookup.insert(toLookUp);
 
-    uint8_t message[FIND_CLOSEST_MESSAGE_SIZE];
+    if (! contacts.empty() ) {
+        uint8_t message[FIND_CLOSEST_MESSAGE_SIZE];
 
-    LocationLookupManager::writeLookupMessage(message, selfAddress, locationMgr.getLocation(), toLookUp);
+        LocationLookupManager::writeLookupMessage(message, selfAddress, locationMgr.getLocation(), toLookUp);
 
-    handleDHTPacket(MSGTYPE_DHT_FIND_CLOSEST,
-                    selfAddress,
-                    locationMgr.getLocation(),
-                    message,
-                    FIND_CLOSEST_MESSAGE_SIZE);
+            auto itr = contacts.findClosestEntry(toLookUp);
 
+                localHandler.sendFromLocal(MSGTYPE_DHT_FIND_CLOSEST,
+                                           itr->address,
+                                           itr->location,
+                                           message,
+                           FIND_CLOSEST_MESSAGE_SIZE);
+    } else {
+	    Logger::log(LogLevel::INFO, "Location Lookup Manager has no contacts, will perform request when contacts acquired.");
+    }
+    
 }
 
 /*
@@ -115,7 +125,8 @@ void LocationLookupManager::handleDHTPacket(int messageType,
 
             auto itr = contacts.findClosestEntry(query);
 
-            if (itr != contacts.end() && selfAddress.xorDistanceTo(query) > itr->address.xorDistanceTo(query)) {
+	    bool closerThanSelf = selfAddress.xorDistanceTo(query) > itr->address.xorDistanceTo(query);
+            if (itr != contacts.end() && closerThanSelf) {
                 // The contact is closer in xor space to the query, forward the query to the contact
                 // TODO: route choice number
                 localHandler.sendFromLocal(messageType,

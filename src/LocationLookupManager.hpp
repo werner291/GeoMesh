@@ -65,6 +65,10 @@ public:
         updateListeners.push_back(listener);
     }
 
+    void removeAllListeners() {
+	    updateListeners.clear();
+    }
+
     void refreshRoutingTable();
 
     void prune(){};
