@@ -8,7 +8,8 @@ set(CORE_SRC AbstractInterface.cpp Router.cpp Location.cpp Logger.cpp LinkManage
         my_htonll.cpp VirtualLocationManager.cpp LocalPacketHandler.cpp AbstractInterface.hpp Router.hpp Location.hpp
         Logger.hpp LinkManager.hpp LocalInterface.hpp ContactsSet.cpp ContactsSet.hpp
         UniqueAddress.hpp Packet.cpp LocationLookupManager.hpp GreedyRoutingTable.hpp
-        my_htonll.hpp VirtualLocationManager.hpp LocalPacketHandler.hpp)
+        my_htonll.hpp VirtualLocationManager.hpp LocalPacketHandler.hpp
+        Scheduler.cpp Scheduler.hpp)
 add_library(core ${CORE_SRC})
 
 set_property(TARGET core PROPERTY CXX_STANDARD 11)
