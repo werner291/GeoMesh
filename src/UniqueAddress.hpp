@@ -20,34 +20,25 @@ const int ADDRESS_LENGTH_OCTETS = 16; // 128-bit addresses, we're optimistic.
 struct AddressDistance {
 
     // Lower index means higher order.
-    uint32_t data[ADDRESS_LENGTH_OCTETS / 4];
+    uint8_t data[ADDRESS_LENGTH_OCTETS];
+
+    inline int compare(const AddressDistance& other) const {
+	    return memcmp(data,other.data, ADDRESS_LENGTH_OCTETS);
+    }
 
     inline bool operator<(const AddressDistance &other) const {
-        for (int i = 0; i < ADDRESS_LENGTH_OCTETS / 4; ++i) {
-            if (data[i] != other.data[i]) {
-                return (data[i] < other.data[i]);
-            }
-        }
-        return false;
+	    return compare(other) < 0;
     }
 
     inline bool operator>(const AddressDistance &other) const {
-        for (int i = 0; i < ADDRESS_LENGTH_OCTETS / 4; ++i) {
-            if (data[i] != other.data[i]) {
-                return (data[i] > other.data[i]);
-            }
-        }
-        return false;
+	    return compare(other) > 0;
     }
 
     /**
      * Whether this distance exactly matches the other, byte for byte.
      */
     inline bool operator==(const AddressDistance &other) const {
-        for (int i = 0; i < ADDRESS_LENGTH_OCTETS / 4; ++i) {
-            if (data[i] != other.data[i]) return false;
-        }
-        return true;
+	    return compare(other) == 0;
     }
 
     inline bool operator <=(const AddressDistance &other) const {
@@ -56,7 +47,7 @@ struct AddressDistance {
 
     int getDifferingBits() {
         int count = 0;
-        for (uint32_t i : data) {
+        for (uint8_t i : data) {
             while (i != 0) { // Keep at it until the number reaches 0.
                 if ((i & 1) == 1) {
                     count += 1;
@@ -67,7 +58,22 @@ struct AddressDistance {
         return count;
     }
 
+    int getMatchingPrefixLength() {
+	    int match = 0;
+	    
+	    for (uint8_t i : data ) {
+	        match += 8;
+		if (i != 0) {
+		while (i != 0) {
+			i = i >> 1;
+			match -= 1;
+		}
+		return match;
+		}
+	    }
 
+	    return match;
+    }
 
 };
 

@@ -46,6 +46,7 @@ TEST(address_base, inequality_2) {
     EXPECT_LT(a,b);
 
     EXPECT_GT(b,a);
+
 }
 
 TEST(distance_xor_compute, identity_random) {
@@ -68,10 +69,20 @@ TEST(distance_xor_compute, extremes) {
 
     AddressDistance d = a.xorDistanceTo(b);
 
-    EXPECT_EQ(d.data[0],UINT32_MAX);
-    EXPECT_EQ(d.data[1],UINT32_MAX);
-    EXPECT_EQ(d.data[2],UINT32_MAX);
-    EXPECT_EQ(d.data[3],UINT32_MAX);
+    for (int i = 0; i < 16; i++) {
+        EXPECT_EQ(d.data[i],UINT8_MAX);
+    }
+}
+
+TEST(distance_xor_compute, short_matching_prefix) {
+
+    Address a = Address::fromString("0F00:0000:0000:0000:0000:0000:0000:0000");
+
+    Address b = Address::fromString("0FeF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF");
+
+    AddressDistance d = a.xorDistanceTo(b);
+
+    EXPECT_EQ(8, d.getMatchingPrefixLength());
 }
 
 TEST(distance_xor_compute, extremes_order) {
@@ -83,11 +94,14 @@ TEST(distance_xor_compute, extremes_order) {
     AddressDistance d = a.xorDistanceTo(b);
 
     EXPECT_EQ(64, d.getDifferingBits());
+    EXPECT_EQ(0, d.getMatchingPrefixLength());
 
-    EXPECT_EQ(d.data[0],UINT32_MAX);
-    EXPECT_EQ(d.data[1],UINT32_MAX);
-    EXPECT_EQ(d.data[2],0);
-    EXPECT_EQ(d.data[3],0);
+    for (int i = 0; i < 8; i++) {
+        EXPECT_EQ(d.data[i],UINT8_MAX);
+    }
+    for (int i = 8; i < 16; i++) {
+        EXPECT_EQ(d.data[i],0);
+    }
 }
 
 TEST(address,map_of_addresses) {
@@ -103,8 +117,6 @@ TEST(address,map_of_addresses) {
 
     for (int i = 0; i < 10; ++i) {
         auto itr = addressesMap.find(addresses[i]);
-
-
 
         EXPECT_FALSE(itr == addressesMap.end());
         EXPECT_EQ(i, itr->second);
