@@ -5,6 +5,7 @@
 #ifndef GEOMESH_SCHEDULER_H
 #define GEOMESH_SCHEDULER_H
 
+#include <iostream>
 #include <vector>
 #include <chrono>
 #include <functional>
@@ -55,6 +56,7 @@ private:
 public:
 
     Scheduler(bool async) {
+	    stop = false;
         if (async) {
             asyncThread = new std::thread([&](){
                 while (!stop) {
@@ -75,41 +77,9 @@ public:
         }
     }
 
-    void scheduleTask(const Task& task) {
-        if (updating) {
-            toAdd.push_back(task);
-        } else {
-            tasks.push_back(task);
-        }
-    }
+    void scheduleTask(const Task& task); 
 
-    void update() {
-
-        assert(!updating); // Prevent updateception
-
-        updating = true;
-
-        time_point now = std::chrono::system_clock::now();
-
-        duration delta = lastUpdate - now;
-
-        for (auto itr = tasks.begin(); itr != tasks.end(); ++itr) {
-            if (itr->planned <= now) {
-                itr->callback(now, delta, *itr);
-
-                if (itr->repeats) {
-                    itr->planned += itr->interval;
-                } else {
-                    itr = tasks.erase(itr);
-                }
-            }
-        }
-
-        tasks.insert(tasks.end(), toAdd.begin(), toAdd.end());
-        toAdd.clear();
-
-        updating = false;
-    }
+    void update();
 
 };
 
