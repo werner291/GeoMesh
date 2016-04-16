@@ -2,6 +2,7 @@
 // Created by Werner Kroneman on 06-04-16.
 //
 
+#include <unistd.h>
 #include "Scheduler.hpp"
 
 void Scheduler::scheduleTask(const Task& task) {
