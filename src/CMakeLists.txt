@@ -15,6 +15,13 @@ add_library(core ${CORE_SRC})
 set_property(TARGET core PROPERTY CXX_STANDARD 11)
 set_property(TARGET core PROPERTY CXX_STANDARD_REQUIRED ON)
 
+set(Boost_USE_STATIC_LIBS OFF) 
+set(Boost_USE_MULTITHREADED ON)  
+set(Boost_USE_STATIC_RUNTIME OFF) 
+find_package(Boost COMPONENTS program_options REQUIRED) 
+
+    include_directories(${Boost_INCLUDE_DIRS}) 
+
 IF (BUILD_SIMULATOR)
     FIND_LIBRARY(FLTK_LIBRARY_GL fltk_gl /opt/local/lib)
     FIND_LIBRARY(FLTK_LIBRARY fltk /opt/local/lib)
@@ -45,7 +52,8 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 ENDIF ()
 
 add_library(daemon_core ${DAEMON_SRC})
-TARGET_LINK_LIBRARIES(daemon_core core)
+
+TARGET_LINK_LIBRARIES(daemon_core core ${Boost_LIBRARIES})
 
 add_executable(geomeshd geomeshd/GeoMeshd_main.cpp)
 
@@ -55,4 +63,4 @@ set_property(TARGET daemon_core PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET geomeshd PROPERTY CXX_STANDARD 11)
 set_property(TARGET geomeshd PROPERTY CXX_STANDARD_REQUIRED ON)
 
-TARGET_LINK_LIBRARIES(geomeshd core daemon_core)# LIBRARY_asio)
+TARGET_LINK_LIBRARIES(geomeshd core daemon_core )
