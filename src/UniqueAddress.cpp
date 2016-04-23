@@ -28,7 +28,27 @@ Address Address::generateRandom() { // TODO use keypair for generating addresses
     return blank;
 }
 
-Address Address::fromString(std::string str) {
+Address Address::generateFromKeys(const KeyPair& keys) {
+
+    std::vector<uint8_t> pubkey = keys.getPublicKeyAsBytes();
+
+    
+    auto firstHash = simpleSHA256(pubkey.data(),pubkey.size());
+
+    auto secondHash = simpleSHA256(firstHash.data(), firstHash.size());
+   
+    uint8_t addrBytes[ADDRESS_LENGTH_OCTETS];
+
+    addrBytes[0] = 0xfc;
+    addrBytes[1] = 0xf4;
+
+    memcpy(addrBytes + 2, secondHash.data(), ADDRESS_LENGTH_OCTETS - 2);
+
+    return Address::fromBytes(addrBytes);
+
+}
+
+Address Address::fromString(const std::string& str) {
     struct in6_addr ipv6data;
     inet_pton(AF_INET6, str.c_str(), &ipv6data);
 

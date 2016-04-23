@@ -3,13 +3,37 @@ project(MeshnetSim)
 
 include_directories(/opt/local/include)
 
-set(CORE_SRC AbstractInterface.cpp Router.cpp Location.cpp Logger.cpp LinkManager.cpp LocalInterface.cpp
-        UniqueAddress.cpp Packet.cpp LocationLookupManager.cpp GreedyRoutingTable.cpp
-        my_htonll.cpp VirtualLocationManager.cpp LocalPacketHandler.cpp AbstractInterface.hpp Router.hpp Location.hpp
-        Logger.hpp LinkManager.hpp LocalInterface.hpp ContactsSet.cpp ContactsSet.hpp
-        UniqueAddress.hpp Packet.cpp LocationLookupManager.hpp GreedyRoutingTable.hpp
-        my_htonll.hpp VirtualLocationManager.hpp LocalPacketHandler.hpp
-        Scheduler.cpp Scheduler.hpp)
+set(CORE_SRC 
+    AbstractInterface.cpp 
+    Router.cpp Location.cpp
+    Logger.cpp
+    LinkManager.cpp
+    LocalInterface.hpp
+    LocalInterface.cpp
+    UniqueAddress.hpp
+    UniqueAddress.cpp
+    Packet.hpp
+    Packet.cpp
+    VirtualLocationManager.hpp
+    LocationLookupManager.cpp
+    GreedyRoutingTable.hpp
+    GreedyRoutingTable.cpp
+    my_htonll.cpp
+    VirtualLocationManager.cpp
+    LocalPacketHandler.hpp
+    LocalPacketHandler.cpp
+    AbstractInterface.hpp
+    Router.hpp
+    Location.hpp
+    Logger.hpp
+    LinkManager.hpp 
+    ContactsSet.cpp
+    ContactsSet.hpp
+    LocationLookupManager.hpp
+    my_htonll.hpp
+    Crypto.h Crypto.cpp
+    Scheduler.cpp Scheduler.hpp)
+
 add_library(core ${CORE_SRC})
 
 set_property(TARGET core PROPERTY CXX_STANDARD 11)
@@ -21,6 +45,8 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost COMPONENTS program_options REQUIRED) 
 
     include_directories(${Boost_INCLUDE_DIRS}) 
+
+
 
 IF (BUILD_SIMULATOR)
     FIND_LIBRARY(FLTK_LIBRARY_GL fltk_gl /opt/local/lib)
