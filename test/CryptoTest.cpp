@@ -1,3 +1,4 @@
+#include <memory>
 #include <gtest/gtest.h>
 #include "../src/Crypto.h"
 #include "../src/UniqueAddress.hpp"
@@ -7,11 +8,10 @@ TEST(crypto, address_crypto) {
     std::cout << "Generating 500 addresses to see if they're unique." << std::endl;
 
     std::set<Address> addresses;
-
     for (int i = 0; i < 500; i++) {
         
         if (i % 10 == 0) {
-            std::cout << (i/5) << "%" << std::endl;
+            std::cout << '\r' << (i/5) << "% " << std::flush;
         }
 
         auto keys = KeyPair::generateNewKeypair(2048);
@@ -21,6 +21,8 @@ TEST(crypto, address_crypto) {
         ASSERT_EQ(addresses.end(), addresses.find(addr));
         addresses.insert(addr);
     }
+
+    std::cout << std::endl;
 
 }
 
