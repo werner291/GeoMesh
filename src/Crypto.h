@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <vector>
 #include <array>
+#include <memory>
 
 /**
  * Calculate the SHA256 of the {@code input}
