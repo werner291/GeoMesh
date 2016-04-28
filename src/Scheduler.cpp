@@ -19,7 +19,7 @@ void Scheduler::update() {
 
         updating = true;
 
-        time_point now = std::chrono::system_clock::now();
+        time_point now = clock::now();
 
         duration delta = lastUpdate - now;
 

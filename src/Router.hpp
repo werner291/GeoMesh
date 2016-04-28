@@ -10,7 +10,6 @@
 #include "LocalInterface.hpp"
 #include "LinkManager.hpp"
 #include "UniqueAddress.hpp"
-#include "LocationLookupManager.hpp"
 #include "GreedyRoutingTable.hpp"
 #include "LocalPacketHandler.hpp"
 
@@ -48,24 +47,15 @@ private:
 
     LinkManager linkMgr;
 
-    GreedyRoutingTable greedyRoutingTable;
+    GreedyRoutingTable& greedyRoutingTable;
 
     std::set<DirectionalEntry> mFaceRoutingTable;
 
     std::map<Address, LocalRoutingTableEntry> mLocalRoutingTable;
 
-    LocationLookupManager dhtRoutingTable;
-
     std::queue<PacketPtr> routingQueue;
 
 public:
-    GreedyRoutingTable &getGreedyRoutingTable() {
-        return greedyRoutingTable;
-    }
-
-    LocationLookupManager &getDhtRoutingTable() {
-        return dhtRoutingTable;
-    }
 
     LinkManager& getLinkManager() {
         return linkMgr;
@@ -75,7 +65,7 @@ public:
         return uniqueaddress;
     }
 
-    Router(Address uniqueaddress, Location location);
+    Router(Address uniqueaddress, Location location, GreedyRoutingTable& greedyRoutingTable);
 
     ~Router() {
     }

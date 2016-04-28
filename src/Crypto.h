@@ -1,3 +1,22 @@
+/*
+ * (c) Copyright 2016 Werner Kroneman
+ *
+ * This file is part of GeoMesh.
+ * 
+ * GeoMesh is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * GeoMesh is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with GeoMesh.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef GEOMESH_CRYPTO_H
 #define GEOMESH_CRYPTO_H
 
@@ -5,12 +24,14 @@
 #include <openssl/bio.h>
 #include <openssl/sha.h>
 #include <openssl/evp.h>
+#include <openssl/pem.h>
 
 #include <exception>
 #include <assert.h>
 #include <vector>
 #include <array>
 #include <memory>
+#include <string>
 
 /**
  * Calculate the SHA256 of the {@code input}
@@ -96,6 +117,18 @@ class KeyPair {
         std::unique_ptr<KeyPair> keys(new KeyPair());
 
         RSA_generate_key_ex(keys->rsa, length, keys->ex, nullptr);
+
+        return keys;
+    }
+
+    static std::unique_ptr<KeyPair> fromPemString(const std::string &pemString) {
+        std::unique_ptr<KeyPair> keys(new KeyPair());
+
+        BIO *bio = BIO_new_mem_buf(pemString.data(), pemString.length());
+
+        RSA_free(keys->rsa);
+
+        keys->rsa = PEM_read_bio_RSAPrivateKey(bio, nullptr, nullptr, nullptr);
 
         return keys;
     }

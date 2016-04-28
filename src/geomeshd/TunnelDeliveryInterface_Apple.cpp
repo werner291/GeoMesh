@@ -9,6 +9,7 @@
 #include <sys/ioctl.h>
 #include <sys/un.h>
 #include <regex>
+#include <unistd.h>
 #include <errno.h>
 #include "TunnelDeliveryInterface_Apple.hpp"
 #include "../Logger.hpp"

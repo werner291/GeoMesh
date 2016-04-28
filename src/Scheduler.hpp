@@ -16,10 +16,12 @@ class Scheduler {
 
 public:
 
+    typedef std::chrono::steady_clock clock;
+
     struct Task;
 
-    typedef std::chrono::system_clock::time_point time_point;
-    typedef std::chrono::system_clock::duration duration;
+    typedef clock::time_point time_point;
+    typedef clock::duration duration;
     typedef std::function<void (time_point currentTime, duration delta, Task& task)> TaskCallback;
 
     struct Task {
@@ -61,7 +63,7 @@ public:
             asyncThread = new std::thread([&](){
                 while (!stop) {
                     update();
-                    usleep(100);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
                 }
             });
         } else {

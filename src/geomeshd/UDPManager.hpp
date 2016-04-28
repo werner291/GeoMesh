@@ -7,6 +7,7 @@
 
 #include "../LinkManager.hpp"
 #include "UDPInterface.hpp"
+#include "../Scheduler.hpp"
 #include <string>
 #include <string.h>
 
@@ -38,7 +39,7 @@ class UDPManager {
     bool sendMessage(PacketPtr message, UDPInterface* iFace);
 
 public:
-    UDPManager(LinkManager &linkMgr, int localPort);
+    UDPManager(LinkManager &linkMgr, int localPort, Scheduler& scheduler);
 
     /**
      * Send a UDP bridge hello packet to the specified address and port,

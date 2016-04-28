@@ -6,12 +6,15 @@ enable_testing()
 
 add_subdirectory(googletest)
 
+
+    FIND_PACKAGE(OpenSSL REQUIRED)
+
 # Core-only tests
 
-set(core_test_SRCS Location_test.cpp Packet_test.cpp Address_test.cpp ContactsSetTest.cpp DHTTest.cpp Scheduler_test.cpp)
+set(core_test_SRCS Location_test.cpp Packet_test.cpp Address_test.cpp ContactsSetTest.cpp DHTTest.cpp Scheduler_test.cpp CryptoTest.cpp)
 
 add_executable(runCoreTests gtest.cpp ${core_test_SRCS})
-target_link_libraries(runCoreTests gtest gmock core)
+target_link_libraries(runCoreTests gtest gmock core ${OPENSSL_CRYPTO_LIBRARY})
 
 set_property(TARGET runCoreTests PROPERTY CXX_STANDARD 11)
 set_property(TARGET runCoreTests PROPERTY CXX_STANDARD_REQUIRED ON)

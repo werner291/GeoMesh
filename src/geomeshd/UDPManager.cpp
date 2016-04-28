@@ -10,7 +10,7 @@
 #include <time.h>
 #include "UDPManager.hpp"
 
-UDPManager::UDPManager(LinkManager& linkMgr, int localPort) : linkMgr(linkMgr) {
+UDPManager::UDPManager(LinkManager& linkMgr, int localPort, Scheduler& scheduler) : linkMgr(linkMgr) {
 
     socketID = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -28,11 +28,20 @@ UDPManager::UDPManager(LinkManager& linkMgr, int localPort) : linkMgr(linkMgr) {
     }
 
     // Enable non-blocking IO.
+    // TODO use some kind of centralized system that allows me to use select() on UNIX-like systems
     int flags = fcntl(socketID, F_GETFL, 0);
     fcntl(socketID, F_SETFL, flags | O_NONBLOCK);
+
+    scheduler.scheduleTask(Scheduler::Task(Scheduler::clock::now(),
+                       std::chrono::milliseconds(10),
+                       true,
+                       std::bind(&UDPManager::pollMessages,this)));
+
 }
 
 void UDPManager::connectTo(std::string address, int port) {
+
+    Logger::log(LogLevel::INFO, "Connecting to UDP peer at " + address + " port " + std::to_string(port));
 
     // Allocate the interface
     std::shared_ptr<UDPInterface> iface(new UDPInterface(this));
@@ -86,8 +95,6 @@ void UDPManager::pollMessages() {
 
         uint16_t protVersion = ntohs(((uint16_t *) buffer)[0]);
         uint16_t localIface = ntohs(((uint16_t *) buffer)[1]);
-
-        Logger::log(LogLevel::DEBUG, "Received UDP datagram for iFace " + std::to_string(localIface));
 
         if (localIface == 0) {
             // This is a message directed at the UDPManager

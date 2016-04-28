@@ -36,6 +36,10 @@ set(CORE_SRC
 
 add_library(core ${CORE_SRC})
 
+
+FIND_PACKAGE(OpenSSL REQUIRED)
+target_link_libraries(core ${OPENSSL_CRYPTO_LIBRARY})
+
 set_property(TARGET core PROPERTY CXX_STANDARD 11)
 set_property(TARGET core PROPERTY CXX_STANDARD_REQUIRED ON)
 

@@ -274,12 +274,12 @@ bool Router::routeFaceRelay(PacketPtr data, int fromIface, Location destination)
     }
 }
 
-Router::Router(Address uniqueaddress, Location location) :
+Router::Router(Address uniqueaddress, Location location, GreedyRoutingTable& greedyRoutingTable) :
         uniqueaddress(uniqueaddress),
         locationMgr(location),
         localHandler(locationMgr, uniqueaddress, std::bind(&Router::handleMessage, this, std::placeholders::_1, 0)),
         linkMgr(std::bind(&Router::handleMessage, this, std::placeholders::_1, std::placeholders::_2)),
-        dhtRoutingTable(localHandler,uniqueaddress,locationMgr) {
+        greedyRoutingTable(greedyRoutingTable) {
 
     linkMgr.addLinkListener([this](std::shared_ptr<AbstractInterface> iFace, LinkEvent event) {
 

@@ -1,0 +1,8 @@
+- Location lookup DHT
+- Daemonisation
+- Ethernet / Raw sockets
+- Web admin interface
+- RPC interface
+- config file (and loader)
+- Vitrual location algorithm 
+
