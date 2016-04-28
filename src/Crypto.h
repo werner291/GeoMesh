@@ -124,7 +124,9 @@ class KeyPair {
     static std::unique_ptr<KeyPair> fromPemString(const std::string &pemString) {
         std::unique_ptr<KeyPair> keys(new KeyPair());
 
-        BIO *bio = BIO_new_mem_buf(pemString.data(), pemString.length());
+        BIO *bio = BIO_new(BIO_s_mem());
+
+        BIO_puts(bio, pemString.c_str());
 
         RSA_free(keys->rsa);
 
