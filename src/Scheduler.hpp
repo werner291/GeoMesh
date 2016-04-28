@@ -61,9 +61,9 @@ public:
 	    stop = false;
         if (async) {
             asyncThread = new std::thread([&](){
+                std::this_thread::sleep_until(lastUpdate + std::chrono::milliseconds(10));
                 while (!stop) {
                     update();
-                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
                 }
             });
         } else {
