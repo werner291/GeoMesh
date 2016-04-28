@@ -13,16 +13,16 @@ TEST(scheduler_test, test_sync) {
 
     int calls = 0;
 
-    sched.scheduleTask(Scheduler::Task(system_clock::now() + milliseconds(10), milliseconds(10), true,
+    sched.scheduleTask(Scheduler::Task(Scheduler::clock::now() + milliseconds(10), milliseconds(10), true,
                                        [&](Scheduler::time_point time, Scheduler::duration delta,
                                            Scheduler::Task &task) {
                                            calls++;
 
-                                           ASSERT_TRUE(time - system_clock::now() < milliseconds(1)
-                                                       && system_clock::now() - time < milliseconds(1));
+                                           ASSERT_TRUE(time - Scheduler::clock::now() < milliseconds(1)
+                                                       && Scheduler::clock::now() - time < milliseconds(1));
                                        }));
 
-    Scheduler::time_point start = system_clock::now();
+    Scheduler::time_point start = Scheduler::clock::now();
 
     const int ITERATIONS = 500;
 
@@ -34,7 +34,7 @@ TEST(scheduler_test, test_sync) {
 
     }
 
-    Scheduler::duration elapsed = system_clock::now() - start;
+    Scheduler::duration elapsed = Scheduler::clock::now() - start;
 
     int milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
 
@@ -49,7 +49,7 @@ TEST(scheduler_test, test_async) {
 
     calls = 0;
 
-    sched.scheduleTask(Scheduler::Task(system_clock::now() + milliseconds(10), milliseconds(10), true,
+    sched.scheduleTask(Scheduler::Task(Scheduler::clock::now() + milliseconds(10), milliseconds(10), true,
                                        [&](Scheduler::time_point time, Scheduler::duration delta,
                                            Scheduler::Task &task) {
                                            if (calls == -1) {
@@ -57,16 +57,16 @@ TEST(scheduler_test, test_async) {
                                            } else {
                                                calls++;
 
-                                               ASSERT_TRUE(time - system_clock::now() < milliseconds(1)
-                                                           && system_clock::now() - time < milliseconds(1));
+                                               ASSERT_TRUE(time - Scheduler::clock::now() < milliseconds(1)
+                                                           && Scheduler::clock::now() - time < milliseconds(1));
                                            }
                                        }));
 
-    Scheduler::time_point start = system_clock::now();
+    Scheduler::time_point start = Scheduler::clock::now();
 
     std::this_thread::sleep_for(milliseconds(5000));
 
-    Scheduler::duration elapsed = system_clock::now() - start;
+    Scheduler::duration elapsed = Scheduler::clock::now() - start;
 
     int milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
 
