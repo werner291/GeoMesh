@@ -94,6 +94,14 @@ private:
 
 public:
 
+    /**
+     * Create a new Scheduler.
+     *
+     * @param async Whether to start a thread in the background and call tasks
+     *              automatically (please be careful about synchronisation).
+     *              If not, you will have to call the update() function at a
+     *              regular interval.
+     */
     Scheduler(bool async) {
 	    stop = false;
         if (async) {
@@ -101,6 +109,7 @@ public:
                 std::this_thread::sleep_until(lastUpdate + std::chrono::milliseconds(10));
                 while (!stop) {
                     update();
+                    
                 }
             });
         } else {
