@@ -37,6 +37,9 @@
  *    Call scheduleTask() to add a new task.
  * If using synchronously, the update() function must be called at a regular interval.
  * If using async, the callbacks will be called from another thread.
+ *
+ * Note: The scheduler checks for events to be executed every time update() is called.
+ *       If it is called asynchronously, it is updated every 10 ms.
  */
 class Scheduler {
 

@@ -35,9 +35,7 @@ namespace po = boost::program_options;
 #include "TunnelDeliveryInterface_Linux.hpp"
 #endif
 #ifdef __APPLE__
-
 #include "TunnelDeliveryInterface_Apple.hpp"
-
 #endif
 
 #include "../UniqueAddress.hpp"
@@ -45,7 +43,6 @@ namespace po = boost::program_options;
 #include "UDPManager.hpp"
 #include "../Router.hpp"
 #include "../Scheduler.hpp"
-#include <regex>
 
 #define DEFAULT_CONFIG_NODAEMON "geomesh.json"
 #define DEFAULT_CONFIG_DAEMON "/etc/geomesh.json"
@@ -67,46 +64,46 @@ bool usingSyslog = false;
 bool running = true;
 
 void enableSyslogStrategy() {
-setlogmask(LOG_UPTO (LOG_NOTICE));
-openlog("geomeshd", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
+    setlogmask(LOG_UPTO (LOG_NOTICE));
+    openlog("geomeshd", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
 
-Logger::setLogStrategy([](const LogLevel level, const std::string &string) {
-switch (level) {
-default:
-syslog(LOG_NOTICE, "%s", string.c_str());
-break;
-}
-});
+    Logger::setLogStrategy([](const LogLevel level, const std::string &string) {
+        switch (level) {
+            default:
+                syslog(LOG_NOTICE, "%s", string.c_str());
+            break;
+        }
+    });
 
-usingSyslog = true;
+    usingSyslog = true;
 }
 
 void signalReceived(int signal) {
 
-std::cout << "Received signal: " << signal << std::endl;
+    std::cout << "Received signal: " << signal << std::endl;
 
 }
 
 void generateConfigurationFile(const std::string &path) {
-std::cout << "Generating default config file at path: " << path << std::endl;
+    std::cout << "Generating default config file at path: " << path << std::endl;
 
-//KeyPair keys = generateKeyPair();
+    //KeyPair keys = generateKeyPair();
 
-//Address address = Address::fromPublicKey(keys.pubKey);
+    //Address address = Address::fromPublicKey(keys.pubKey);
 
-ofstream genCfg(path);
+    ofstream genCfg(path);
 
-if (!genCfg.is_open()) {
-throw runtime_error("Cannot write to file: " + path);
-}
+    if (!genCfg.is_open()) {
+        throw runtime_error("Cannot write to file: " + path);
+    }
 
-genCfg << "udp_peers = []" << std::endl;
-genCfg << "udp_port = 10976" << std::endl;
-genCfg << "udp_bridge_enable = 1" << std::endl;
-//genCfg << "address_key = " << keys.privKey.toBase64() << std::endl;
-genCfg << "ethernet_autoconnect = 1" << std::endl;
-genCfg.flush();
-genCfg.close();
+    genCfg << "udp_peers = []" << std::endl;
+    genCfg << "udp_port = 10976" << std::endl;
+    genCfg << "udp_bridge_enable = 1" << std::endl;
+    //genCfg << "address_key = " << keys.privKey.toBase64() << std::endl;
+    genCfg << "ethernet_autoconnect = 1" << std::endl;
+    genCfg.flush();
+    genCfg.close();
 }
 
 void daemonize() {
@@ -114,18 +111,19 @@ void daemonize() {
 pid_t pid = fork();
 
 if (pid > 0) {
-// Parent process
+    // Parent process
 
-std::cout << "Daemon forked to background successfully!" << std::endl;
-std::cout << "Child process ad PID: " << pid << std::endl;
+    std::cout << "Daemon forked to background successfully!" << std::endl;
+    std::cout << "Child process ad PID: " << pid << std::endl;
 
-exit(0);
+    exit(0);
 } else if (pid < 0) {
-std::cout << "Fork failed!" << std::endl;
+    std::cout << "Fork failed!" << std::endl;
+    exit(1);
 } else {
 // This is the child process, continue daemonization (TODO)
 
-enableSyslogStrategy();
+    enableSyslogStrategy();
 }
 
 umask(0);
@@ -147,7 +145,7 @@ int main(int argc, char **argv) {
     
     std::cout << "(c) Copyright 2016 Werner Kroneman" << std::endl
         << "This program was written in the hope that it would be useful, but comes with ABSOLUTELY NO WARRANTY!" << std::endl
-        << "This program is free software licenced under the GNU GPLv3 licence. See the LICENCE file you should have received with the software." << std::endl;
+        << "This program is free software license under the GNU GPLv3 license. See the LICENSE file you should have received with the software." << std::endl;
 
     // Register signal handlers
     
@@ -220,6 +218,7 @@ int main(int argc, char **argv) {
     if (!configFile.is_open()) {
         std::cout << "Config file " << vm["config"].as<std::string>() << " not found. Exiting." << std::endl;
         std::cout << "Use " << argv[0] << " --genconf [filepath] to generate a default configuration file." << std::endl;
+        return 1;
     }
 
     if (vm["daemon"].as<bool>()) {
