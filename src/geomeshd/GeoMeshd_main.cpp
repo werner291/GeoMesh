@@ -1,4 +1,5 @@
 /*
+ *
  * (c) Copyright 2016 Werner Kroneman
  *
  * This file is part of GeoMesh.
@@ -236,6 +237,8 @@ int main(int argc, char **argv) {
 
         generateConfigFile(path);
 
+        std::cout << "Done!" << std::endl;
+
         return 0;
     }
 
@@ -268,15 +271,7 @@ int main(int argc, char **argv) {
 
     std::string stringKey = vm["address_key"].as<std::string>();
 
-    std::cout << stringKey << std::endl;
-
-    AddressPrivateKey key;
-    Base64Decoder decoder;
-    
-    decoder.Put((byte*)stringKey.c_str(),stringKey.length());
-    decoder.MessageEnd();
-
-    key.BERDecodePrivateKey(decoder, false, 0);
+    AddressPrivateKey key = privateKeyFromString(stringKey);
 
     AddressPublicKey pubKey;
     key.MakePublicKey(pubKey);
@@ -332,23 +327,27 @@ int main(int argc, char **argv) {
 
         // Iterate over all the peers specified in the onfig file and try to connect to them.
         for (const std::string& peer : vm["udp_peers"].as<std::vector<std::string> >()) {
-            std::regex regex("([0-9]+.[0-9]+.[0-9]+.[0-9]+):([0-9]+)");
 
-            std::smatch results;
+            if (! peer.empty()) {
 
-            if (regex_match(peer, results, regex)) {
-                std::string address = results[0];
-                int port = std::stoi(results[1].str());
+                std::regex regex("([0-9]+.[0-9]+.[0-9]+.[0-9]+):([0-9]+)");
 
-                udpManager->connectTo(address,port);
-            } else {
-                std::cout << "Invalid peer address: " << peer
-                          << ", must be in x.x.x.x:port format for IPv4, and in [...]:port format for IPv6 (unimplemented)."
-                          << std::endl;
+                std::smatch results;
 
-                exit(1); // TODO Problematic if already daemonized, need to do validation early on
+                if (regex_match(peer, results, regex)) {
+                    std::string address = results[0];
+                    int port = std::stoi(results[1].str());
+
+                    udpManager->connectTo(address,port);
+                } else {
+                    std::cout << "Invalid peer address: " << peer
+                              << ", must be in x.x.x.x:port format for IPv4, and in [...]:port format for IPv6 (unimplemented)."
+                              << std::endl;
+
+                    exit(1); // TODO Problematic if already daemonized, need to do validation early on
+                }
+
             }
-
         }
 
     }
