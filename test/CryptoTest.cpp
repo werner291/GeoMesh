@@ -1,60 +1,51 @@
-#include <memory>
+#include "../src/Logger.hpp"
+#include <cryptopp/base64.h>
+#include <cryptopp/hex.h>
+#include <cryptopp/eccrypto.h>
+#include <cryptopp/filters.h>
+#include <cryptopp/osrng.h>
+#include <cryptopp/asn.h>
+#include <cryptopp/oids.h>
+#include <iostream>
+#include <fstream>
+#include <exception>
 #include <gtest/gtest.h>
 #include "../src/Crypto.h"
 #include "../src/UniqueAddress.hpp"
 
-TEST(crypto, address_crypto) {
 
-    std::cout << "Generating 500 addresses to see if they're unique." << std::endl;
+using namespace CryptoPP;
+using namespace std;
 
-    std::set<Address> addresses;
-    for (int i = 0; i < 500; i++) {
-        
-        if (i % 10 == 0) {
-            std::cout << '\r' << (i/5) << "% " << std::flush;
-        }
 
-        auto keys = KeyPair::generateNewKeypair(2048);
+TEST(crypto, encode_decode_cycle_1) {
 
-        Address addr = Address::generateFromKeys(*keys);
+    AutoSeededRandomPool rng;
 
-        ASSERT_EQ(addresses.end(), addresses.find(addr));
-        addresses.insert(addr);
-    }
+    AddressPrivateKey privateKey = generateAddressKey();
 
-    std::cout << std::endl;
+    std::string keyString = privateKeyToString(privateKey);
+    
+    std::cout << keyString << std::endl;
+
+    AddressPrivateKey key = privateKeyFromString(keyString);
+
+   EXPECT_EQ(privateKey.GetPrivateExponent(), key.GetPrivateExponent());
 
 }
 
-TEST(crypto, sha256) {
+TEST(crypto, encode_decode_cycle) {
 
-    std::string testString = "The quick brown fox jumped over the lazy dog.";
+    AutoSeededRandomPool rng;
 
-    std::string expected = "68b1282b91de2c054c36629cb8dd447f12f096d3e3c587978dc2248444633483";
+    AddressPrivateKey privateKey = generateAddressKey();
 
-    auto hash = simpleSHA256(testString.data(), testString.length());
+    std::string keyString = privateKeyToString(privateKey);
+    
+    std::cout << keyString << std::endl;
 
-    std::stringstream result;
+    AddressPrivateKey key = privateKeyFromString(keyString);
 
-result << std::hex;
-
-    for (int i = 0; i < 32; i++) {
-        result << (hash[i] >> 4);
-        result << (hash[i] & 15);
-    }
-
-    EXPECT_EQ(expected, result.str());
-}
-
-TEST(crypto, sign_and_verify) {
-
-   auto keys = KeyPair::generateNewKeypair(2048);
-   
-   std::string testString = "The quick brown fox jumped over the lazy dog.";
-
-   auto signature = keys->sign((uint8_t*)testString.c_str(), testString.length());
-
-   EXPECT_TRUE(keys->verify((uint8_t*)testString.c_str(), testString.length(), (uint8_t*) signature.data(), signature.size()));
+   EXPECT_EQ(privateKey.GetPrivateExponent(), key.GetPrivateExponent());
 
 }
-

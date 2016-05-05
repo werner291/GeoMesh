@@ -1,18 +1,47 @@
 #include "Crypto.h"
 
-std::array<uint8_t,32> simpleSHA256(const void* input, unsigned long length)
-{
-    std::array<uint8_t,32> hash;
+using namespace std;
+using namespace CryptoPP;
 
-        SHA256_CTX context;
-        if(!SHA256_Init(&context))
-            throw std::runtime_error("Error while initializing SHA256 context.");
+AddressPrivateKey generateAddressKey() {
+    AutoSeededRandomPool rng;
 
-        if(!SHA256_Update(&context, (unsigned char*)input, length))
-            throw std::runtime_error("Error while initializing SHA256 context.");
+    AddressPrivateKey privateKey;
+    // TODO Try so understand what secp60r1() exactly means.
+    privateKey.Initialize( rng, ASN1::secp256r1()  );
+    bool result = privateKey.Validate( rng, 3  );
 
-        if(!SHA256_Final(hash.data(), &context))
-            throw std::runtime_error("Error while initializing SHA256 context.");
-        
-        return hash;
+    if (! result) {
+        throw runtime_error("Error while generating private address key: failed validation.");
+    }
+    return privateKey;
+}
+
+
+std::string privateKeyToString(const AddressPrivateKey& pKey) {
+    std::string keyString;
+    Base64Encoder encoder(new StringSink(keyString));
+
+    const Integer& exponent = pKey.GetPrivateExponent();
+
+    exponent.Encode(encoder, 32, Integer::UNSIGNED);
+
+    encoder.MessageEnd();
+
+    return keyString;
+}
+
+AddressPrivateKey privateKeyFromString(const std::string& keyString){
+    Base64Decoder decoder;
+    
+    decoder.Put((byte*)keyString.c_str(),keyString.length());
+    decoder.MessageEnd();
+
+    Integer privateExponent;
+    privateExponent.Decode(decoder, 32);
+    AddressPrivateKey key;
+    key.AccessGroupParameters().Initialize(CryptoPP::ASN1::secp256k1());
+    key.SetPrivateExponent(privateExponent);
+
+    return key;
 }

@@ -6,11 +6,9 @@ enable_testing()
 
 add_subdirectory(googletest)
 
-
-
 # Core-only tests
 
-set(core_test_SRCS Location_test.cpp Packet_test.cpp Address_test.cpp ContactsSetTest.cpp DHTTest.cpp Scheduler_test.cpp CryptoTest.cpp)
+set(core_test_SRCS CryptoTest2.cpp Location_test.cpp Packet_test.cpp Address_test.cpp ContactsSetTest.cpp DHTTest.cpp Scheduler_test.cpp)
 
 add_executable(runCoreTests gtest.cpp ${core_test_SRCS})
 target_link_libraries(runCoreTests gtest gmock core )

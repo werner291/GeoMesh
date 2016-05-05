@@ -28,8 +28,20 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <cryptopp/base64.h>
+#include <cryptopp/eccrypto.h>
+#include <cryptopp/filters.h>
+#include <cryptopp/osrng.h>
+#include <cryptopp/asn.h>
+#include <cryptopp/oids.h>
+
 using namespace std;
+using namespace CryptoPP;
 namespace po = boost::program_options;
+
+#include "../Crypto.h"
+
+#include "genconf.h"
 
 #ifdef __linux__
 #include "TunnelDeliveryInterface_Linux.hpp"
@@ -84,27 +96,6 @@ void signalReceived(int signal) {
 
 }
 
-void generateConfigurationFile(const std::string &path) {
-    std::cout << "Generating default config file at path: " << path << std::endl;
-
-    //KeyPair keys = generateKeyPair();
-
-    //Address address = Address::fromPublicKey(keys.pubKey);
-
-    ofstream genCfg(path);
-
-    if (!genCfg.is_open()) {
-        throw runtime_error("Cannot write to file: " + path);
-    }
-
-    genCfg << "udp_peers = []" << std::endl;
-    genCfg << "udp_port = 10976" << std::endl;
-    genCfg << "udp_bridge_enable = 1" << std::endl;
-    //genCfg << "address_key = " << keys.privKey.toBase64() << std::endl;
-    genCfg << "ethernet_autoconnect = 1" << std::endl;
-    genCfg.flush();
-    genCfg.close();
-}
 
 void daemonize() {
 
@@ -143,45 +134,77 @@ int main(int argc, char **argv) {
 
     // Cover our asses
     
-    std::cout << "(c) Copyright 2016 Werner Kroneman" << std::endl
-        << "This program was written in the hope that it would be useful, but comes with ABSOLUTELY NO WARRANTY!" << std::endl
-        << "This program is free software license under the GNU GPLv3 license. See the LICENSE file you should have received with the software." << std::endl;
+    std::cout << "(c) Copyright 2016 Werner Kroneman. This program was written"
+        << " in the hope that it would be useful, but comes with ABSOLUTELY NO"
+        << " WARRANTY! This program is free software licensed under the GNU"
+        << " GPLv3 license. See the LICENSE file you should have received with"
+        << " the software." << std::endl;
 
     // Register signal handlers
     
-    signal(SIGINT, &signalReceived);
+    //signal(SIGINT, &signalReceived);
 
     po::options_description config_options("GeoMesh configuration");
     config_options.add_options()
-            ("udp_peers", po::value<std::vector<std::string> >()->multitoken(),
-             "List of UDP peers in IPAddress:Port format.")
-            ("udp_port", po::value<int>()->default_value(10976), "UDP port on which to listen for UDP bridge packets.")
-            ("udp_bridge_enable", po::value<bool>()->default_value(true), "Whether to enable the UDP bridge.")
-            ("address_key", "A base64-encoded private key used to generate a public key and an address."
-                    " The generated address will be printed at startup."
-                    " Note: keep this key secure, or others will be able to impersonate you on the network!"
-                    " Also: GeoMesh only uses keys for a very limited form of authentication, messages are sent in cleartext!"
-                    " Use software like SSL to keep your data secure!")
-            ("ethernet_autoconnect", po::value<bool>()->default_value(true),
-             "Whether to automatically connect to other GeoMesh nodes"
-                     " that are connected through Ethernet, Wifi and similar direct links.")
-            ("local_interface_enable", po::value<bool>()->default_value(true),
-                    "Whether to make GeoMesh accessible to the host such that processes on the host"
-                    " can access GeoMesh hosts as if it were IPv6. This is done through a TUN device on Linux, or a"
-                    " utun device on OSX. An entry will also be added to the routing table to redirect all traffic"
-                    " bound for fcf4::/16 into that tunnel device.")
-            ("tun_device_name", po::value<std::string>()->default_value("tunGeo"),
-                    "The name of the tunnel device.");
-
+            ("udp_peers",
+                 po::value<std::vector<std::string> >()->multitoken(),
+                 "List of UDP peers in IPAddress:Port format.")
+            ("udp_port",
+                 po::value<int>()->default_value(10976),
+                 "UDP port on which to listen for UDP bridge packets.")
+            ("udp_bridge_enable", 
+                 po::value<bool>()->default_value(true),
+                 "Whether to enable the UDP bridge.")
+            ("rpc_enable",
+                 po::value<bool>()->default_value(true),
+                 "Whether to enable administration and querying through RPC."
+                 " Otherwise, the only way to communicate with the process is"
+                 " through signals.")
+            ("rpc_port",
+                 po::value<int>()->default_value(10976),
+                 "The TCP port to listen on for incoming RPC requests.")
+            ("rpc_password",
+                 po::value<std::string>()->required(),
+                 "The password used to authenticate with RPC. Typically also"
+                 " the password to any web interfaces that might exist.")
+            ("address_key", 
+                 "A base64-encoded private key used to generate a public key"
+                 " and an address. The generated address will be printed at"
+                 " startup. Note: keep this key secure, or others will be able"
+                 " to hijack your address. Also: GeoMesh only uses keys for a"
+                 " very limited form of authentication, messages are sent in"
+                 " cleartext! Use software like SSL to keep your data secure!")
+            ("ethernet_autoconnect", 
+                 po::value<bool>()->default_value(true),
+                 "Whether to automatically connect to other GeoMesh nodes that"
+                 " are connected through Ethernet, Wifi, etc...")
+            ("local_interface_enable", 
+                 po::value<bool>()->default_value(true),
+                 "Whether to make GeoMesh accessible to the host such that"
+                 " processes on the host can access GeoMesh hosts as if it"
+                 " were IPv6. This is done through a TUN device on Linux, or a"
+                 " utun device on OSX. An entry will also be added to the"
+                 " routing table to redirect all traffic bound for fcf4::/16"
+                 " into that tunnel device.")
+            ("tun_device_name", 
+                 po::value<std::string>()->default_value("tunGeo"),
+                 "The name of the tunnel device.");
 
     po::options_description cli_options;
     cli_options.add_options()
             ("help,h", "Display help.")
-            ("config,c", po::value<std::string>()->default_value("/etc/geomesh.conf"), "Config file location.")
-            ("genconf", po::value<std::string>(), "Generate a new config file at a specified path.")
-            ("version,v", "Show version and exit.")
-            ("daemon,d", po::value<bool>()->default_value(true),
-             "Whether to fork into the background, or remain in the foreground.");
+            ("config,c",
+             po::value<std::string>()->default_value("/etc/geomesh.conf"),
+             "Config file location.")
+            ("genconf",
+             po::value<std::string>(), 
+             "Generate a new config file at a specified path.")
+            ("version,v",
+             "Show version and exit.")
+            ("daemon,d",
+             po::value<bool>()->default_value(true),
+             "Whether to fork into the background, or remain in"
+             " the foreground.");
 
     //cli_options.add(config_options);
 
@@ -190,19 +213,29 @@ int main(int argc, char **argv) {
     po::store(po::parse_command_line(argc, argv, cli_options), vm);
 
     if (vm.count("help")) {
+        // Print help and exit.
         std::cout << cli_options << std::endl;
         return 0;
     }
 
     if (vm.count("version")) {
-        std::cout << "Compiled on " << __DATE__ <<
-        ". Early development version. Refer to git for exact version information." << std::endl;
+        // Display version and exit.
+        std::cout << "Compiled on " << __DATE__ << ". Early development"
+            " version. Refer to git for exact version information."
+            << std::endl;
         return 0;
     }
 
     if (vm.count("genconf")) {
+        // If requested, generate a default configuration file at the specified
+        // location and then exit.
+
         std::string path = vm["genconf"].as<std::string>();
-        generateConfigurationFile(path);
+        std::cout << "Generating default config file at path: " << path
+            << std::endl;
+
+        generateConfigFile(path);
+
         return 0;
     }
 
@@ -216,24 +249,39 @@ int main(int argc, char **argv) {
     ifstream configFile(vm["config"].as<std::string>());
 
     if (!configFile.is_open()) {
-        std::cout << "Config file " << vm["config"].as<std::string>() << " not found. Exiting." << std::endl;
-        std::cout << "Use " << argv[0] << " --genconf [filepath] to generate a default configuration file." << std::endl;
+        std::cout << "Config file " << vm["config"].as<std::string>() << 
+            " not found. Exiting." << std::endl;
+        std::cout << "Use " << argv[0] << 
+            " --genconf [filepath] to generate a default configuration file." << std::endl;
+
         return 1;
     }
+
+    po::store(po::parse_config_file(configFile, config_options), vm);
 
     if (vm["daemon"].as<bool>()) {
         daemonize();
     }
 
-    std::unique_ptr<KeyPair> addressKeys;
 
     // TODO validation
 
     std::string stringKey = vm["address_key"].as<std::string>();
 
-    addressKeys = KeyPair::fromPemString(stringKey);
+    std::cout << stringKey << std::endl;
 
-    Address addr = Address::generateFromKeys(*addressKeys);
+    AddressPrivateKey key;
+    Base64Decoder decoder;
+    
+    decoder.Put((byte*)stringKey.c_str(),stringKey.length());
+    decoder.MessageEnd();
+
+    key.BERDecodePrivateKey(decoder, false, 0);
+
+    AddressPublicKey pubKey;
+    key.MakePublicKey(pubKey);
+
+    Address addr = Address::generateFromKey(pubKey);
 
     std::cout << "Using address: " << addr.toString() << std::endl;
 
@@ -245,7 +293,6 @@ int main(int argc, char **argv) {
                               addr,
                               router.getLocationMgr());
 
-
     // Allocate and initialize the scheduler
     Scheduler scheduler(false);
 
@@ -253,8 +300,9 @@ int main(int argc, char **argv) {
     std::unique_ptr<TunnelIface> tunnel;
 
     // Start the tunnel interface (platform-specific)
-    // Only if requested, otherwise GeoMesh will not be able to provide services to the host.
-    // This may be useful for relay-only nodes. Does not affect RPC.
+    // Only if requested, otherwise GeoMesh will not be able to provide
+    // services to the host. This may be useful for relay-only nodes.
+    // Does not affect RPC.
     if (vm["local_interface_enable"].as<bool>()) {
 
         ipAdapter.reset(new LocalInterface(router.getLocalHandler(), llm));
@@ -267,12 +315,12 @@ int main(int argc, char **argv) {
                         Scheduler::clock::now(),
                         std::chrono::milliseconds(50),
                         true,
-                        [&] (Scheduler::time_point t, Scheduler::duration d, Scheduler::Task& task) { tunnel->pollMessages(); }
+                        [&] (Scheduler::time_point t, Scheduler::duration d, Scheduler::Task& task)
+                            { tunnel->pollMessages(); }
                     ));
     }
 
     std::unique_ptr<UDPManager> udpManager;
-
 
     // If UDP bridge is enabled, create the UDPManager and configure it
     if (vm["udp_bridge_enable"].as<bool>()) {

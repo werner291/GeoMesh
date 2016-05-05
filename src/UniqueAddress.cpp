@@ -10,14 +10,16 @@ std::random_device rdev;
 std::mt19937 rgen(rdev());
 std::uniform_int_distribution<unsigned char> addrgen(0,255);
 
+using namespace CryptoPP;
 
-Address Address::generateRandom() { // TODO use keypair for generating addresses.
+Address Address::generateRandom() { 
     Address blank;
 
     // Unallocated Unique Local Address range for IPv6 with prefix fc::/8
     blank.bytes[0] = 0xfc;
-    // The "f4" octet is to distinguis from CJDNS addresses. GeoMesh doesn't claim the whole range. It doesn't claim
-    // anything really, but this should make things easier when there are conflicts with other uniquely generated
+    // The "f4" octet is to distinguish from CJDNS addresses. GeoMesh doesn't
+    // claim the whole range. It doesn't claim anything really, but this should
+    //make things easier when there are conflicts with other uniquely generated
     // addresses.
     blank.bytes[1] = 0xf4;
 
@@ -28,21 +30,23 @@ Address Address::generateRandom() { // TODO use keypair for generating addresses
     return blank;
 }
 
-Address Address::generateFromKeys(const KeyPair& keys) {
+Address Address::generateFromKey(const AddressPublicKey& key) {
 
-    std::vector<uint8_t> pubkey = keys.getPublicKeyAsBytes();
+    // TODO check whether this is big enough!
+    uint8_t buffer[2000];
+ 
+    ArraySink sink(buffer,2000);
+    // TODO check whether this is safe!
+    // Does this polymorphically save the private key too?
+    key.DEREncodePublicKey(sink); 
 
-    
-    auto firstHash = simpleSHA256(pubkey.data(),pubkey.size());
-
-    auto secondHash = simpleSHA256(firstHash.data(), firstHash.size());
-   
-    uint8_t addrBytes[ADDRESS_LENGTH_OCTETS];
+    byte addrBytes[2 + SHA256::DIGESTSIZE];
 
     addrBytes[0] = 0xfc;
     addrBytes[1] = 0xf4;
 
-    memcpy(addrBytes + 2, secondHash.data(), ADDRESS_LENGTH_OCTETS - 2);
+    // TODO check whether TotalPutLength is the right method to call
+    SHA256().CalculateDigest(addrBytes + 2, buffer, sink.TotalPutLength());
 
     return Address::fromBytes(addrBytes);
 
@@ -61,8 +65,7 @@ Address Address::fromString(const std::string& str) {
 
 void Address::writeToSocketAddress(struct sockaddr_in6& socketAddress) const {
 
-    std::memcpy(&socketAddress.sin6_addr.s6_addr, bytes, ADDRESS_LENGTH_OCTETS);
-
-
+    std::memcpy(&socketAddress.sin6_addr.s6_addr, bytes, 
+                ADDRESS_LENGTH_OCTETS);
 
 }

@@ -31,14 +31,14 @@ set(CORE_SRC
     ContactsSet.hpp
     LocationLookupManager.hpp
     my_htonll.hpp
-    Crypto.h Crypto.cpp
-    Scheduler.cpp Scheduler.hpp)
+    Scheduler.cpp Scheduler.hpp
+    Crypto.h Crypto.cpp)
 
 add_library(core ${CORE_SRC})
 
 
-FIND_PACKAGE(OpenSSL REQUIRED)
-target_link_libraries(core ${OPENSSL_CRYPTO_LIBRARY})
+FIND_PACKAGE(CRYPTOPP REQUIRED)
+target_link_libraries(core cryptopp)
 
 set_property(TARGET core PROPERTY CXX_STANDARD 11)
 set_property(TARGET core PROPERTY CXX_STANDARD_REQUIRED ON)
@@ -85,7 +85,7 @@ add_library(daemon_core ${DAEMON_SRC})
 
 TARGET_LINK_LIBRARIES(daemon_core core ${Boost_LIBRARIES})
 
-add_executable(geomeshd geomeshd/GeoMeshd_main.cpp)
+add_executable(geomeshd geomeshd/genconf.cpp geomeshd/GeoMeshd_main.cpp)
 
 set_property(TARGET daemon_core PROPERTY CXX_STANDARD 11)
 set_property(TARGET daemon_core PROPERTY CXX_STANDARD_REQUIRED ON)

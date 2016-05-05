@@ -12,6 +12,9 @@
 #include <sstream>
 #include <iostream>
 
+#include <cryptopp/sha.h>
+#include <cryptopp/rsa.h>
+
 #include "Crypto.h"
 
 const int ADDRESS_LENGTH_OCTETS = 16; // 128-bit addresses, we're optimistic.
@@ -114,7 +117,7 @@ public:
 
     static Address generateRandom();
 
-    static Address generateFromKeys(const KeyPair& keys);
+    static Address generateFromKey(const AddressPublicKey& keys);
 
     static Address fromString(const std::string& str);
 
