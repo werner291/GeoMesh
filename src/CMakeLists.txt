@@ -46,7 +46,7 @@ set_property(TARGET core PROPERTY CXX_STANDARD_REQUIRED ON)
 set(Boost_USE_STATIC_LIBS OFF) 
 set(Boost_USE_MULTITHREADED ON)  
 set(Boost_USE_STATIC_RUNTIME OFF) 
-find_package(Boost COMPONENTS program_options thread REQUIRED) 
+find_package(Boost COMPONENTS program_options REQUIRED) 
 
     include_directories(${Boost_INCLUDE_DIRS}) 
 

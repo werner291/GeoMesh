@@ -202,6 +202,8 @@ int main(int argc, char **argv) {
              "Generate a new config file at a specified path.")
             ("version,v",
              "Show version and exit.")
+            ("verbose",
+             "Enable DEBUG-level logging.")
             ("daemon,d",
              po::value<bool>()->default_value(true),
              "Whether to fork into the background, or remain in"
@@ -227,6 +229,11 @@ int main(int argc, char **argv) {
         return 0;
     }
 
+    if (vm.count("verbose")) {
+        Logger::setLogLevel(LogLevel::DEBUG);
+        Logger::log(LogLevel::DEBUG, "Verbose logging enabled.");
+    }
+
     if (vm.count("genconf")) {
         // If requested, generate a default configuration file at the specified
         // location and then exit.
@@ -244,10 +251,6 @@ int main(int argc, char **argv) {
 
     // Check for any errors
     po::notify(vm);
-
-    if (vm.count("config")) {
-        std::cout << "config" << std::endl;
-    }
 
     ifstream configFile(vm["config"].as<std::string>());
 
