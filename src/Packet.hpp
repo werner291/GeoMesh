@@ -216,8 +216,6 @@ public:
      * @return Whether the specified address is equal to the address in the IPv6 destination header field.
      */
     inline bool isDestination(const Address &address) const {
-        assert(getMessageType() == MSGTYPE_IPv6);
-
         return memcmp(header + GEOMESH_HEADER_DESTINATION_ADDRESS, address.getBytes(), ADDRESS_LENGTH_OCTETS) == 0;
     }
 

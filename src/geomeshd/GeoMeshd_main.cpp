@@ -338,8 +338,8 @@ int main(int argc, char **argv) {
                 std::smatch results;
 
                 if (regex_match(peer, results, regex)) {
-                    std::string address = results[0];
-                    int port = std::stoi(results[1].str());
+                    std::string address = results[1];
+                    int port = std::stoi(results[2].str());
 
                     udpManager->connectTo(address,port);
                 } else {

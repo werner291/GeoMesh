@@ -62,18 +62,19 @@ void UDPManager::connectTo(std::string address, int port) {
 
     std::string msg = helloMsg.str();
 
-    uint8_t buffer[500];
+    uint8_t buffer[msg.length() + 1 + 4];
 
     ((uint16_t *) buffer)[0] = htons(0);
     ((uint16_t *) buffer)[1] = htons(0);
 
+    
     strncpy(reinterpret_cast<char *>(buffer + 4), msg.c_str(), msg.length());
 
     buffer[4 + msg.length()] = 0;
 
     sendto(socketID,
            buffer,
-           500,
+           msg.length() + 4 + 1, // String length + 1 for \0 + 4 for header
            0,
            (struct sockaddr *) &destAddr,
            sizeof(destAddr));
