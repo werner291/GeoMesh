@@ -13,7 +13,8 @@ bool LocationLookupManager::processEntrySuggestion(const Address& address, const
 	if (address != selfAddress) {
 		// Do not add ourselves as a contact
         addEntry(address, loc, expires);
-        Logger::log(LogLevel::DEBUG,"Added contact " + address.toString() 
+        Logger::log(LogLevel::DEBUG,
+               "Added contact " + address.toString() 
                 + " at " + loc.getDescription());
 	}
 

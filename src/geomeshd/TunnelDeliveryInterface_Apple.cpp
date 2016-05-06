@@ -61,10 +61,13 @@ void TunnelDeliveryInterface_Apple::startTunnelInterface() {
     if (connect(mSocketId, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
         int err = errno;
         close(mSocketId);
-        Logger::log(LogLevel::ERROR, "connecting to utun device" + std::string(strerror(err)));
+        Logger::log(LogLevel::ERROR,
+                "connecting to utun device" + std::string(strerror(err)));
 
         if (err == EPERM) {
-            Logger::log(LogLevel::ERROR, "Most systems require admin rights to affect networking. Try running geomeshd with sudo.");
+            Logger::log(LogLevel::ERROR,
+                    "Most systems require admin rights to affect networking."
+                    " Try running geomeshd with sudo.");
             exit(EXIT_FAILURE);
         }
     }

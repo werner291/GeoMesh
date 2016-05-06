@@ -68,8 +68,13 @@ IF (BUILD_SIMULATOR)
 ENDIF ()
 
 
-set(DAEMON_SRC geomeshd/GeoMeshd_main.cpp geomeshd/UDPInterface.cpp geomeshd/UDPManager.cpp geomeshd/UnixSocketsFunctions.cpp
-        geomeshd/UDPFragment.cpp geomeshd/UDPReceptionBuffer.cpp)
+set(DAEMON_SRC 
+    geomeshd/GeoMeshd_main.cpp 
+    geomeshd/UDPInterface.cpp 
+    geomeshd/UDPManager.cpp 
+    geomeshd/UnixSocketsFunctions.cpp
+    geomeshd/UDPFragment.cpp
+    geomeshd/UDPReceptionBuffer.cpp)
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(DAEMON_SRC ${DAEMON_SRC} geomeshd/TunnelDeliveryInterface_Apple.cpp)

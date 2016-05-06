@@ -57,8 +57,17 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
     ifr.ifr_flags = flags;
 
     if ((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
-        Logger::log(LogLevel::ERROR, "Error setting tunnel flags: " + std::string(strerror(errno)));
+        Logger::log(LogLevel::ERROR,
+                "Error setting tunnel flags: " + std::string(strerror(errno)));
+
         close(fd);
+
+        if (err == EPERM) {
+            Logger::log(LogLevel::ERROR,
+                    "Most systems require admin rights to affect networking."
+                    " Try running geomeshd with sudo.");
+            exit(EXIT_FAILURE);
+        }
     }
 
     long flag = fcntl(fd, F_GETFL, 0);
