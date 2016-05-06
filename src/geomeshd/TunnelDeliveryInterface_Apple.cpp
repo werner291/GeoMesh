@@ -25,7 +25,9 @@ TunnelDeliveryInterface_Apple::TunnelDeliveryInterface_Apple(LocalInterface *loc
 
     // Callback when the Router wants to deliver a message to the local system
     localInterface->setDataReceivedHandler(
-            std::bind(&TunnelDeliveryInterface_Apple::deliverIPv6Packet, this, std::placeholders::_1, std::placeholders::_2));
+            std::bind(&TunnelDeliveryInterface_Apple::deliverIPv6Packet,
+                      this,
+                      std::placeholders::_1, std::placeholders::_2));
 }
 
 void TunnelDeliveryInterface_Apple::startTunnelInterface() {

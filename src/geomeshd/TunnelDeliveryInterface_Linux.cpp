@@ -18,7 +18,7 @@
 
 TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *localInterface,
                                                              const Address &iFaceAddress)
-        : mLocalInterface(localInterface), iFaceAddress(iFaceAddress), fd(-1) {
+        :iFaceAddress(iFaceAddress), mLocalInterface(localInterface), fd(-1) {
 
     iFaceName[0] = 't';
     iFaceName[1] = 'u';
@@ -32,7 +32,10 @@ TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *loc
     //memset(iFaceName, 0, TUNInterface_IFNAMSIZ);
 
     localInterface->setDataReceivedHandler(
-            std::bind(&TunnelDeliveryInterface_Linux::deliverIPv6Packet, this, std::placeholders::_1));
+            std::bind(&TunnelDeliveryInterface_Linux::deliverIPv6Packet,
+                      this,
+                      std::placeholders::_1,
+                      std::placeholders::_2));
 }
 
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
@@ -116,12 +119,12 @@ void TunnelDeliveryInterface_Linux::installRoute() {
 
 };
 
-void TunnelDeliveryInterface_Linux::deliverIPv6Packet(PacketPtr packet) {
+void TunnelDeliveryInterface_Linux::deliverIPv6Packet(uint8_t* data, size_t length) {
 
     // Send to the local system.
     int result = write(fd,
-                      packet->getPayload(),
-                      packet->getPayloadLength());
+                      data,
+                      length);
 
     if (result == -1) {
         int err = errno;

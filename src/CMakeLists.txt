@@ -46,11 +46,9 @@ set_property(TARGET core PROPERTY CXX_STANDARD_REQUIRED ON)
 set(Boost_USE_STATIC_LIBS OFF) 
 set(Boost_USE_MULTITHREADED ON)  
 set(Boost_USE_STATIC_RUNTIME OFF) 
-find_package(Boost COMPONENTS program_options REQUIRED) 
+find_package(Boost COMPONENTS program_options thread REQUIRED) 
 
     include_directories(${Boost_INCLUDE_DIRS}) 
-
-
 
 IF (BUILD_SIMULATOR)
     FIND_LIBRARY(FLTK_LIBRARY_GL fltk_gl /opt/local/lib)
@@ -93,4 +91,4 @@ set_property(TARGET daemon_core PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET geomeshd PROPERTY CXX_STANDARD 11)
 set_property(TARGET geomeshd PROPERTY CXX_STANDARD_REQUIRED ON)
 
-TARGET_LINK_LIBRARIES(geomeshd core daemon_core )
+TARGET_LINK_LIBRARIES(geomeshd core daemon_core pthread)

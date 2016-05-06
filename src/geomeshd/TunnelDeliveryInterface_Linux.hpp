@@ -31,7 +31,7 @@ public:
 
     void startTunnelInterface();
 
-    void deliverIPv6Packet(PacketPtr packet);
+    void deliverIPv6Packet(uint8_t* data, size_t length);
 
     void pollMessages();
 
