@@ -12,7 +12,9 @@ bool LocationLookupManager::processEntrySuggestion(const Address& address, const
 
 	if (address != selfAddress) {
 		// Do not add ourselves as a contact
-    addEntry(address, loc, expires);
+        addEntry(address, loc, expires);
+        Logger::log(LogLevel::DEBUG,"Added contact " + address.toString() 
+                + " at " + loc.getDescription());
 	}
 
     waitingForLookup.erase(address);
@@ -100,7 +102,8 @@ LocationLookupManager::LocationLookupManager(LocalPacketHandler& localHandler,
 
     for (int msgType : {MSGTYPE_DHT_FIND_CLOSEST,
                         MSGTYPE_DHT_FIND_RESPONSE,
-                        MSGTYPE_DHT_LEAVE}) {
+                        MSGTYPE_DHT_LEAVE,
+                        MSGTYPE_LOCATION_INFO}) {
         localHandler.addLocalPacketListener(std::bind(&LocationLookupManager::handleDHTPacket,
                                                       this,
                                                       std::placeholders::_1,
@@ -135,37 +138,52 @@ void LocationLookupManager::handleDHTPacket(int messageType,
                                            messageSize);
             } else {
                 // No contacts are closer than the current node, respond with our own contact info.
-                Address requesterAddress = Address::fromBytes(message + FIND_CLOSEST_REQUESTER);
-                Location requesterLocation = Location::fromBytes(message + FIND_CLOSEST_REQUESTER_LOCATION);
+                Address requesterAddress = Address::fromBytes(message 
+                                               + FIND_CLOSEST_REQUESTER);
+                Location requesterLocation = Location::fromBytes(message 
+                                      + FIND_CLOSEST_REQUESTER_LOCATION);
 
                 localHandler.sendFromLocal(MSGTYPE_DHT_FIND_RESPONSE,
                                            requesterAddress,
                                            requesterLocation,
                                            message,
                                            messageSize);
-		processEntrySuggestion(requesterAddress,requesterLocation,0);
+                processEntrySuggestion(requesterAddress,requesterLocation,0);
             }
 
         }
             break;
-	case MSGTYPE_DHT_FIND_RESPONSE: {
-	    auto itr = waitingForLookup.find(from);
+        case MSGTYPE_DHT_FIND_RESPONSE: {
+            auto itr = waitingForLookup.find(from);
 
-	    if (itr == waitingForLookup.end()) {
-		// Perhaps the node was not reachable?
-		// Put it in the contacts anyway
-		// TODO: Add a request ID to the message and
-		// check whether the message was asked for or not.
-	    } else {
-		for (Listener& listener : updateListeners) {
-			listener(from,fromLocation,0); // TODO better expiry time
-	    	}
-	    }
-	    processEntrySuggestion(from,fromLocation,0);
-        }
-        break;
+            if (itr == waitingForLookup.end()) {
+            // Perhaps the node was not reachable?
+            // Put it in the contacts anyway
+            // TODO: Add a request ID to the message and
+            // check whether the message was asked for or not.
+            } else {
+                Logger::log(LogLevel::DEBUG, 
+                        std::string("Location lookup completed. ")
+                        + from.toString() + " is at " 
+                        + fromLocation.getDescription());
+
+                for (Listener& listener : updateListeners) {
+                    listener(from,fromLocation,0); // TODO better expiry time
+                }
+
+                waitingForLookup.erase(itr);
+            }
+            processEntrySuggestion(from,fromLocation,0);
+            }
+            break;
+        case MSGTYPE_LOCATION_INFO: {
+
+            processEntrySuggestion(from,fromLocation,0);
+        } break;
         default:
-            Logger::log(LogLevel::WARN, "LocationLookupManager.handleDHTPacket received message with unknown type "
+            Logger::log(LogLevel::WARN,
+                        "LocationLookupManager.handleDHTPacket received "
+                        "message with unknown type "
                                         + std::to_string(messageType));
             break;
     }

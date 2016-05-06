@@ -8,15 +8,23 @@
 
 bool Router::handleMessage(PacketPtr data, int fromIface) {
 
-    Logger::log(LogLevel::DEBUG, "Message received from " + data->getSourceAddress().toString()
-                                 + " destined to " + data->getDestinationAddress().toString()
-                                 + " of type " + std::to_string(data->getMessageType()));
+    Logger::log(LogLevel::DEBUG, "Message received from " 
+                                 + data->getSourceAddress().toString()
+                                 + " destined to " 
+                                 + data->getDestinationAddress().toString()
+                                 + " of type " 
+                                 + std::to_string(data->getMessageType()));
 
     int protocol_version = data->getProtocolVersion();
 
     if (data->isDestination(uniqueaddress) ||
             data->getMessageType() == MSGTYPE_LOCATION_INFO) {
 
+        Logger::log(LogLevel::DEBUG, "Handling message locally.");
+
+        // TODO move this somewhere past the LocalHandler. The Router
+        // should not make decisions about whether to modify
+        // the routing table or not.
         if (data->getMessageType() == MSGTYPE_LOCATION_INFO) {
             Location peerLocation = data->getSourceLocation();
 
@@ -30,16 +38,18 @@ bool Router::handleMessage(PacketPtr data, int fromIface) {
 
                 for (auto neighbour : linkMgr.mInterfaces) {
                     if (neighbour.second->getInterfaceId() != fromIface)
-                        linkMgr.sendPacket(data, neighbour.second->getInterfaceId());
+                        linkMgr.sendPacket(data,
+                                           neighbour.second->getInterfaceId());
                 }
 
             }
-        } else {
-            localHandler.handleLocalPacket(data);
         }
+
+        localHandler.handleLocalPacket(data);
 
         return true;
     } else {
+        Logger::log(LogLevel::DEBUG, "Forwarding the packet to another node.");
         return forwardPacket(data, fromIface);
     }
 }
@@ -55,9 +65,11 @@ bool Router::forwardPacket(PacketPtr data, int fromIface) {
         if (linkMgr.sendPacket(data, itr->second.iFaceID)) {
             return true;
         } else {
-            Logger::log(LogLevel::WARN, "Trying to route packet bound for " + destAddr.toString()
-                                        + " through interface " + std::to_string(itr->second.iFaceID)
-                                        + " but sendPacket(...) returned false.");
+            Logger::log(LogLevel::WARN, "Trying to route packet bound for " 
+                                     + destAddr.toString()
+                                     + " through interface " 
+                                     + std::to_string(itr->second.iFaceID)
+                                     + " but sendPacket(...) returned false.");
         }
         // Else, try to route according to location
     }

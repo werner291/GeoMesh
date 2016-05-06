@@ -35,6 +35,19 @@ struct DirectionalEntry {
     }
 };
 
+/**
+ * The Router is the class that, given a packet, decides where to send it next.
+ * 
+ * If the packet is addressed to the local system, it is passed to the
+ * localHandler.
+ *
+ * If the packet is addressed to an address in the local routing table,
+ * redirect it accoring to local routing rules.
+ *
+ * Otherwise, route using geographic routing rules.
+ *
+ * The router only routes, it does not manage the routing tables.
+ */
 class Router {
 
     Address uniqueaddress;

@@ -112,7 +112,6 @@ TEST(DHTTest, relay_find_preconfigured) {
 
 TEST(dhtTest, respond_find) {
 
-    int a = 9;
     DHTSimplifiedNode node(Address::fromString("5555:5555:5555:5555:5555:5555:5555:5555"), Location(10, -56));
 
     int sent = 0;
@@ -248,17 +247,9 @@ TEST(DHTTest, routingTest) {
 
     for (int i = 0; i < MAX_NODES; i++) {
         std::shared_ptr<DHTSimplifiedNode> node = std::make_shared<DHTSimplifiedNode>(
-                Address::generateRandom(), Location(0, 0),
+                Address::generateRandom(), 
+                Location(0, 0),
                 [&](const PacketPtr &packet) -> bool {
-
-	            if (packet->getMessageType() == MSGTYPE_DHT_FIND_CLOSEST) {
-
-		         Address query = Address::fromBytes(packet->getPayload() + FIND_CLOSEST_QUERY); 
-			 int matching = query.xorDistanceTo(packet->getDestinationAddress()).getMatchingPrefixLength();
-			 //std::cout << "Forwarding query for " << query.toString() << 
-			   //           " to " << packet->getDestinationAddress().toString() << 
-			     //         " Matching: " << matching <<  std::endl;
-		    }
 
                     Address destination = packet->getDestinationAddress();
 
