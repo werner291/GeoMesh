@@ -17,7 +17,7 @@ bool LinkManager::sendPacket(const PacketPtr &data, int iFace) {
     }
 }
 
-void LinkManager::connectInterface(std::shared_ptr<AbstractInterface> iFace) {
+void LinkManager::connectInterface(std::shared_ptr<AbstractLinkEndpoint> iFace) {
 
     mInterfaces.insert(std::make_pair(iFace->getInterfaceId(), iFace));
     iFace->setDataReceivedCallback(routeInboundPacket);

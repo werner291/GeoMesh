@@ -7,13 +7,12 @@
 
 #include <vector>
 #include <netinet/in.h>
-#include "../Packet.hpp"
+#include "Packet.hpp"
 
 /**
- * Represents a fragment of a packet to be sent over a UDP bridge.
- *
+ * Represents a fragment of a packet to be sent over a fragmenting link.
  */
-class UDPFragment {
+class PacketFragment {
 
     /**
      * A 12-byte header followed by payload information.
@@ -50,7 +49,7 @@ public:
      * @param includesHeader Whether the provided data includes the header, or whether space should
      *                       be reserved in the buffer to fit a header later on.
      */
-    UDPFragment(const uint8_t* buffer, int bufferLength, bool includesHeader);
+    PacketFragment(const uint8_t* buffer, int bufferLength, bool includesHeader);
 
     inline int getProtocolVersion() {
         return ntohs(*reinterpret_cast<uint16_t*>(data.data()));
@@ -112,6 +111,6 @@ public:
 
 };
 
-typedef std::shared_ptr<UDPFragment> UDPFragmentPtr;
+typedef std::shared_ptr<PacketFragment> PacketFragmentPtr;
 
 #endif //GEOMESH_UDPFRAGMENT_H

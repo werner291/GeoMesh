@@ -5,14 +5,14 @@
 #ifndef GEOMESH_UDPRECEPTIONBUFFER_H
 #define GEOMESH_UDPRECEPTIONBUFFER_H
 
-#include "UDPFragment.hpp"
+#include "PacketFragment.hpp"
 
-#include "../Packet.hpp"
+#include "Packet.hpp"
 
 /**
- * The UDPReceptionBuffer helps to combine a number of UDPFragment objects into a packet.
+ * The PacketDefragmenter helps to combine a number of PacketFragment objects into a packet.
  */
-class UDPReceptionBuffer {
+class PacketDefragmenter {
 
     // The packet number that corresponds to the packet that the last-received
     // fragment was part of.
@@ -50,12 +50,12 @@ public:
     /*
      * Create a new empty reception buffer.
      */
-    UDPReceptionBuffer() : packetNumber(0), expectedSize(0), valid(false) {}
+    PacketDefragmenter() : packetNumber(0), expectedSize(0), valid(false) {}
 
     /**
      * Receive and store a fragment of data.
      */
-    bool receive(UDPFragmentPtr frag);
+    bool receive(PacketFragmentPtr frag);
 
     /**
      * @return Whether the full packet has been received.

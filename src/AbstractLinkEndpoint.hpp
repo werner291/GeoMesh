@@ -9,8 +9,7 @@
 #include <functional>
 #include "Packet.hpp"
 
-
-class AbstractInterface;
+class AbstractLinkEndpoint;
 
 typedef std::function<void(PacketPtr, int)> DataCallback;
 
@@ -19,7 +18,7 @@ class Router;
 /**
  * An abstract object representing one end of a direct (level 2) link to a peer.
  */
-class AbstractInterface {
+class AbstractLinkEndpoint {
 
     // Every interface has an ID that is unique throughout the lifetime of the program.
     // Use of this static variable allows us to keep track of which interface IDs have been
@@ -37,7 +36,7 @@ public:
         return iFaceID;
     }
 
-    AbstractInterface();
+    AbstractLinkEndpoint();
 
     /**
      * Send a GeoMesh packet to the peer on the other side of the link of which
@@ -60,7 +59,7 @@ public:
      *
      * Orders the interfaces by their interface ID.
      */
-    bool operator>(const AbstractInterface& other) const {
+    bool operator>(const AbstractLinkEndpoint& other) const {
         return iFaceID > other.iFaceID;
     }
 
@@ -70,7 +69,7 @@ public:
      *
      * Orders the interfaces by their interface ID.
      */
-    bool operator<(const AbstractInterface& other) const {
+    bool operator<(const AbstractLinkEndpoint& other) const {
         return iFaceID < other.iFaceID;
     }
 

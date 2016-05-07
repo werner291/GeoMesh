@@ -293,7 +293,7 @@ Router::Router(Address uniqueaddress, Location location, GreedyRoutingTable& gre
         linkMgr(std::bind(&Router::handleMessage, this, std::placeholders::_1, std::placeholders::_2)),
         greedyRoutingTable(greedyRoutingTable) {
 
-    linkMgr.addLinkListener([this](std::shared_ptr<AbstractInterface> iFace, LinkEvent event) {
+    linkMgr.addLinkListener([this](std::shared_ptr<AbstractLinkEndpoint> iFace, LinkEvent event) {
 
         if (event == LINKEVENT_CREATED) {
             this->sendLocationInfo(iFace->getInterfaceId());

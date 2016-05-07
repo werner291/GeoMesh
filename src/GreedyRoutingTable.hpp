@@ -6,7 +6,7 @@
 #define GEOMESH_GREEDYROUTINGTABLE_H
 
 #include "Location.hpp"
-#include "AbstractInterface.hpp"
+#include "AbstractLinkEndpoint.hpp"
 #include "Logger.hpp"
 
 /**

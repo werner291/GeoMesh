@@ -2,10 +2,10 @@
 // Created by System Administrator on 2/29/16.
 //
 
-#include "UDPReceptionBuffer.hpp"
+#include "PacketDefragmenter.hpp"
 #include <cmath>
 
-void UDPReceptionBuffer::removeOverlappingRanges() {
+void PacketDefragmenter::removeOverlappingRanges() {
 
     // receivedRanges is sorted by starting index of the range.
     // For any two ranges (a,b) and (c,d), if they overlap,
@@ -21,7 +21,7 @@ void UDPReceptionBuffer::removeOverlappingRanges() {
     }
 }
 
-bool UDPReceptionBuffer::receive(UDPFragmentPtr frag) {
+bool PacketDefragmenter::receive(PacketFragmentPtr frag) {
     // If this fragment belongs to a different packet than the one we were receiving,
     // reset the buffer.
     if (packetNumber != frag->getPacketNumber() || expectedSize != frag->getPacketLength()) {
@@ -44,7 +44,7 @@ bool UDPReceptionBuffer::receive(UDPFragmentPtr frag) {
     return isFullPacketAvailable();
 }
 
-void UDPReceptionBuffer::markReceived(int begin, int end) {
+void PacketDefragmenter::markReceived(int begin, int end) {
 
     // Check whether the range was inserted or not.
     bool inserted = false;
@@ -72,7 +72,7 @@ void UDPReceptionBuffer::markReceived(int begin, int end) {
 /**
  * @return Whether the full packet has been received.
  */
-bool UDPReceptionBuffer::isFullPacketAvailable() {
+bool PacketDefragmenter::isFullPacketAvailable() {
 
     // If a previous call has been made, return the cached result if not invalidated
     if (valid) return true;
@@ -101,7 +101,7 @@ bool UDPReceptionBuffer::isFullPacketAvailable() {
 
 }
 
-PacketPtr UDPReceptionBuffer::getReconstructedPacket() {
+PacketPtr PacketDefragmenter::getReconstructedPacket() {
     assert(isFullPacketAvailable());
     return std::make_shared<Packet>(buffer.data(), buffer.size());
 }

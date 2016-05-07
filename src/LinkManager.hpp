@@ -6,7 +6,7 @@
 #define MESHNETSIM_INTERFACEMANAGER_H
 
 #include <map>
-#include "AbstractInterface.hpp"
+#include "AbstractLinkEndpoint.hpp"
 
 class Router;
 
@@ -15,7 +15,7 @@ enum LinkEvent {
     LINKEVENT_BROKEN
 };
 
-typedef std::function<void(std::shared_ptr<AbstractInterface>, LinkEvent)> LinkChangeListener;
+typedef std::function<void(std::shared_ptr<AbstractLinkEndpoint>, LinkEvent)> LinkChangeListener;
 
 /**
  * A class designed to contain a list to of all links to direct peers.
@@ -31,7 +31,7 @@ public:
     LinkManager(std::function< void (const PacketPtr& packet, int fromIface) > routeInboundPacket)
       : routeInboundPacket(routeInboundPacket) { };
 
-    std::map<int, std::shared_ptr<AbstractInterface> > mInterfaces;
+    std::map<int, std::shared_ptr<AbstractLinkEndpoint> > mInterfaces;
 
     /**
      * Send a valid GeoMesh packet through the interface with the given ID.
@@ -47,7 +47,7 @@ public:
      *
      * Please note that Router will immediately send a location information macket.
      */
-    void connectInterface(std::shared_ptr<AbstractInterface> iFace);
+    void connectInterface(std::shared_ptr<AbstractLinkEndpoint> iFace);
 
     /**
      * Send a packet of data to all known links / interfaces.

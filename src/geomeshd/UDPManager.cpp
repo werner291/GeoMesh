@@ -10,7 +10,8 @@
 #include <time.h>
 #include "UDPManager.hpp"
 
-UDPManager::UDPManager(LinkManager& linkMgr, int localPort, Scheduler& scheduler) : linkMgr(linkMgr) {
+UDPManager::UDPManager(LinkManager& linkMgr, int localPort,
+        Scheduler& scheduler) : linkMgr(linkMgr) {
 
     socketID = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -18,17 +19,21 @@ UDPManager::UDPManager(LinkManager& linkMgr, int localPort, Scheduler& scheduler
 
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = htonl(INADDR_ANY);
-    localPort = localPort;
     sin.sin_port = htons(localPort);
 
     if (bind(socketID, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
-        Logger::log(LogLevel::ERROR, "Error while binding UDP bridge control socket: " + std::string(strerror(errno)));
+        Logger::log(LogLevel::ERROR,
+                "Error while binding UDP bridge control socket: " 
+                + std::string(strerror(errno)));
     } else {
-        Logger::log(LogLevel::INFO, "UDP bridge listening on port " + std::to_string(ntohs(sin.sin_port)));
+        Logger::log(LogLevel::INFO,
+                "UDP bridge listening on port " 
+                + std::to_string(ntohs(sin.sin_port)));
     }
 
     // Enable non-blocking IO.
-    // TODO use some kind of centralized system that allows me to use select() on UNIX-like systems
+    // TODO use some kind of centralized system that allows me to use select()
+    // on UNIX-like systems
     int flags = fcntl(socketID, F_GETFL, 0);
     fcntl(socketID, F_SETFL, flags | O_NONBLOCK);
 
@@ -41,11 +46,9 @@ UDPManager::UDPManager(LinkManager& linkMgr, int localPort, Scheduler& scheduler
 
 void UDPManager::connectTo(std::string address, int port) {
 
-    Logger::log(LogLevel::INFO, "Connecting to UDP peer at " + address + " port " + std::to_string(port));
-
-    // Allocate the interface
-    std::shared_ptr<UDPInterface> iface(new UDPInterface(this));
-    connectingLinks.insert(std::make_pair(iface->getInterfaceId(), iface));
+    Logger::log(LogLevel::INFO,
+            "Connecting to UDP peer at " + address + " port " 
+            + std::to_string(port));
 
     struct sockaddr_in destAddr;
 
@@ -53,8 +56,14 @@ void UDPManager::connectTo(std::string address, int port) {
     destAddr.sin_family = AF_INET;
     destAddr.sin_port = htons(port);
     destAddr.sin_addr.s_addr = inet_addr(address.c_str());
+    
+    // Allocate the interface
+    std::shared_ptr<UnixSocketInterface> iface( new UnixSocketInterface(
+                std::bind(&UDPManager::sendFragment, this, 
+                    std::placeholders::_1, std::placeholders::_2), 
+                (sockaddr_storage*)(&destAddr)));
 
-    iface->setPeerAddress(destAddr);
+    connectingLinks.insert(std::make_pair(iface->getInterfaceId(), iface));
 
     std::stringstream helloMsg;
 
@@ -62,11 +71,17 @@ void UDPManager::connectTo(std::string address, int port) {
 
     std::string msg = helloMsg.str();
 
+    sendControlMessage(msg,destAddr);
+
+    Logger::log(LogLevel::INFO, "Peering request sent to " + address);
+
+}
+
+void UDPManager::sendControlMessage(const std::string& msg, struct sockaddr_in& destAddr) {
     uint8_t buffer[msg.length() + 1 + 4];
 
     ((uint16_t *) buffer)[0] = htons(0);
     ((uint16_t *) buffer)[1] = htons(0);
-
     
     strncpy(reinterpret_cast<char *>(buffer + 4), msg.c_str(), msg.length());
 
@@ -78,9 +93,6 @@ void UDPManager::connectTo(std::string address, int port) {
            0,
            (struct sockaddr *) &destAddr,
            sizeof(destAddr));
-
-    Logger::log(LogLevel::INFO, "Peering request sent to " + address);
-
 }
 
 void UDPManager::pollMessages() {
@@ -101,7 +113,7 @@ void UDPManager::pollMessages() {
             // This is a message directed at the UDPManager
             processBridgeControlMessage((char *) buffer + 4, sender);
         } else {
-            // This is a message directed at one of the UDPInterfaces
+            // This is a message directed at one of the FragmentingLinkEndpoints
             processNormalPacketFragment(buffer, nbytes, localIface);
         }
     } else if (nbytes == 0) {
@@ -119,7 +131,7 @@ void UDPManager::pollMessages() {
 }
 
 void UDPManager::processNormalPacketFragment(const uint8_t *buffer, int nbytes, uint16_t localIface) {
-    UDPFragmentPtr fragment(new UDPFragment(buffer, nbytes, true));
+    PacketFragmentPtr fragment(new PacketFragment(buffer, nbytes, true));
 
     auto itr = establishedLinks.find(localIface);
 
@@ -131,58 +143,62 @@ void UDPManager::processNormalPacketFragment(const uint8_t *buffer, int nbytes, 
     }
 }
 
-void UDPManager::processBridgeControlMessage(char *received, sockaddr_in &sender) {
-    if (strncmp(received, "GeoMesh_UDP_Bridge_Hello", strlen("GeoMesh_UDP_Bridge_Hello")) == 0) {
+void UDPManager::processBridgeControlMessage(char *received,
+                                             sockaddr_in &sender) {
+    
+    if (strncmp(received, "GeoMesh_UDP_Bridge_Hello",
+                strlen("GeoMesh_UDP_Bridge_Hello")) == 0) {
 
         // Extract the remote interface id and port number
         int clientIfaceID;
-        sscanf(received, "GeoMesh_UDP_Bridge_Hello cientIfaceID:%i", &clientIfaceID);
+        sscanf(received, "GeoMesh_UDP_Bridge_Hello cientIfaceID:%i",
+                &clientIfaceID);
 
-        // Store the information about our new peer, including the address and GeoMesh port (NOT the bridge control port)
-        std::shared_ptr<UDPInterface> newIface(new UDPInterface(this));
-        newIface->setPeerAddress(sender);
+        // Store the information about our new peer, including the address and 
+        // GeoMesh port (NOT the bridge control port)
+        // Allocate the interface
+        std::shared_ptr<UnixSocketInterface> newIface( new UnixSocketInterface(
+                    std::bind(&UDPManager::sendFragment, this, 
+                        std::placeholders::_1, std::placeholders::_2), 
+                    (sockaddr_storage*)(&sender)));
+
         newIface->setMRemoteIface(clientIfaceID);
 
         establishedLinks.insert(std::make_pair(newIface->getInterfaceId(), newIface));
 
-        char sendBuffer[500];
+        std::stringstream response;
+        response << "GeoMesh_UDP_Bridge_Established cientIfaceID:"
+            << clientIfaceID << " serverIfaceID:"
+            << newIface->getInterfaceId();
 
-        ((uint16_t *) sendBuffer)[0] = htons(0);
-        ((uint16_t *) sendBuffer)[1] = htons(0);
-
-        // Generate a response message containing the remote interface id (NOT THE LOCAL ONE!),
-        // as well as the LOCAL GeoMesh port
-        // Note that these are swapped!
-        sprintf(sendBuffer+4, "GeoMesh_UDP_Bridge_Established cientIfaceID:%i serverIfaceID:%i", clientIfaceID, newIface->getInterfaceId());
-
-        // Send it back to the remote (use the bridge control port, which is the port from which the hello was sent)
-        sendto(socketID,
-               sendBuffer,
-               strlen(sendBuffer+4)+4+1,
-               0,
-               (struct sockaddr *) &sender, // Return to sender
-               sizeof(sender));
+        sendControlMessage(response.str(), sender);
 
         usleep(1000);
 
-        // Tell the router about the new link. (AFTER SENDING ESTABLISHED!!! or the receiver will ignore the packet
-        // and we'll have to wait for the scheduled re-send (TODO implement resending)
+        // Tell the router about the new link. (AFTER SENDING ESTABLISHED!!! or 
+        // the receiver will ignore the packet and we'll have to wait for the
+        // scheduled re-send (TODO implement resending)
         linkMgr.connectInterface(newIface);
 
         Logger::log(INFO, "Received peering request, remote interface ID is " +
                           std::to_string(newIface->getMRemoteIface()));
 
         // This is a response to a hello message we sent previously
-    } else if (strncmp(received, "GeoMesh_UDP_Bridge_Established", strlen("GeoMesh_UDP_Bridge_Established")) == 0) {
+    } else if (strncmp(received, "GeoMesh_UDP_Bridge_Established",
+                strlen("GeoMesh_UDP_Bridge_Established")) == 0) {
 
-        // Extract the local interface id and port number
-        // The interface id allows us to identify for which local interface we sent the message.
+        // Extract the local interface id and port number. The interface id
+        // allows us to identify for which local interface we sent the message.
         int ifaceID, remoteIfaceID;
-        sscanf(received, "GeoMesh_UDP_Bridge_Established cientIfaceID:%i serverIfaceID:%i", &ifaceID, &remoteIfaceID);
+        sscanf(received, "GeoMesh_UDP_Bridge_Established cientIfaceID:%i"
+               " serverIfaceID:%i", &ifaceID, &remoteIfaceID);
 
+        // Find the interface associated with this ID (if any)
         auto itr = connectingLinks.find(ifaceID);
         if (itr != connectingLinks.end()) {
 
+            // Yes, we were waiting for this. Transfer the interface
+            // from the "waiting" to the "established"
             establishedLinks.insert(std::make_pair(itr->first, itr->second));
 
             itr->second->setMRemoteIface(remoteIfaceID);
@@ -191,7 +207,11 @@ void UDPManager::processBridgeControlMessage(char *received, sockaddr_in &sender
 
             connectingLinks.erase(itr);
         } else {
-            Logger::log(WARN, "Received unexpected GeoMesh_UDP_Bridge_Established: " + std::string(received));
+            // We didn't initiate a connection, so why are we getting
+            // a confirmation?
+            Logger::log(WARN,
+                    "Received unexpected GeoMesh_UDP_Bridge_Established: " 
+                    + std::string(received));
         }
 
         Logger::log(INFO, "Peering request confirmed.");
@@ -200,56 +220,23 @@ void UDPManager::processBridgeControlMessage(char *received, sockaddr_in &sender
     }
 }
 
-bool UDPManager::sendMessage(PacketPtr message, UDPInterface* iFace) {
+bool UDPManager::sendFragment(PacketFragmentPtr frag, uint16_t iFaceID) {
 
-    Logger::log(LogLevel::ERROR, "UDPManager: sending UDP message to remote iFace: "
-                                 + std::to_string(iFace->mRemoteIface));
+    auto itr = establishedLinks.find(iFaceID);
 
-    std::vector<UDPFragmentPtr> fragments = fragmentPacket(message, iFace->getNextPacketNumber(), iFace->mRemoteIface);
+    assert(itr != establishedLinks.end());
 
-    for (UDPFragmentPtr frag : fragments) {
+    int result = sendto(socketID,
+                        frag->getDataBuffer(),
+                        frag->getDataLength(),
+                        0,
+                        (struct sockaddr *) &itr->second->addr,
+                        sizeof(itr->second->addr));
 
-        int result = sendto(socketID,
-                            frag->getDataBuffer(),
-                            frag->getDataLength(),
-                            0,
-                            (struct sockaddr *) &iFace->peerAddress,
-                            sizeof(iFace->peerAddress));
-
-        if (result < 0) {
-            Logger::log(LogLevel::ERROR, "UDPManager: error while sending: " + std::string(strerror(errno)));
-            return false;
-        }
+    if (result < 0) {
+        Logger::log(LogLevel::ERROR, "UDPManager: error while sending: " 
+                + std::string(strerror(errno)));
+        return false;
     }
-
-
-
-    return true;
 }
 
-std::vector<UDPFragmentPtr> UDPManager::fragmentPacket(const PacketPtr &message, uint16_t packetNum, uint16_t remoteIface) {
-
-    std::vector<UDPFragmentPtr> fragments;
-
-    int maxFragSize = 500;
-
-    for (int fragStart = 0; fragStart < message->getDataLength(); fragStart += maxFragSize) {
-
-        int fragLength = std::min(maxFragSize, message->getDataLength() - fragStart);
-
-        UDPFragmentPtr frag(new UDPFragment(message->getData()+fragStart, fragLength, false));
-
-        frag->setPacketNumber(packetNum);
-
-        frag->setPacketLength(message->getDataLength());
-
-        frag->setDestinationInterfaceID(remoteIface);
-
-        frag->setFragmentStart(fragStart);
-
-        frag->setFragmentLength(fragLength);
-
-        fragments.push_back(frag);
-    }
-    return fragments;
-}

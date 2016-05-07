@@ -4,7 +4,7 @@
 
 #include "LocalInterface.hpp"
 
-#include "AbstractInterface.hpp"
+#include "AbstractLinkEndpoint.hpp"
 
 #include "Packet.hpp"
 

@@ -5,15 +5,13 @@
 #ifndef GEOMESH_UDPINTERFACE_H
 #define GEOMESH_UDPINTERFACE_H
 
-#include "../AbstractInterface.hpp"
-#include "UDPInterface.hpp"
-#include "../Logger.hpp"
+#include "AbstractLinkEndpoint.hpp"
+#include "FragmentingLinkEndpoint.hpp"
+#include "Logger.hpp"
 #include <netinet/in.h>
 #include <string>
 #include <string.h>
-#include "UDPReceptionBuffer.hpp"
-
-class UDPManager;
+#include "PacketDefragmenter.hpp"
 
 /**
  * How many reception buffers each UDP interface has.
@@ -24,22 +22,20 @@ const int UDP_RECEPTION_BUFFER_COUNT = 2;
 
 const int UDP_FRAGMENT_SIZE = 576; // IPv4 minimum MTU.
 
+typedef std::function<void (const PacketFragmentPtr&, uint16_t localIfaceID)>
+            FragmentHandlerCallback;
+
 /**
- * A subclass of AbstractInterface that exposes UDP links to the LinkManager.
+ * A subclass of AbstractLinkEndpoint that exposes UDP links to the LinkManager.
  * This class doesn't do much on its own, and passes any data to be sent to
  * the UDPManager.
  */
-class UDPInterface : public AbstractInterface {
+class FragmentingLinkEndpoint : public AbstractLinkEndpoint {
 
-    // UDPInterface is basially an extension of UDPManager that allows the UDPManager
-    // to be inserted as one or more interfaces into the LinkManager.
-    friend UDPManager;
-
-private:
-    // The interface number of the corresponding UDPInterface at the other end of the link.
+    // The interface number of the corresponding FragmentingLinkEndpoint at the other end of the link.
     int mRemoteIface;
 
-    int nextPacketNumber;
+    uint16_t nextPacketNumber;
 
     time_t lastMessage;
 
@@ -47,26 +43,16 @@ private:
     struct sockaddr_in peerAddress;
 
     // An array of reception buffers.
-    UDPReceptionBuffer receptionBuffers[UDP_RECEPTION_BUFFER_COUNT];
+    PacketDefragmenter receptionBuffers[UDP_RECEPTION_BUFFER_COUNT];
 
-    // A reference to the UDPManager corresponding to this interface.
-    UDPManager* udpMan;
-
-    /**
-     * To be called by UDPManager. A fragment of data has arrived, store it in
-     * the reception buffer. Process the resulting packet if all have arrived.
-     * Please note that packets may be lost or reordered over UDP.
-     */
-    void dataFragmentReceived() {
-
-    }
+    FragmentHandlerCallback fragmentHandler;
 
 public:
 
     /**
      * Simple constructor that records the reference to the UDPManager
      */
-    UDPInterface(UDPManager* udpMan);
+    FragmentingLinkEndpoint(FragmentHandlerCallback handler);
 
     /**
      * Set the address of the peer. This address is the one that is written as the destination
@@ -74,7 +60,8 @@ public:
      */
     void setPeerAddress(struct sockaddr_in remoteAddr) {
 
-        Logger::log(LogLevel::DEBUG, "UDP bridge interface " + std::to_string(iFaceID) + " peer address changed.");
+        Logger::log(LogLevel::DEBUG, "UDP bridge interface " 
+                + std::to_string(iFaceID) + " peer address changed.");
 
         peerAddress = remoteAddr;
 
@@ -88,22 +75,24 @@ public:
     bool sendData(PacketPtr data) override;
 
     /**
-     * Called by the UDPManager to notify this interface of the arrival of a new fragment over the UDP bridge
-     * destined to this iterface. The UDPInterface will insert the fragment in a reception buffer and try
-     * to reconstruct a packet.
+     * Called by the UDPManager to notify this interface of the arrival of 
+     * a new fragment over the UDP bridge destined to this iterface.
+     *
+     * The FragmentingLinkEndpoint will insert the fragment in a reception 
+     * buffer and try to reconstruct a packet.
      */
-    void fragmentReceived(UDPFragmentPtr frag);
+    void fragmentReceived(PacketFragmentPtr frag);
 
     /**
      * Called when a full GeoMesh packet is received from the wire side.
      * Not to be confused with UDP bridge fragment packets.
      */
     void packetReceived(PacketPtr data) {
-        this->dataArrivedCallback(data, iFaceID);
+        dataArrivedCallback(data, iFaceID);
     }
 
     /**
-     * Get the interface number of the UDPInterface at the other side.
+     * Get the interface number of the FragmentingLinkEndpoint at the other side.
      */
     int getMRemoteIface() const {
         return mRemoteIface;
@@ -113,7 +102,7 @@ public:
      * Set the remote interface.
      */
     void setMRemoteIface(int mRemoteIface) {
-        UDPInterface::mRemoteIface = mRemoteIface;
+        FragmentingLinkEndpoint::mRemoteIface = mRemoteIface;
     }
 
     /**

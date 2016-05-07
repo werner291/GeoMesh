@@ -2,13 +2,13 @@
 // Created by System Administrator on 2/29/16.
 //
 
-#include "UDPFragment.hpp"
+#include "PacketFragment.hpp"
 
 #include <exception>
 
-#include "../Logger.hpp"
+#include "Logger.hpp"
 
-UDPFragment::UDPFragment(const uint8_t* buffer, int bufferLength, bool includesHeader) {
+PacketFragment::PacketFragment(const uint8_t* buffer, int bufferLength, bool includesHeader) {
 
     if (includesHeader) {
         // Provided data includes the header, no need to make any extra room for it

@@ -6,7 +6,7 @@
 #define MESHNETSIM_ROUTER_H
 
 #include "Location.hpp"
-#include "AbstractInterface.hpp"
+#include "AbstractLinkEndpoint.hpp"
 #include "LocalInterface.hpp"
 #include "LinkManager.hpp"
 #include "UniqueAddress.hpp"

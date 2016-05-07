@@ -9,6 +9,8 @@
 
 TEST(udpbridge,fragmentation) {
 
+
+
     uint8_t data[MAX_PACKET_SIZE-1];
 
     for (int i=0; i< MAX_PACKET_SIZE-1; ++i) {
@@ -17,11 +19,17 @@ TEST(udpbridge,fragmentation) {
 
     PacketPtr packet = std::make_shared<Packet>(data, MAX_PACKET_SIZE-1);
 
-    auto fragments = UDPManager::fragmentPacket(packet, 375, 7);
 
-    std::random_shuffle(fragments.begin(),fragments.end());
+    std::vector<PacketFragmentPtr> fragments;
+    
+    FragmentingLinkEndpoint sender([&](const PacketFragmentPtr frag, uint16_t iFaceID) {
+        EXPECT_EQ(sender.getInterfaceId(), iFaceID);
+        fragments.push_back(frag);
+    });
 
-    UDPReceptionBuffer buffer;
+    std::random_shuffle(fragments.begin(), fragments.end());
+
+    PacketDefragmenter buffer;
 
     for (int i = fragments.size()-1; i >=0; --i) {
         buffer.receive(fragments[i]);
@@ -41,29 +49,3 @@ TEST(udpbridge,fragmentation) {
 
 }
 
-TEST(udpbridge,fragmentation_location) {
-
-    Location loc(-5,60);
-    Address address = Address::generateRandom();
-
-    PacketPtr packet = Packet::createLocationInfoPacket(loc, address);
-
-    auto fragments = UDPManager::fragmentPacket(packet, 375, 7);
-
-    std::random_shuffle(fragments.begin(),fragments.end());
-
-    UDPReceptionBuffer buffer;
-
-    for (int i = fragments.size()-1; i >=0; --i) {
-        buffer.receive(fragments[i]);
-    }
-
-    bool packetAvaliable = buffer.isFullPacketAvailable();
-
-    EXPECT_TRUE(packetAvaliable);
-
-    PacketPtr reconstructed = buffer.getReconstructedPacket();
-
-    //EXPECT_EQ(loc, reconstructed->getSourceLocation());
-    EXPECT_EQ(address, reconstructed->getSourceAddress());
-}

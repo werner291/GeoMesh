@@ -6,17 +6,27 @@
 #define GEOMESH_UDPCONNECTIONMANAGER_H
 
 #include "../LinkManager.hpp"
-#include "UDPInterface.hpp"
+#include "../FragmentingLinkEndpoint.hpp"
 #include "../Scheduler.hpp"
 #include <string>
 #include <string.h>
+
+class UnixSocketInterface : public FragmentingLinkEndpoint {
+
+    public:
+   UnixSocketInterface(FragmentHandlerCallback handler, sockaddr_storage* addr) 
+       : FragmentingLinkEndpoint(handler) {
+       
+       memcpy(&(this->addr),addr,sizeof(sockaddr_storage));
+   }; 
+
+   sockaddr_storage addr;
+};
 
 /**
  * Starts, maintains and stops UDP bridge links to other direct peers.
  */
 class UDPManager {
-
-    friend UDPInterface;
 
     LinkManager& linkMgr;
 
@@ -26,17 +36,13 @@ class UDPManager {
 
     const int MAX_FRAGMENT_SIZE = 600;
 
-    std::map<uint16_t, std::shared_ptr<UDPInterface> > connectingLinks;
+    std::map<uint16_t, std::shared_ptr<UnixSocketInterface> > connectingLinks;
 
-    std::map<uint16_t, std::shared_ptr<UDPInterface> > establishedLinks;
+    std::map<uint16_t, std::shared_ptr<UnixSocketInterface> > establishedLinks;
 
-    /**
-     * Take the specified message, and send it over the UDP bridge.
-     * The UDPInterface is the interface that sends the message.
-     * Note: You should not call this method directly, it is usually
-     * called from UDPInterface.
-     */
-    bool sendMessage(PacketPtr message, UDPInterface* iFace);
+    bool sendFragment(PacketFragmentPtr frag, uint16_t localIfaceID);
+
+    void sendControlMessage(const std::string& msg, struct sockaddr_in& destAddr);
 
 public:
     UDPManager(LinkManager &linkMgr, int localPort, Scheduler& scheduler);
@@ -66,21 +72,10 @@ public:
      *
      * \param buffer Pointer to the first byte of the GeoMesh packet header
      * \param nbytes Integer representing the number of bytes in the buffer.
-     * \param localIface The interface number of the corresponding UDPInterface.
+     * \param localIface The interface number of the corresponding FragmentingLinkEndpoint.
      */
     void processNormalPacketFragment(const uint8_t *buffer, int nbytes, uint16_t localIface);
 
-
-    /**
-     * Transform the provided {@param message} into a vector of fragments.
-     *
-     * @param message The message to fragment
-     * @param packetNumber A 16-bit number that is incremented for each interface for each packet.
-     * @param remoteIface The interface number on the other end of the UDP bridge
-     *
-     * @returns A vector of UDPFragmentPtrs, which all point to a fragment of the original packet.
-     */
-    static std::vector<UDPFragmentPtr> fragmentPacket(const PacketPtr &message, uint16_t packetNumber, uint16_t remoteIface);
 };
 
 

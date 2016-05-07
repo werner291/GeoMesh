@@ -4,8 +4,12 @@ project(MeshnetSim)
 include_directories(/opt/local/include)
 
 set(CORE_SRC 
-    AbstractInterface.cpp 
-    Router.cpp Location.cpp
+    AbstractLinkEndpoint.cpp 
+    FragmentingLinkEndpoint.cpp 
+    PacketFragment.cpp
+    PacketDefragmenter.cpp
+    Router.cpp 
+    Location.cpp
     Logger.cpp
     LinkManager.cpp
     LocalInterface.hpp
@@ -22,7 +26,7 @@ set(CORE_SRC
     VirtualLocationManager.cpp
     LocalPacketHandler.hpp
     LocalPacketHandler.cpp
-    AbstractInterface.hpp
+    AbstractLinkEndpoint.hpp
     Router.hpp
     Location.hpp
     Logger.hpp
@@ -70,18 +74,16 @@ ENDIF ()
 
 set(DAEMON_SRC 
     geomeshd/GeoMeshd_main.cpp 
-    geomeshd/UDPInterface.cpp 
     geomeshd/UDPManager.cpp 
     geomeshd/UnixSocketsFunctions.cpp
-    geomeshd/UDPFragment.cpp
-    geomeshd/UDPReceptionBuffer.cpp)
+    )
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(DAEMON_SRC ${DAEMON_SRC} geomeshd/TunnelDeliveryInterface_Apple.cpp)
 ENDIF ()
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set(DAEMON_SRC ${DAEMON_SRC} geomeshd/TunnelDeliveryInterface_Linux.cpp geomeshd/UDPFragment.cpp geomeshd/UDPReceptionBuffer.cpp)
+    set(DAEMON_SRC ${DAEMON_SRC} geomeshd/TunnelDeliveryInterface_Linux.cpp geomeshd/PacketFragment.cpp geomeshd/PacketDefragmenter.cpp)
 ENDIF ()
 
 add_library(daemon_core ${DAEMON_SRC})
