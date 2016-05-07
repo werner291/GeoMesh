@@ -1,6 +1,21 @@
-//
-// Created by System Administrator on 2/1/16.
-//
+/*
+ * (c) Copyright 2016 Werner Kroneman
+ *
+ * This file is part of GeoMesh.
+ * 
+ * GeoMesh is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * GeoMesh is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with GeoMesh.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -107,6 +122,13 @@ void UDPManager::pollMessages() {
     if (nbytes > 0) { // It's a proper datagaram (not an error)
 
         uint16_t protVersion = ntohs(((uint16_t *) buffer)[0]);
+
+        if (protVersion > 0) {
+            Logger::log(LogLevel::WARN, "Unsupported protocol version on UDP"
+                    " bridge! Consider upgrading your GeoMesh installation!");
+            return;
+        }
+
         uint16_t localIface = ntohs(((uint16_t *) buffer)[1]);
 
         if (localIface == 0) {
@@ -238,5 +260,7 @@ bool UDPManager::sendFragment(PacketFragmentPtr frag, uint16_t iFaceID) {
                 + std::string(strerror(errno)));
         return false;
     }
+
+    return true;
 }
 

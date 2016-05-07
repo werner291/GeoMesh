@@ -17,6 +17,11 @@ bool Router::handleMessage(PacketPtr data, int fromIface) {
 
     int protocol_version = data->getProtocolVersion();
 
+    if (protocol_version > PROTOCOL_VERSION) {
+        Logger::log(LogLevel::WARN, "Received packet with unsupported protocol"
+               " version. Consider upgrading.");
+    }
+
     if (data->isDestination(uniqueaddress) ||
             data->getMessageType() == MSGTYPE_LOCATION_INFO) {
 
@@ -26,7 +31,6 @@ bool Router::handleMessage(PacketPtr data, int fromIface) {
         // should not make decisions about whether to modify
         // the routing table or not.
         if (data->getMessageType() == MSGTYPE_LOCATION_INFO) {
-            Location peerLocation = data->getSourceLocation();
 
             int hops = data->getLocationInfoHopCount();
 
@@ -118,7 +122,9 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
     assert(suggestionPacket->getMessageType() == MSGTYPE_LOCATION_INFO);
 
     if (!suggestionPacket->verifyLocationInformation()) {
-        return false; // The location information was damaged. (TODO add intentional falsification check)
+        // The location information was damaged.
+        // (TODO add intentional falsification check)
+        return false; 
     }
 
     Location peerLocation = suggestionPacket->getSourceLocation();
@@ -127,8 +133,6 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
 
     if (hops == 1) {
         // This is a direct neighbour
-
-        int before = mFaceRoutingTable.size();
 
         DirectionalEntry entry {
                 fromIface, locationMgr.getLocation().getDirectionTo(peerLocation), peerLocation

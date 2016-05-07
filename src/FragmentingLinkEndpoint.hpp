@@ -37,7 +37,7 @@ class FragmentingLinkEndpoint : public AbstractLinkEndpoint {
 
     uint16_t nextPacketNumber;
 
-    time_t lastMessage;
+    //time_t lastMessage;
 
     // The address of the peer at the other end of the link.
     struct sockaddr_in peerAddress;

@@ -97,9 +97,9 @@ void LocationLookupManager::keepAlive() {
 LocationLookupManager::LocationLookupManager(LocalPacketHandler& localHandler,
                                              const Address &selfAddress,
                                              const VirtualLocationManager &locationMgr)
-        : localHandler(localHandler),
-          selfAddress(selfAddress),
-          locationMgr(locationMgr) {
+        : selfAddress(selfAddress),
+          locationMgr(locationMgr),
+          localHandler(localHandler){
 
     for (int msgType : {MSGTYPE_DHT_FIND_CLOSEST,
                         MSGTYPE_DHT_FIND_RESPONSE,

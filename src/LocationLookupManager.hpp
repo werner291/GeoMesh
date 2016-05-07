@@ -30,7 +30,8 @@ class LocationLookupManager {
 
     static const int REDUNDANCY_LEVEL = 2;
 
-    typedef std::function< void (const Address& address, const Location& loc, time_t expires) > Listener;
+    typedef std::function< void (const Address& address, const Location& loc,
+            time_t expires) > Listener;
 
     std::vector< Listener > updateListeners;
 

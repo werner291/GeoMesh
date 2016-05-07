@@ -36,7 +36,9 @@ void TunnelDeliveryInterface_Apple::startTunnelInterface() {
     mSocketId = socket(PF_SYSTEM, SOCK_DGRAM, SYSPROTO_CONTROL);
 
     if (mSocketId < 0) {
-        Logger::log(LogLevel::ERROR, "socket(PF_SYSTEM, SOCK_DGRAM, SYSPROTO_CONTROL) " + std::string(strerror(errno)));
+        Logger::log(LogLevel::ERROR,
+                "socket(PF_SYSTEM, SOCK_DGRAM, SYSPROTO_CONTROL) " 
+                + std::string(strerror(errno)));
     }
 
     // Ask the system to allocate a utun device ID for us. (utun0, utun1, ...)
@@ -45,9 +47,9 @@ void TunnelDeliveryInterface_Apple::startTunnelInterface() {
     strncpy(info.ctl_name, UTUN_CONTROL_NAME, strlen(UTUN_CONTROL_NAME));
 
     if (ioctl(mSocketId, CTLIOCGINFO, &info) < 0) {
-        int err = errno;
         close(mSocketId);
-        Logger::log(LogLevel::ERROR, "getting utun device id " + std::string(strerror(errno)));
+        Logger::log(LogLevel::ERROR, "getting utun device id " 
+                + std::string(strerror(errno)));
     }
 
     // Connect with a utun device

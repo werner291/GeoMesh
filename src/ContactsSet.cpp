@@ -1,10 +1,26 @@
-//
-// Created by Werner Kroneman on 04-04-16.
-//
+/*
+ * (c) Copyright 2016 Werner Kroneman
+ *
+ * This file is part of GeoMesh.
+ * 
+ * GeoMesh is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * GeoMesh is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with GeoMesh.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "ContactsSet.hpp"
 
-ContactsSet::const_iterator ContactsSet::findClosestEntry(const Address &query) const {
+ContactsSet::const_iterator ContactsSet::findClosestEntry(const Address &query)
+    const {
 
     auto a = entries.begin(); // Take an iterator to begin
 
@@ -64,8 +80,6 @@ ContactsSet::iterator ContactsSet::insert(const Entry &entry) {
     auto last = entries.end() - 1;
 
     while (first < last) {
-
-        bool equal = first > last;
 
         int distance = std::distance(first, last);
         auto mid = first + distance / 2;
