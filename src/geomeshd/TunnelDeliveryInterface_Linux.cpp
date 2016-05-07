@@ -16,9 +16,9 @@
 #include <unistd.h>
 #include "UnixSocketsFunctions.hpp"
 
-TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *localInterface,
-                                                             const Address &iFaceAddress)
-        :iFaceAddress(iFaceAddress), mLocalInterface(localInterface), fd(-1) {
+TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(
+        LocalInterface *localInterface, const Address &iFaceAddress)
+        :  mLocalInterface(localInterface), fd(-1), iFaceAddress(iFaceAddress){
 
     iFaceName[0] = 't';
     iFaceName[1] = 'u';
@@ -27,7 +27,6 @@ TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *loc
     iFaceName[4] = 'e';
     iFaceName[5] = 'o';
     iFaceName[6] = 0;
-
 
     //memset(iFaceName, 0, TUNInterface_IFNAMSIZ);
 
