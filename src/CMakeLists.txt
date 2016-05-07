@@ -83,7 +83,7 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 ENDIF ()
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set(DAEMON_SRC ${DAEMON_SRC} geomeshd/TunnelDeliveryInterface_Linux.cpp geomeshd/PacketFragment.cpp geomeshd/PacketDefragmenter.cpp)
+    set(DAEMON_SRC ${DAEMON_SRC} geomeshd/TunnelDeliveryInterface_Linux.cpp)
 ENDIF ()
 
 add_library(daemon_core ${DAEMON_SRC})
