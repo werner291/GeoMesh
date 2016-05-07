@@ -40,6 +40,9 @@ TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(LocalInterface *loc
 
 void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
+    Logger::log(LogLevel::DEBUG,
+                "Trying to start tun.");
+    
     struct ifreq ifr;
     int err;
     int flags = IFF_TUN | IFF_NO_PI;
@@ -75,10 +78,11 @@ void TunnelDeliveryInterface_Linux::startTunnelInterface() {
 
     strcpy(iFaceName, ifr.ifr_name);
 
-
     assignIP();
 
     installRoute();
+
+    Logger::log(LogLevel::DEBUG, "TUN setup done.");
 };
 
 void TunnelDeliveryInterface_Linux::assignIP() {
@@ -87,19 +91,27 @@ void TunnelDeliveryInterface_Linux::assignIP() {
 
     // Prevent a nasty bash injection under the root user.
     if (!std::regex_match(std::string(iFaceName), utunReg)) {
-        Logger::log(LogLevel::ERROR, "Invalid interface name while assigning address " + std::string(iFaceName));
+        Logger::log(LogLevel::ERROR,
+                    "Invalid interface name while assigning address " 
+                    + std::string(iFaceName));
         return;
     };
 
     std::stringstream command;
 
     command << "ip link set " << iFaceName << " up" << std::endl;
-    command << "ip -6 addr add " << iFaceAddress.toString() << " dev " << iFaceName << std::endl;
+    command << "ip -6 addr add " << iFaceAddress.toString() << " dev " 
+        << iFaceName << std::endl;
     command << "ip link set dev " << iFaceName << " mtu " << MAX_PAYLOAD_SIZE;
 
-    Logger::log(LogLevel::INFO, "Assigned IPv6 address " + command.str());
+    Logger::log(LogLevel::INFO,
+                "Assigned IPv6 address " + iFaceAddress.toString());
 
-    system(command.str().c_str());
+    if (system(command.str().c_str()) != 0) {
+        Logger::log(LogLevel::ERROR,
+                "Error while assigning address to TUN device. Exiting.");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void TunnelDeliveryInterface_Linux::pollMessages() {
