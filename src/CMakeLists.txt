@@ -9,6 +9,7 @@ set(CORE_SRC
     PacketFragment.cpp
     PacketDefragmenter.cpp
     Router.cpp 
+    Location.hpp
     Location.cpp
     Logger.cpp
     LinkManager.cpp
@@ -28,7 +29,6 @@ set(CORE_SRC
     LocalPacketHandler.cpp
     AbstractLinkEndpoint.hpp
     Router.hpp
-    Location.hpp
     Logger.hpp
     LinkManager.hpp 
     ContactsSet.cpp
@@ -108,4 +108,4 @@ set_property(TARGET daemon_core PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET geomeshd PROPERTY CXX_STANDARD 11)
 set_property(TARGET geomeshd PROPERTY CXX_STANDARD_REQUIRED ON)
 
-TARGET_LINK_LIBRARIES(geomeshd core daemon_core pthread)
+TARGET_LINK_LIBRARIES(geomeshd daemon_core pthread)
