@@ -52,7 +52,7 @@ class LocationLookupManager {
 
     Address selfAddress;
 
-    ContactsSet contacts;
+    ContactsSet& contacts;
 
     std::set<Address> waitingForLookup;
 
@@ -69,7 +69,8 @@ class LocationLookupManager {
 public:
     LocationLookupManager(LocalPacketHandler& localHandler,
                           const Address &selfAddress,
-                          const VirtualLocationManager &locationMgr);
+                          const VirtualLocationManager &locationMgr,
+                          ContactsSet& contacts);
 
     bool processEntrySuggestion(const Address& address, const Location& loc, time_t expires);
 

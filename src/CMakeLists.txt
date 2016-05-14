@@ -61,8 +61,13 @@ IF (BUILD_SIMULATOR)
     FIND_LIBRARY(LIBRARY_glu GLU)
     FIND_LIBRARY(LIBRARY_glut GLUT)
 
-    set(SIM_SRC simulator/NetworkSim.cpp simulator/NetworkWidget.cpp simulator/SimulatorLink.cpp simulator/ActionButton.cpp
-            simulator/draw3d.cpp simulator/simulator_main.cpp)
+    set(SIM_SRC
+        simulator/NetworkSim.cpp
+        simulator/NetworkWidget.cpp 
+        simulator/SimulatorLink.cpp
+        simulator/ActionButton.cpp
+        simulator/draw3d.cpp
+        simulator/simulator_main.cpp)
 
     add_executable(Simulator ${SIM_SRC})
     TARGET_LINK_LIBRARIES(Simulator core ${FLTK_LIBRARY} ${FLTK_LIBRARY_GL} ${LIBRARY_OpenGL} ${LIBRARY_glu} ${LIBRARY_glut})
@@ -76,6 +81,10 @@ set(DAEMON_SRC
     geomeshd/GeoMeshd_main.cpp 
     geomeshd/UDPManager.cpp 
     geomeshd/UnixSocketsFunctions.cpp
+    geomeshd/HTTPServer.cpp
+    geomeshd/RESTHandler.cpp
+    geomeshd/RESTResourceAdapters.hpp
+    geomeshd/json/jsoncpp.cpp
     )
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -87,6 +96,7 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 ENDIF ()
 
 add_library(daemon_core ${DAEMON_SRC})
+
 
 TARGET_LINK_LIBRARIES(daemon_core core ${Boost_LIBRARIES})
 

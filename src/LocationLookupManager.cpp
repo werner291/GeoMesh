@@ -75,24 +75,31 @@ void LocationLookupManager::refreshRoutingTable() {
 
 void LocationLookupManager::requestLocationLookup(const Address& toLookUp) {
 
-	Logger::log(LogLevel::DEBUG, "Requested location lookup for address " + toLookUp.toString());
+	Logger::log(LogLevel::DEBUG, "Requested location lookup for address " 
+            + toLookUp.toString());
 
     waitingForLookup.insert(toLookUp);
 
-    if (! contacts.empty() ) {
+    if (! contacts.empty() ) 
+    {
         uint8_t message[FIND_CLOSEST_MESSAGE_SIZE];
 
-        LocationLookupManager::writeLookupMessage(message, selfAddress, locationMgr.getLocation(), toLookUp);
+        writeLookupMessage(message, selfAddress, locationMgr.getLocation(),
+                toLookUp);
 
-            auto itr = contacts.findClosestEntry(toLookUp);
+        auto itr = contacts.findClosestEntry(toLookUp);
 
-                localHandler.sendFromLocal(MSGTYPE_DHT_FIND_CLOSEST,
-                                           itr->address,
-                                           itr->location,
-                                           message,
-                           FIND_CLOSEST_MESSAGE_SIZE);
-    } else {
-	    Logger::log(LogLevel::INFO, "Location Lookup Manager has no contacts, will perform request when contacts acquired.");
+        localHandler.sendFromLocal(MSGTYPE_DHT_FIND_CLOSEST,
+                                   itr->address,
+                                   itr->location,
+                                   message,
+                                   FIND_CLOSEST_MESSAGE_SIZE);
+
+    } 
+    else 
+    {
+	    Logger::log(LogLevel::INFO, "Location Lookup Manager has no contacts,"
+               " will perform request when contacts acquired.");
     }
     
 }
@@ -111,10 +118,11 @@ void LocationLookupManager::keepAlive() {
 
 LocationLookupManager::LocationLookupManager(LocalPacketHandler& localHandler,
                                              const Address &selfAddress,
-                                             const VirtualLocationManager &locationMgr)
-        : selfAddress(selfAddress),
-          locationMgr(locationMgr),
-          localHandler(localHandler){
+                                             const VirtualLocationManager &locationMgr,
+                                             ContactsSet& contacts)
+        : selfAddress(selfAddress), locationMgr(locationMgr),
+          localHandler(localHandler), contacts(contacts)
+{
 
     for (int msgType : {MSGTYPE_DHT_FIND_CLOSEST,
                         MSGTYPE_DHT_FIND_RESPONSE,

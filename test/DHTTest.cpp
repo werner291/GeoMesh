@@ -17,11 +17,14 @@ public:
     LocalPacketHandler lh;
     LocationLookupManager llm;
     LocalInterface li;
+    ContactsSet contacts;
 
     DHTSimplifiedNode(const Address &addr,
                       const Location &loc,
                       std::function<bool(PacketPtr)> sendPacket = EMPTY_SEND_STRATEGY)
-            : addr(addr), vlm(loc), lh(vlm, addr, sendPacket), llm(lh, addr, vlm), li(lh, llm) { }
+            : addr(addr), vlm(loc), lh(vlm, addr, sendPacket), 
+              llm(lh, addr, vlm,contacts), li(lh, llm) 
+    { }
 };
 
 /**
@@ -31,14 +34,18 @@ public:
 TEST(DHTTest, relay_find_preconfigured) {
 
     // Address/location of the simulated node.
-    Address simulatedAddress = Address::fromString("5555:5555:5555:5555:5555:5555:5555:5555");
+    Address simulatedAddress = Address::fromString(
+            "5555:5555:5555:5555:5555:5555:5555:5555");
     VirtualLocationManager simulatedVLM(Location(0, 0));
+    ContactsSet contacts;
 
     // Initialize local handler with empty send strategy.
-    LocalPacketHandler localHandler(simulatedVLM, simulatedAddress, EMPTY_SEND_STRATEGY);
+    LocalPacketHandler localHandler(simulatedVLM, simulatedAddress,
+            EMPTY_SEND_STRATEGY);
 
     // The LLM of the simulated node
-    LocationLookupManager llm(localHandler, simulatedAddress, simulatedVLM);
+    LocationLookupManager llm(localHandler, simulatedAddress, simulatedVLM,
+            contacts);
 
     // Give it a contact very close to its own position
     llm.processEntrySuggestion(Address::fromString("5555:5555:5555:5555:5555:5555:5555:5551"),

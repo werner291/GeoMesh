@@ -1,5 +1,4 @@
 /*
- *
  * (c) Copyright 2016 Werner Kroneman
  *
  * This file is part of GeoMesh.
@@ -57,6 +56,10 @@ namespace po = boost::program_options;
 #include "../Router.hpp"
 #include "../Scheduler.hpp"
 
+#include "HTTPServer.hpp"
+#include "RESTHandler.hpp"
+#include "RESTResourceAdapters.hpp"
+
 #define DEFAULT_CONFIG_NODAEMON "geomesh.json"
 #define DEFAULT_CONFIG_DAEMON "/etc/geomesh.json"
 
@@ -91,43 +94,43 @@ void enableSyslogStrategy() {
     usingSyslog = true;
 }
 
-void signalReceived(int signal) {
-
+void signalReceived(int signal) 
+{
     std::cout << "Received signal: " << signal << std::endl;
-
+    running = false;
 }
 
 
-void daemonize() {
+void daemonize() 
+{
+    pid_t pid = fork();
 
-pid_t pid = fork();
+    if (pid > 0) {
+        // Parent process
 
-if (pid > 0) {
-    // Parent process
+        std::cout << "Daemon forked to background successfully!" << std::endl;
+        std::cout << "Child process ad PID: " << pid << std::endl;
 
-    std::cout << "Daemon forked to background successfully!" << std::endl;
-    std::cout << "Child process ad PID: " << pid << std::endl;
+        exit(0);
+    } else if (pid < 0) {
+        std::cout << "Fork failed!" << std::endl;
+        exit(1);
+    } else {
+    // This is the child process, continue daemonization (TODO)
 
-    exit(0);
-} else if (pid < 0) {
-    std::cout << "Fork failed!" << std::endl;
-    exit(1);
-} else {
-// This is the child process, continue daemonization (TODO)
+        enableSyslogStrategy();
+    }
 
-    enableSyslogStrategy();
-}
+    umask(0);
 
-umask(0);
+    /* Create a new SID for the child process */
+    pid_t sid = setsid();
+    if (sid < 0) {
 
-/* Create a new SID for the child process */
-pid_t sid = setsid();
-if (sid < 0) {
+            Logger::log(LogLevel::ERROR, "Cannot set session ID of daemon.");
+            closelog();
 
-        Logger::log(LogLevel::ERROR, "Cannot set session ID of daemon.");
-        closelog();
-
-        exit(EXIT_FAILURE);
+            exit(EXIT_FAILURE);
     }
 }
 
@@ -143,7 +146,7 @@ int main(int argc, char **argv) {
 
     // Register signal handlers
     
-    //signal(SIGINT, &signalReceived);
+    signal(SIGINT, &signalReceived);
 
     po::options_description config_options("GeoMesh configuration");
     config_options.add_options()
@@ -214,6 +217,7 @@ int main(int argc, char **argv) {
     // Parse command line arguments into program options
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, cli_options), vm);
+    po::notify(vm);
 
     if (vm.count("help")) {
         // Print help and exit.
@@ -269,7 +273,6 @@ int main(int argc, char **argv) {
         daemonize();
     }
 
-
     // TODO validation
 
     std::string stringKey = vm["address_key"].as<std::string>();
@@ -284,12 +287,14 @@ int main(int argc, char **argv) {
     std::cout << "Using address: " << addr.toString() << std::endl;
 
     GreedyRoutingTable table;
+    ContactsSet contacts;
 
     Router router(addr, Location(0, 0), table);
 
     LocationLookupManager llm(router.getLocalHandler(),
                               addr,
-                              router.getLocationMgr());
+                              router.getLocationMgr(),
+                              contacts);
 
     // Allocate and initialize the scheduler
     Scheduler scheduler(false);
@@ -342,19 +347,42 @@ int main(int argc, char **argv) {
                     int port = std::stoi(results[2].str());
 
                     udpManager->connectTo(address,port);
-                } else {
-                    std::cout << "Invalid peer address: " << peer
-                              << ", must be in x.x.x.x:port format for IPv4, and in [...]:port format for IPv6 (unimplemented)."
-                              << std::endl;
-
-                    exit(1); // TODO Problematic if already daemonized, need to do validation early on
                 }
+                else 
+                {
+                    std::cout << "Invalid peer address: " << peer
+                              << ", must be in x.x.x.x:port format for IPv4,"
+                                 " and in [...]:port format for IPv6"
+                                 " (unimplemented)." << std::endl;
 
+                    exit(1); // TODO Problematic if already daemonized, need to
+                             // do validation early on
+                }
             }
         }
-
     }
 
+    std::unique_ptr<HTTPServer> httpserver;
+    std::unique_ptr<RESTRequestHandler> rest;
+    std::unique_ptr<ContactsResource> contactsResource;
+
+    if (vm["rpc_enable"].as<bool>()) {
+
+        rest.reset(new RESTRequestHandler());
+
+        contactsResource.reset(new ContactsResource(contacts));
+        rest->addResource("contacts",*contactsResource);
+
+        httpserver.reset(new HTTPServer(9999, "Hello!", *rest));
+        scheduler.scheduleTask(Scheduler::Task(
+                        Scheduler::clock::now(),
+                        std::chrono::milliseconds(50),
+                        true,
+                        [&] (Scheduler::time_point t, Scheduler::duration d,
+                              Scheduler::Task& task)
+                        { httpserver->pollSocket(); }
+                    ));
+    }
 
     // For the whole duration of the program, poll for messages and handle time-related things.
     while (running) {
@@ -363,6 +391,8 @@ int main(int argc, char **argv) {
 
         usleep(10000); // Sleep 0.01 seconds = 10000 microseconds
     }
+
+    Logger::log(LogLevel::INFO, "Shutting down...");
 
     if (usingSyslog) {
         closelog();
