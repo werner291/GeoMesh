@@ -19,7 +19,6 @@
 
 #include <assert.h>
 
-#include "json/json/json.h"
 
 #include "RESTHandler.hpp"
 
@@ -105,6 +104,8 @@ void RESTRequestHandler::handleRequest( HTTPResponse& out,
         if (request.getMethod() == "POST")
         {
             result = itr->second.post(objectName,obj);
+            out.setStatus(201, "Created");
+            out.setHeader("Location", "/" + resource + result.location);
         }
         else if (request.getMethod() == "PUT")
         {
@@ -120,7 +121,6 @@ void RESTRequestHandler::handleRequest( HTTPResponse& out,
         out.setStatus(406, "Not acceptable");
     
     // JSON (also if unspecified)
-
     Json::FastWriter writer;
     out.getBodyStream() << writer.write(result.properties);
 

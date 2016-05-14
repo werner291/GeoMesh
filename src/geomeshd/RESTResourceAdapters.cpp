@@ -16,3 +16,64 @@
  * You should have received a copy of the GNU General Public License
  * along with GeoMesh.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "../UniqueAddress.hpp"
+#include "../Location.cpp"
+
+#include "RESTResourceAdapters.hpp"
+
+RESTObject ContactsResource::get(std::string request) 
+{
+    if (!request.empty() && request != "/")
+        throw HTTPException(400,"Invalid query");
+
+    RESTObject result;
+
+    result.properties = Json::Value(Json::arrayValue);
+
+    for (const ContactsSet::Entry& contact : contacts) 
+    {
+        Json::Value contactInfo(Json::objectValue);
+        contactInfo["address"] = contact.address.toString();
+        contactInfo["latitude"] = contact.location.lat;
+        contactInfo["longitude"] = contact.location.lon;
+        contactInfo["expires"] = (Json::UInt64) contact.expires;
+
+        result.properties.append(contactInfo);
+    }
+
+    return result;
+}
+
+RESTObject ContactsResource::post(std::string request,
+            const RESTObject& posted) 
+{
+    // An ID is not allowed on POST, it will be returned
+    // in the Locaiton: header
+    if (!request.empty() && request != "/")
+        throw HTTPException(400,"Invalid query");
+
+    
+    Address addr;
+    try {
+        addr = Address::fromString(posted.properties["address"].asString());
+    } catch (...) {
+        // TODO Create a proper exception class
+        throw HTTPException(400,"Invalid address");
+    }
+
+    Location loc(posted.properties["latitude"].asDouble(),
+                 posted.properties["longitude"].asDouble());
+
+    time_t expires = posted.properties["expires"].asUInt64();
+
+    contacts.insert(ContactsSet::Entry(addr,loc,expires));
+
+    // Return the object as required.
+    RESTObject obj;
+    obj.properties = posted.properties;
+    // Set location to address
+    obj.location = "/" + addr.toString();
+
+    return obj;
+}

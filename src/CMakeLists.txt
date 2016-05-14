@@ -83,7 +83,7 @@ set(DAEMON_SRC
     geomeshd/UnixSocketsFunctions.cpp
     geomeshd/HTTPServer.cpp
     geomeshd/RESTHandler.cpp
-    geomeshd/RESTResourceAdapters.hpp
+    geomeshd/RESTResourceAdapters.cpp
     geomeshd/json/jsoncpp.cpp
     )
 

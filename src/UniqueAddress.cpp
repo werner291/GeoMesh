@@ -17,6 +17,7 @@
  * along with GeoMesh.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <exception>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "UniqueAddress.hpp"
@@ -69,7 +70,10 @@ Address Address::generateFromKey(const AddressPublicKey& key) {
 
 Address Address::fromString(const std::string& str) {
     struct in6_addr ipv6data;
-    inet_pton(AF_INET6, str.c_str(), &ipv6data);
+    
+    if (inet_pton(AF_INET6, str.c_str(), &ipv6data) != 1)
+        // TODO create custom exception class.
+        throw std::runtime_error("Error while reading address.");
 
     Address blank;
 

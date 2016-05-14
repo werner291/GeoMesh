@@ -38,33 +38,9 @@ public:
         : contacts(contacts)
     { }
 
-    virtual RESTObject get(std::string request) override
-    {
-        if (!request.empty() && request != "/")
-            throw HTTPException(400,"Invalid query");
+    RESTObject get(std::string request) override;
 
-        RESTObject result;
-
-        result.properties = Json::Value(Json::arrayValue);
-
-        for (const ContactsSet::Entry& contact : contacts) 
-        {
-            Json::Value contactInfo(Json::objectValue);
-            contactInfo["address"] = contact.address.toString();
-            contactInfo["latitude"] = contact.location.lat;
-            contactInfo["longitude"] = contact.location.lon;
-            contactInfo["expires"] = (Json::UInt64) contact.expires;
-
-            result.properties.append(contactInfo);
-        }
-
-        return result;
-    }
-
-    virtual RESTObject post(std::string request, const RESTObject& object) override
-    {
-        throw HTTPMethodNotAllowedException("post method not allowed.");
-    }
+    RESTObject post(std::string request, const RESTObject& posted) override;
 
     virtual RESTObject put(std::string request, const RESTObject& object) override
     {
@@ -75,7 +51,6 @@ public:
     {
         throw HTTPMethodNotAllowedException("delete method not allowed.");
     }
-
 };
 
 
