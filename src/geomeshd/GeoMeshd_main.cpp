@@ -27,6 +27,7 @@
 #include <syslog.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <signal.h>
 
 #include <cryptopp/base64.h>
 #include <cryptopp/eccrypto.h>
