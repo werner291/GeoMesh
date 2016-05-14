@@ -16,7 +16,6 @@ public:
     HTTPException(int status, const std::string& reason)
         : std::runtime_error(std::to_string(status) + " " + reason),
           reason(reason), status(status) 
-          
     { }
 
     const std::string& getReason()
