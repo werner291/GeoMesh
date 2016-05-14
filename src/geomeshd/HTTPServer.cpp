@@ -20,6 +20,9 @@
 #include <iostream>
 #include "../Logger.hpp"
 #include "HTTPServer.hpp"
+#include <string.h>
+#include <errno.h>
+#include <assert.h>
 
 using namespace std;
 
@@ -32,7 +35,7 @@ HTTPServer::HTTPServer(int port, string password, RequestHandler& requestHandler
     if (serverSocket < 0) 
         throw runtime_error("ERROR opening socket");
     
-    bzero((char *) &serv_addr, sizeof(serv_addr));
+    memset((char *) &serv_addr, 0, sizeof(serv_addr));
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
@@ -59,7 +62,7 @@ void HTTPServer::pollSocket()
 
     if (clientSocket >= 0) 
     {
-        activeRequests.emplace_back(HTTPRequest());
+        activeRequests.emplace_back();
         activeRequests.back().state = HTTPRequest::REQUEST;
         activeRequests.back().expected_body = 0;
         activeRequests.back().clientSocket = clientSocket;
@@ -165,7 +168,7 @@ void HTTPServer::processIncomingBytes(HTTPRequest& conn)
                 conn.state = HTTPRequest::HEADER;
 
                 // Find the first space seperating the method and the request
-                int firstSpace = headerLine.find(" ");
+                auto firstSpace = headerLine.find(" ");
 
                 if (firstSpace == string::npos) {
                     // If absent, tell the client and close.
@@ -174,7 +177,7 @@ void HTTPServer::processIncomingBytes(HTTPRequest& conn)
                 }
                 
                 // Find the second space
-                int secondSpace = headerLine.find(" ", firstSpace+1);
+                auto secondSpace = headerLine.find(" ", firstSpace+1);
 
                 if (secondSpace == string::npos) {
                     HTTPResponse(400,"Bad request").writeTo(conn.clientSocket);
@@ -210,17 +213,17 @@ void HTTPServer::processIncomingBytes(HTTPRequest& conn)
                 }
                 else
                 {
-                    int colonPos = headerLine.find(":");
+                    auto colonPos = headerLine.find(":");
                     if (colonPos == string::npos) 
                         throw HTTPException(400,"Invalid header, missing colon");
                     
                     // Find the first non-whitespace char after the :
-                    int valuePos = headerLine.find_first_not_of(" ", colonPos+1);
+                    auto valuePos = headerLine.find_first_not_of(" ", colonPos+1);
                     if (valuePos == string::npos) 
                         throw HTTPException(400,"Invalid header, missing value");
                     
                     // Find the last non-whitespace character
-                    int valueEnd = headerLine.length()-1;
+                    auto valueEnd = headerLine.length()-1;
                     while (headerLine[valueEnd] == ' ') --valueEnd;
 
                     string key = headerLine.substr(0,colonPos);
@@ -235,7 +238,10 @@ void HTTPServer::processIncomingBytes(HTTPRequest& conn)
            << " of " << conn.expected_body << std::endl; 
 
         // The header was passed, is the body as large as we expect yet?
-        if (conn.buffer.tellp() - conn.buffer.tellg() >= conn.expected_body) 
+        assert(conn.buffer.tellp() >= conn.buffer.tellg());
+        size_t bufLength = conn.buffer.tellp() - conn.buffer.tellg();
+
+        if (bufLength >= conn.expected_body) 
         {
             // Yes! If the request was correct, we should be able to
             // handle it now! Set status to 200 for now.

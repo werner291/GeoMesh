@@ -14,8 +14,8 @@ class HTTPException : std::runtime_error
 
 public:
     HTTPException(int status, const std::string& reason)
-        : reason(reason), status(status), 
-          std::runtime_error(std::to_string(status) + " " + reason)
+        : std::runtime_error(std::to_string(status) + " " + reason),
+          reason(reason), status(status) 
     { }
 
     const std::string& getReason()
