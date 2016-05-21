@@ -49,18 +49,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b9eb4c74-e530-4172-a748-7697c4453694" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/Crypto.cpp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/Crypto.h" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/geomeshd/FileDescriptorNotifier.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/geomeshd/http/HTTPResponse.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/geomeshd/http/HTTPResponse.hpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/geomeshd/http/HTTPServer.hpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/geomeshd/http/IncomingHTTPRequest.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/geomeshd/http/IncomingHTTPRequest.h" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/geomeshd/HTTPServer.hpp" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/geomeshd/HTTPExceptions.hpp" afterPath="$PROJECT_DIR$/src/geomeshd/http/HTTPExceptions.hpp" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/geomeshd/HTTPServer.cpp" afterPath="$PROJECT_DIR$/src/geomeshd/http/HTTPServer.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/googletest" afterPath="$PROJECT_DIR$/test/googletest" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/GeoMesh.iml" afterPath="$PROJECT_DIR$/.idea/GeoMesh.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" afterPath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/CMakeLists.txt" afterPath="$PROJECT_DIR$/src/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/UniqueAddress.cpp" afterPath="$PROJECT_DIR$/src/UniqueAddress.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/UniqueAddress.hpp" afterPath="$PROJECT_DIR$/src/UniqueAddress.hpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/LocationLookupManager.cpp" afterPath="$PROJECT_DIR$/src/LocationLookupManager.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Scheduler.cpp" afterPath="$PROJECT_DIR$/src/Scheduler.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Scheduler.hpp" afterPath="$PROJECT_DIR$/src/Scheduler.hpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/base64.h" afterPath="$PROJECT_DIR$/src/base64.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/geomeshd/GeoMeshd_main.cpp" afterPath="$PROJECT_DIR$/src/geomeshd/GeoMeshd_main.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/CMakeLists.txt" afterPath="$PROJECT_DIR$/test/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/CryptoTest.cpp" afterPath="$PROJECT_DIR$/test/CryptoTest.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/geomeshd/RESTHandler.hpp" afterPath="$PROJECT_DIR$/src/geomeshd/RESTHandler.hpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Apple.cpp" afterPath="$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Apple.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Apple.hpp" afterPath="$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Apple.hpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Linux.cpp" afterPath="$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Linux.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Linux.hpp" afterPath="$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Linux.hpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/geomeshd/UDPManager.cpp" afterPath="$PROJECT_DIR$/src/geomeshd/UDPManager.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/geomeshd/UDPManager.hpp" afterPath="$PROJECT_DIR$/src/geomeshd/UDPManager.hpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/geomeshd/UnixSocketsFunctions.cpp" afterPath="$PROJECT_DIR$/src/geomeshd/UnixSocketsFunctions.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/Scheduler_test.cpp" afterPath="$PROJECT_DIR$/test/Scheduler_test.cpp" />
     </list>
     <ignored path="GeoMesh.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -81,45 +98,12 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="GeoMeshd_main.cpp" pinned="false" current-in-tab="true">
+      <file leaf-file-name="GeoMeshd_main.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/geomeshd/GeoMeshd_main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="99">
-              <caret line="269" column="0" selection-start-line="269" selection-start-column="0" selection-end-line="269" selection-end-column="0" />
+            <state relative-caret-position="486">
+              <caret line="333" column="0" selection-start-line="333" selection-start-column="0" selection-end-line="333" selection-end-column="0" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="base64.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base64.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="3" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="3" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="base64.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/base64.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="2" selection-end-column="3" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="UDPManager.hpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/geomeshd/UDPManager.hpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="615">
-              <caret line="41" column="4" selection-start-line="41" selection-start-column="4" selection-end-line="41" selection-end-column="4" />
-              <folding>
-                <element signature="e#132#161#0" expanded="true" />
-                <marker date="1461841182000" expanded="true" signature="353:2768" placeholder="{...}" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -127,8 +111,52 @@
       <file leaf-file-name="UDPManager.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/geomeshd/UDPManager.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="585">
-              <caret line="39" column="1" selection-start-line="39" selection-start-column="1" selection-end-line="39" selection-end-column="1" />
+            <state relative-caret-position="307">
+              <caret line="179" column="1" selection-start-line="179" selection-start-column="1" selection-end-line="179" selection-end-column="1" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UnixSocketsFunctions.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/geomeshd/UnixSocketsFunctions.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-39">
+              <caret line="12" column="20" selection-start-line="12" selection-start-column="20" selection-end-line="12" selection-end-column="20" />
+              <folding>
+                <element signature="e#53#76#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UDPManager.hpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/geomeshd/UDPManager.hpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="722">
+              <caret line="89" column="2" selection-start-line="89" selection-start-column="2" selection-end-line="89" selection-end-column="2" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TunnelDeliveryInterface_Linux.hpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Linux.hpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="216">
+              <caret line="45" column="30" selection-start-line="45" selection-start-column="30" selection-end-line="45" selection-end-column="30" />
+              <folding>
+                <element signature="e#816#848#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TunnelDeliveryInterface_Linux.cpp" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Linux.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="12" column="23" selection-start-line="12" selection-start-column="23" selection-end-line="12" selection-end-column="23" />
               <folding />
             </state>
           </provider>
@@ -137,43 +165,40 @@
       <file leaf-file-name="TunnelDeliveryInterface_Apple.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Apple.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="11" column="18" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Scheduler.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Scheduler.cpp">
-          <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="315">
-              <caret line="21" column="26" selection-start-line="21" selection-start-column="26" selection-end-line="21" selection-end-column="26" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Scheduler.hpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Scheduler.hpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1710">
-              <caret line="114" column="20" selection-start-line="114" selection-start-column="20" selection-end-line="114" selection-end-column="20" />
+              <caret line="35" column="4" selection-start-line="35" selection-start-column="4" selection-end-line="41" selection-end-column="34" />
               <folding>
-                <element signature="e#107#126#0" expanded="true" />
-                <marker date="1461940147000" expanded="true" signature="512:884" placeholder="{...}" />
-                <marker date="1461940147000" expanded="true" signature="802:814" placeholder="{...}" />
-                <marker date="1461940147000" expanded="true" signature="838:878" placeholder="{...}" />
+                <element signature="e#54#81#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Scheduler_test.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/Scheduler_test.cpp">
+      <file leaf-file-name="TunnelDeliveryInterface_Apple.hpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Apple.hpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="31" selection-start-line="9" selection-start-column="31" selection-end-line="9" selection-end-column="31" />
+            <state relative-caret-position="347">
+              <caret line="52" column="34" selection-start-line="52" selection-start-column="34" selection-end-line="52" selection-end-column="56" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="75">
+              <caret line="5" column="18" selection-start-line="5" selection-start-column="7" selection-end-line="5" selection-end-column="18" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/geomeshd/CMakeLists.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="210">
+              <caret line="14" column="9" selection-start-line="14" selection-start-column="9" selection-end-line="14" selection-end-column="9" />
               <folding />
             </state>
           </provider>
@@ -187,27 +212,21 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/LocalPacketHandler.cpp" />
-        <option value="$PROJECT_DIR$/doc/DHT.md" />
         <option value="$PROJECT_DIR$/src/Packet.hpp" />
         <option value="$PROJECT_DIR$/src/LocalPacketHandler.hpp" />
         <option value="$PROJECT_DIR$/src/ContactsSet.h" />
         <option value="$PROJECT_DIR$/src/LocalInterface.cpp" />
-        <option value="$PROJECT_DIR$/test/googletest/googletest/include/gtest/gtest.h" />
         <option value="$PROJECT_DIR$/test/Address_test.cpp" />
         <option value="$PROJECT_DIR$/src/UniqueAddress.hpp" />
         <option value="$PROJECT_DIR$/doc/algorithms.md" />
         <option value="$PROJECT_DIR$/src/ContactsSet.hpp" />
         <option value="$PROJECT_DIR$/test/ContactsSetTest.cpp" />
-        <option value="$PROJECT_DIR$/src/LocationLookupManager.cpp" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/test/Packet_test.cpp" />
         <option value="$PROJECT_DIR$/test/Location_test.cpp" />
         <option value="$PROJECT_DIR$/test/Simulations_test.cpp" />
         <option value="$PROJECT_DIR$/src/Scheduler.h" />
         <option value="$PROJECT_DIR$/test/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/src/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/test/Scheduler_test.cpp" />
         <option value="$PROJECT_DIR$/src/Router.cpp" />
         <option value="$PROJECT_DIR$/src/Router.hpp" />
         <option value="$PROJECT_DIR$/src/Core.h" />
@@ -217,28 +236,66 @@
         <option value="$PROJECT_DIR$/src/geomeshd/Options.h" />
         <option value="$PROJECT_DIR$/src/ContactsSet.cpp" />
         <option value="$PROJECT_DIR$/test/DHTTest.cpp" />
-        <option value="$PROJECT_DIR$/src/geomeshd/UDPManager.hpp" />
-        <option value="$PROJECT_DIR$/src/Scheduler.cpp" />
-        <option value="$PROJECT_DIR$/src/Scheduler.hpp" />
-        <option value="$PROJECT_DIR$/src/geomeshd/UDPManager.cpp" />
-        <option value="$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Apple.cpp" />
-        <option value="$PROJECT_DIR$/src/base64.h" />
         <option value="$PROJECT_DIR$/src/base64.cpp" />
         <option value="$PROJECT_DIR$/src/Crypto.h" />
+        <option value="$PROJECT_DIR$/src/simulator/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/src/base64.h" />
+        <option value="$PROJECT_DIR$/src/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/src/Scheduler.cpp" />
+        <option value="$PROJECT_DIR$/src/LocationLookupManager.cpp" />
+        <option value="$PROJECT_DIR$/src/Scheduler.hpp" />
+        <option value="$PROJECT_DIR$/test/googletest/googletest/include/gtest/gtest.h" />
+        <option value="$PROJECT_DIR$/test/Scheduler_test.cpp" />
+        <option value="$PROJECT_DIR$/src/geomeshd/UDPManager.hpp" />
+        <option value="$PROJECT_DIR$/src/geomeshd/FileDescriptorNotifier.hpp" />
+        <option value="$PROJECT_DIR$/src/geomeshd/HTTPServer.cpp" />
+        <option value="$PROJECT_DIR$/src/geomeshd/FileDescriptorNotifier.cpp" />
+        <option value="$PROJECT_DIR$/src/geomeshd/IncomingHTTPRequest.h" />
+        <option value="$PROJECT_DIR$/src/geomeshd/HTTPServer.hpp" />
+        <option value="$PROJECT_DIR$/src/geomeshd/HTTPResponse.hpp" />
+        <option value="$PROJECT_DIR$/src/geomeshd/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/src/geomeshd/http/HTTPResponse.hpp" />
+        <option value="$PROJECT_DIR$/src/geomeshd/http/HTTPServer.hpp" />
+        <option value="$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Apple.cpp" />
         <option value="$PROJECT_DIR$/src/geomeshd/GeoMeshd_main.cpp" />
+        <option value="$PROJECT_DIR$/src/geomeshd/UDPManager.cpp" />
+        <option value="$PROJECT_DIR$/src/geomeshd/UnixSocketsFunctions.cpp" />
+        <option value="$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Apple.hpp" />
+        <option value="$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Linux.hpp" />
+        <option value="$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Linux.cpp" />
       </list>
     </option>
   </component>
-  <component name="JsBuildToolGruntFileManager" detection-done="true" />
-  <component name="JsBuildToolPackageJson" detection-done="true" />
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
   <component name="JsGulpfileManager">
     <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds">
     <option name="y" value="23" />
     <option name="width" value="1440" />
-    <option name="height" value="830" />
+    <option name="height" value="831" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>XPath</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>C/C++</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -293,39 +350,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="GeoMesh" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="GeoMesh" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="GeoMesh" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="GeoMesh" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="simulator" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -347,26 +372,12 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="GeoMesh" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="GeoMesh" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="doc" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="preferences.intentionPowerPack" />
+    <property name="settings.editor.selected.configurable" value="CPPToolchains" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="js-jscs-nodeInterpreter" value="/usr/local/bin/node" />
@@ -387,24 +398,29 @@
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="941" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
   </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/geomeshd/http" />
+    </key>
+  </component>
   <component name="RunManager" selected="Application.geomeshd">
-    <configuration default="false" name="dhtTest.refresh_procedure" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GeoMesh" TARGET_NAME="runUnitTests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GeoMesh" RUN_TARGET_NAME="runUnitTests" TEST_CLASS="dhtTest" TEST_METHOD="refresh_procedure" TEST_MODE="SUITE_TEST">
-      <envs />
-      <method />
-    </configuration>
-    <configuration default="false" name="dhtTest.respond_find" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GeoMesh" TARGET_NAME="runUnitTests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GeoMesh" RUN_TARGET_NAME="runUnitTests" TEST_CLASS="dhtTest" TEST_METHOD="respond_find" TEST_MODE="SUITE_TEST">
-      <envs />
-      <method />
-    </configuration>
-    <configuration default="false" name="dhtTest.local_minimum_response" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GeoMesh" TARGET_NAME="runUnitTests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GeoMesh" RUN_TARGET_NAME="runUnitTests" TEST_CLASS="dhtTest" TEST_METHOD="local_minimum_response" TEST_MODE="SUITE_TEST">
-      <envs />
-      <method />
-    </configuration>
     <configuration default="false" name="scheduler_test.test_async" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GeoMesh" TARGET_NAME="runCoreTests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GeoMesh" RUN_TARGET_NAME="runCoreTests" TEST_CLASS="scheduler_test" TEST_METHOD="test_async" TEST_MODE="SUITE_TEST">
       <envs />
       <method />
     </configuration>
     <configuration default="false" name="DHTTest.routingTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GeoMesh" TARGET_NAME="runCoreTests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GeoMesh" RUN_TARGET_NAME="runCoreTests" TEST_CLASS="DHTTest" TEST_METHOD="routingTest" TEST_MODE="SUITE_TEST">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="scheduler_test.run_asap_immediate" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" WORKING_DIR="" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GeoMesh" TARGET_NAME="runCoreTests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GeoMesh" RUN_TARGET_NAME="runCoreTests" TEST_CLASS="scheduler_test" TEST_METHOD="run_asap_immediate" TEST_MODE="SUITE_TEST">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="All in scheduler_test" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GeoMesh" TARGET_NAME="runCoreTests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GeoMesh" RUN_TARGET_NAME="runCoreTests" TEST_CLASS="scheduler_test" TEST_MODE="SUITE_TEST">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="All in Scheduler_test.cpp" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GeoMesh" TARGET_NAME="runCoreTests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GeoMesh" RUN_TARGET_NAME="runCoreTests" TEST_PATTERN="scheduler_test.*:scheduler_test/*.*:*/scheduler_test.*/*:*/scheduler_test/*.*" TEST_MODE="PATTERN">
       <envs />
       <method />
     </configuration>
@@ -717,7 +733,7 @@
       <envs />
       <method />
     </configuration>
-    <configuration default="false" name="runCoreTests" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GeoMesh" TARGET_NAME="runCoreTests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GeoMesh" RUN_TARGET_NAME="runCoreTests" TEST_MODE="SUITE_TEST">
+    <configuration default="false" name="runCoreTests" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" WORKING_DIR="" PASS_PARENT_ENVS_2="true" PROJECT_NAME="GeoMesh" TARGET_NAME="runCoreTests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="GeoMesh" RUN_TARGET_NAME="runCoreTests" TEST_MODE="SUITE_TEST">
       <envs />
       <method />
     </configuration>
@@ -765,19 +781,19 @@
       <item index="36" class="java.lang.String" itemvalue="Google Test.runUnitTests" />
       <item index="37" class="java.lang.String" itemvalue="Google Test.runCoreTests" />
       <item index="38" class="java.lang.String" itemvalue="Google Test.runFullTests" />
-      <item index="39" class="java.lang.String" itemvalue="Google Test.dhtTest.refresh_procedure" />
-      <item index="40" class="java.lang.String" itemvalue="Google Test.dhtTest.respond_find" />
-      <item index="41" class="java.lang.String" itemvalue="Google Test.dhtTest.local_minimum_response" />
-      <item index="42" class="java.lang.String" itemvalue="Google Test.scheduler_test.test_async" />
-      <item index="43" class="java.lang.String" itemvalue="Google Test.DHTTest.routingTest" />
+      <item index="39" class="java.lang.String" itemvalue="Google Test.scheduler_test.test_async" />
+      <item index="40" class="java.lang.String" itemvalue="Google Test.DHTTest.routingTest" />
+      <item index="41" class="java.lang.String" itemvalue="Google Test.scheduler_test.run_asap_immediate" />
+      <item index="42" class="java.lang.String" itemvalue="Google Test.All in scheduler_test" />
+      <item index="43" class="java.lang.String" itemvalue="Google Test.All in Scheduler_test.cpp" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Google Test.DHTTest.routingTest" />
-        <item index="1" class="java.lang.String" itemvalue="Google Test.scheduler_test.test_async" />
-        <item index="2" class="java.lang.String" itemvalue="Google Test.dhtTest.local_minimum_response" />
-        <item index="3" class="java.lang.String" itemvalue="Google Test.dhtTest.respond_find" />
-        <item index="4" class="java.lang.String" itemvalue="Google Test.dhtTest.refresh_procedure" />
+        <item index="0" class="java.lang.String" itemvalue="Google Test.All in Scheduler_test.cpp" />
+        <item index="1" class="java.lang.String" itemvalue="Google Test.scheduler_test.run_asap_immediate" />
+        <item index="2" class="java.lang.String" itemvalue="Google Test.scheduler_test.test_async" />
+        <item index="3" class="java.lang.String" itemvalue="Google Test.All in scheduler_test" />
+        <item index="4" class="java.lang.String" itemvalue="Google Test.DHTTest.routingTest" />
       </list>
     </recent_temporary>
   </component>
@@ -904,58 +920,58 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="DHTTest_routingTest - 2016.04.13 at 16h 08m 04s.xml">
-      <configuration name="DHTTest.routingTest" configurationId="CMakeGoogleTestRunConfigurationType" />
+    <history-entry file="All_in_Scheduler_test_cpp - 2016.05.20 at 16h 50m 59s.xml">
+      <configuration name="All in Scheduler_test.cpp" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
-    <history-entry file="DHTTest_routingTest - 2016.04.13 at 16h 09m 22s.xml">
-      <configuration name="DHTTest.routingTest" configurationId="CMakeGoogleTestRunConfigurationType" />
+    <history-entry file="All_in_Scheduler_test_cpp - 2016.05.20 at 17h 10m 22s.xml">
+      <configuration name="All in Scheduler_test.cpp" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
-    <history-entry file="DHTTest_routingTest - 2016.04.13 at 16h 17m 28s.xml">
-      <configuration name="DHTTest.routingTest" configurationId="CMakeGoogleTestRunConfigurationType" />
+    <history-entry file="All_in_Scheduler_test_cpp - 2016.05.20 at 17h 15m 29s.xml">
+      <configuration name="All in Scheduler_test.cpp" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
-    <history-entry file="DHTTest_routingTest - 2016.04.13 at 16h 17m 31s.xml">
-      <configuration name="DHTTest.routingTest" configurationId="CMakeGoogleTestRunConfigurationType" />
+    <history-entry file="All_in_Scheduler_test_cpp - 2016.05.20 at 17h 24m 01s.xml">
+      <configuration name="All in Scheduler_test.cpp" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
-    <history-entry file="DHTTest_routingTest - 2016.04.13 at 16h 17m 34s.xml">
-      <configuration name="DHTTest.routingTest" configurationId="CMakeGoogleTestRunConfigurationType" />
+    <history-entry file="All_in_Scheduler_test_cpp - 2016.05.20 at 17h 26m 00s.xml">
+      <configuration name="All in Scheduler_test.cpp" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
-    <history-entry file="DHTTest_routingTest - 2016.04.13 at 16h 17m 36s.xml">
-      <configuration name="DHTTest.routingTest" configurationId="CMakeGoogleTestRunConfigurationType" />
+    <history-entry file="scheduler_test_run_asap_immediate - 2016.05.19 at 17h 11m 55s.xml">
+      <configuration name="scheduler_test.run_asap_immediate" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
-    <history-entry file="DHTTest_routingTest - 2016.04.13 at 16h 17m 38s.xml">
-      <configuration name="DHTTest.routingTest" configurationId="CMakeGoogleTestRunConfigurationType" />
+    <history-entry file="scheduler_test_run_asap_immediate - 2016.05.20 at 17h 11m 09s.xml">
+      <configuration name="scheduler_test.run_asap_immediate" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
-    <history-entry file="runCoreTests - 2016.04.13 at 16h 06m 17s.xml">
-      <configuration name="runCoreTests" configurationId="CMakeGoogleTestRunConfigurationType" />
+    <history-entry file="scheduler_test_run_asap_immediate - 2016.05.20 at 17h 15m 13s.xml">
+      <configuration name="scheduler_test.run_asap_immediate" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
-    <history-entry file="runCoreTests - 2016.04.13 at 16h 07m 16s.xml">
-      <configuration name="runCoreTests" configurationId="CMakeGoogleTestRunConfigurationType" />
+    <history-entry file="scheduler_test_test_async - 2016.05.20 at 16h 53m 22s.xml">
+      <configuration name="scheduler_test.test_async" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
-    <history-entry file="scheduler_test_test_async - 2016.04.06 at 17h 00m 49s.xml">
+    <history-entry file="scheduler_test_test_async - 2016.05.20 at 17h 08m 32s.xml">
       <configuration name="scheduler_test.test_async" configurationId="CMakeGoogleTestRunConfigurationType" />
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1440" height="830" extended-state="6" />
-    <editor active="false" />
+    <frame x="0" y="23" width="1440" height="831" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18534179" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20366456" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32655826" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32791328" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2841678" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32428765" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32341" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32791328" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32384825" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32205683" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32882273" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32771084" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5569106" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5549525" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32523617" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -995,13 +1011,6 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/geomeshd/GeoMeshd_main.cpp</url>
-          <line>269</line>
-          <option name="timeStamp" value="58" />
-        </line-breakpoint>
-      </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
@@ -1015,162 +1024,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/test/Address_test.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-536">
-          <caret line="30" column="7" selection-start-line="30" selection-start-column="7" selection-end-line="30" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/UniqueAddress.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="139">
-          <caret line="161" column="0" selection-start-line="161" selection-start-column="0" selection-end-line="161" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/Location_test.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="158" column="0" selection-start-line="158" selection-start-column="0" selection-end-line="158" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/NetworkMonitor.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/simulator/NetworkWidget.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="245">
-          <caret line="24" column="4" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/NetworkMonitor.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/simulator/simulator_main.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="70" column="21" selection-start-line="70" selection-start-column="21" selection-end-line="70" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/Simulations_test.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="6" selection-start-line="8" selection-start-column="6" selection-end-line="8" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/Packet_test.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="18" selection-start-line="5" selection-start-column="7" selection-end-line="5" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="33" selection-start-line="11" selection-start-column="33" selection-end-line="11" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Library/Developer/CommandLineTools/usr/include/c++/v1/thread">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="139">
-          <caret line="336" column="0" selection-start-line="336" selection-start-column="0" selection-end-line="336" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Library/Developer/CommandLineTools/usr/include/c++/v1/__functional_base">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="139">
-          <caret line="414" column="0" selection-start-line="414" selection-start-column="0" selection-end-line="414" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Library/Developer/CommandLineTools/usr/include/c++/v1/functional">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="1792" column="0" selection-start-line="1792" selection-start-column="0" selection-end-line="1792" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ContactsSet.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
-          <caret line="13" column="6" selection-start-line="13" selection-start-column="6" selection-end-line="13" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Router.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="473">
-          <caret line="281" column="46" selection-start-line="281" selection-start-column="46" selection-end-line="281" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Router.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="217">
-          <caret line="37" column="6" selection-start-line="37" selection-start-column="6" selection-end-line="37" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Location.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="202">
-          <caret line="47" column="58" selection-start-line="47" selection-start-column="58" selection-end-line="47" selection-end-column="58" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Core.cpp" />
-    <entry file="file://$PROJECT_DIR$/src/Core.h" />
-    <entry file="file://$PROJECT_DIR$/src/LocalPacketHandler.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="495">
-          <caret line="37" column="0" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/LocalInterface.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="142">
-          <caret line="29" column="6" selection-start-line="29" selection-start-column="6" selection-end-line="29" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/LocalInterface.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="915">
-          <caret line="61" column="6" selection-start-line="61" selection-start-column="6" selection-end-line="61" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/LocationLookupManager.hpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
@@ -1202,24 +1055,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/LocationLookupManager.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2250">
-          <caret line="150" column="0" selection-start-line="150" selection-start-column="0" selection-end-line="150" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/LocalPacketHandler.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="585">
           <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/VirtualLocationManager.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -1239,41 +1078,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/geomeshd/Options.cpp" />
     <entry file="file://$PROJECT_DIR$/src/geomeshd/#GeoMeshd_main.cpp#" />
-    <entry file="file://$PROJECT_DIR$/test/DHTTest.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="303" column="31" selection-start-line="303" selection-start-column="31" selection-end-line="303" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/geomeshd/inline" />
-    <entry file="file://$PROJECT_DIR$/test/Scheduler_test.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="31" selection-start-line="9" selection-start-column="31" selection-end-line="9" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/geomeshd/UDPManager.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="615">
-          <caret line="41" column="4" selection-start-line="41" selection-start-column="4" selection-end-line="41" selection-end-column="4" />
-          <folding>
-            <element signature="e#132#161#0" expanded="true" />
-            <marker date="1461841182000" expanded="true" signature="353:2768" placeholder="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Scheduler.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="21" column="26" selection-start-line="21" selection-start-column="26" selection-end-line="21" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///Library/Developer/CommandLineTools/usr/include/c++/v1/__config">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="157">
@@ -1281,63 +1086,286 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Scheduler.hpp">
+    <entry file="file://$PROJECT_DIR$/src/Crypto.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1710">
-          <caret line="114" column="20" selection-start-line="114" selection-start-column="20" selection-end-line="114" selection-end-column="20" />
-          <folding>
-            <element signature="e#107#126#0" expanded="true" />
-            <marker date="1461940147000" expanded="true" signature="512:884" placeholder="{...}" />
-            <marker date="1461940147000" expanded="true" signature="802:814" placeholder="{...}" />
-            <marker date="1461940147000" expanded="true" signature="838:878" placeholder="{...}" />
-          </folding>
+        <state relative-caret-position="1530">
+          <caret line="102" column="49" selection-start-line="102" selection-start-column="49" selection-end-line="102" selection-end-column="49" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/geomeshd/UDPManager.cpp">
+    <entry file="file://$PROJECT_DIR$/src/base64.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="585">
-          <caret line="39" column="1" selection-start-line="39" selection-start-column="1" selection-end-line="39" selection-end-column="1" />
-          <folding />
+        <state relative-caret-position="300">
+          <caret line="20" column="3" selection-start-line="20" selection-start-column="3" selection-end-line="20" selection-end-column="3" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Apple.cpp">
+    <entry file="file://$PROJECT_DIR$/test/Location_test.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="18" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
-          <folding />
+        <state relative-caret-position="380">
+          <caret line="158" column="0" selection-start-line="158" selection-start-column="0" selection-end-line="158" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/base64.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="2" selection-end-column="3" />
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/simulator/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/DHTTest.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4545">
+          <caret line="303" column="31" selection-start-line="303" selection-start-column="31" selection-end-line="303" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/.CMakeLists.txt.swp" />
+    <entry file="file://$PROJECT_DIR$/src/VirtualLocationManager.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cmake_install.cmake">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/VirtualLocationManager.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/functional">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="1764" column="0" selection-start-line="1764" selection-start-column="0" selection-end-line="1764" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/memory">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="1526" column="0" selection-start-line="1526" selection-start-column="0" selection-end-line="1526" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/vector">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="1657" column="0" selection-start-line="1657" selection-start-column="0" selection-end-line="1657" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/queue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="683" column="0" selection-start-line="683" selection-start-column="0" selection-end-line="683" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Scheduler.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="142">
+          <caret line="124" column="1" selection-start-line="124" selection-start-column="1" selection-end-line="124" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/LocationLookupManager.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="124" column="1" selection-start-line="124" selection-start-column="1" selection-end-line="124" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-762">
+          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/googletest/googletest/include/gtest/gtest.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7293">
+          <caret line="2238" column="1" selection-start-line="2238" selection-start-column="1" selection-end-line="2238" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/Scheduler_test.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="110" column="5" selection-start-line="110" selection-start-column="5" selection-end-line="110" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/PacketDefragmenter.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-285">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Scheduler.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="246">
+          <caret line="139" column="17" selection-start-line="139" selection-start-column="9" selection-end-line="139" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geomeshd/http/HTTPServer.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="41" column="22" selection-start-line="41" selection-start-column="22" selection-end-line="41" selection-end-column="22" />
+          <folding>
+            <element signature="e#59#73#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geomeshd/http/HTTPResponse.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="645">
+          <caret line="45" column="2" selection-start-line="45" selection-start-column="2" selection-end-line="45" selection-end-column="2" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/base64.cpp">
+    <entry file="file://$PROJECT_DIR$/src/geomeshd/http/IncomingHTTPRequest.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="3" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="3" />
+        <state relative-caret-position="180">
+          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+          <folding>
+            <element signature="e#127#152#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geomeshd/http/HTTPServer.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="825">
+          <caret line="55" column="0" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Crypto.h">
+    <entry file="file://$PROJECT_DIR$/src/geomeshd/FileDescriptorNotifier.hpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1530">
-          <caret line="102" column="49" selection-start-line="102" selection-start-column="49" selection-end-line="102" selection-end-column="49" />
+        <state relative-caret-position="705">
+          <caret line="47" column="2" selection-start-line="47" selection-start-column="2" selection-end-line="47" selection-end-column="2" />
+          <folding>
+            <element signature="e#60#81#0" expanded="true" />
+            <marker date="1463767206000" expanded="true" signature="347:974" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geomeshd/FileDescriptorNotifier.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1305">
+          <caret line="87" column="18" selection-start-line="87" selection-start-column="18" selection-end-line="87" selection-end-column="18" />
+          <folding>
+            <element signature="e#50#87#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="18" selection-start-line="5" selection-start-column="7" selection-end-line="5" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geomeshd/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="9" selection-start-line="14" selection-start-column="9" selection-end-line="14" selection-end-column="9" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/geomeshd/GeoMeshd_main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="99">
-          <caret line="269" column="0" selection-start-line="269" selection-start-column="0" selection-end-line="269" selection-end-column="0" />
+        <state relative-caret-position="486">
+          <caret line="333" column="0" selection-start-line="333" selection-start-column="0" selection-end-line="333" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geomeshd/UDPManager.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="307">
+          <caret line="179" column="1" selection-start-line="179" selection-start-column="1" selection-end-line="179" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geomeshd/UnixSocketsFunctions.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-39">
+          <caret line="12" column="20" selection-start-line="12" selection-start-column="20" selection-end-line="12" selection-end-column="20" />
+          <folding>
+            <element signature="e#53#76#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geomeshd/UDPManager.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="722">
+          <caret line="89" column="2" selection-start-line="89" selection-start-column="2" selection-end-line="89" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Apple.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="347">
+          <caret line="52" column="34" selection-start-line="52" selection-start-column="34" selection-end-line="52" selection-end-column="56" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Linux.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="45" column="30" selection-start-line="45" selection-start-column="30" selection-end-line="45" selection-end-column="30" />
+          <folding>
+            <element signature="e#816#848#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Apple.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="35" column="4" selection-start-line="35" selection-start-column="4" selection-end-line="41" selection-end-column="34" />
+          <folding>
+            <element signature="e#54#81#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/geomeshd/TunnelDeliveryInterface_Linux.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="23" selection-start-line="12" selection-start-column="23" selection-end-line="12" selection-end-column="23" />
           <folding />
         </state>
       </provider>

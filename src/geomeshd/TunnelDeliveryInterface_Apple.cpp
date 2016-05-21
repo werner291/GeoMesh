@@ -20,14 +20,26 @@
 #define UTUN_OPT_IFNAME 2
 
 TunnelDeliveryInterface_Apple::TunnelDeliveryInterface_Apple(LocalInterface *localInterface,
-                                                             const Address &iFaceAddress)
-        : mLocalInterface(localInterface), iFaceAddress(iFaceAddress) {
+                                                             const Address &iFaceAddress,
+															 FDNotifier& fdnotifier)
+        : mLocalInterface(localInterface), iFaceAddress(iFaceAddress)
+{
 
     // Callback when the Router wants to deliver a message to the local system
     localInterface->setDataReceivedHandler(
             std::bind(&TunnelDeliveryInterface_Apple::deliverIPv6Packet,
                       this,
                       std::placeholders::_1, std::placeholders::_2));
+
+    startTunnelInterface();
+
+    fdnotifier.addFileDescriptor(
+            mSocketId,
+            std::bind(&TunnelDeliveryInterface_Apple::pollMessages,
+                      this,
+                      std::placeholders::_1
+                     )
+                                );
 }
 
 void TunnelDeliveryInterface_Apple::startTunnelInterface() {
@@ -97,6 +109,8 @@ void TunnelDeliveryInterface_Apple::startTunnelInterface() {
         Logger::log(LogLevel::ERROR, "Error setting buffer size!" + std::string(strerror(err)));
         close(mSocketId);
     }
+
+
 
     // Assign the node's unique ID as if it were the computer's IPv6 address
     assignIP();
@@ -171,13 +185,15 @@ void TunnelDeliveryInterface_Apple::deliverIPv6Packet(uint8_t* data, size_t leng
     if (result < 0) {
         int err = errno;
         Logger::log(LogLevel::ERROR,
-                    "TunnelDeliveryInterface_Apple: error while sending: " + std::string(strerror(err)));
+                    "TunnelDeliveryInterface_Apple: error while sending: "
+                    + std::string(strerror(err)));
     }
 
 }
 
 
-void TunnelDeliveryInterface_Apple::pollMessages() {
+void TunnelDeliveryInterface_Apple::pollMessages(int fd)
+{
 
     int received = receiveMessage(mSocketId, mReceptionBuffer, MAX_PAYLOAD_SIZE);
 

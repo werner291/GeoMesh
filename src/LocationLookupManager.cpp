@@ -123,7 +123,6 @@ LocationLookupManager::LocationLookupManager(LocalPacketHandler& localHandler,
         : selfAddress(selfAddress), locationMgr(locationMgr),
           localHandler(localHandler), contacts(contacts)
 {
-
     for (int msgType : {MSGTYPE_DHT_FIND_CLOSEST,
                         MSGTYPE_DHT_FIND_RESPONSE,
                         MSGTYPE_DHT_LEAVE,

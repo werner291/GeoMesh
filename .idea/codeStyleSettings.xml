@@ -3,6 +3,17 @@
   <component name="ProjectCodeStyleSettingsManager">
     <option name="PER_PROJECT_SETTINGS">
       <value>
+        <option name="RIGHT_MARGIN" value="80" />
+        <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="true" />
+        <Objective-C>
+          <option name="NAMESPACE_BRACE_PLACEMENT" value="2" />
+          <option name="FUNCTION_BRACE_PLACEMENT" value="2" />
+          <option name="BLOCK_BRACE_PLACEMENT" value="2" />
+          <option name="FUNCTION_CALL_ARGUMENTS_WRAP" value="5" />
+          <option name="FUNCTION_CALL_ARGUMENTS_NEW_LINE_BEFORE_RPAR" value="true" />
+          <option name="FUNCTION_CALL_ARGUMENTS_ALIGN_MULTILINE_PARS" value="true" />
+          <option name="FIELDS_PREFIX" value="m" />
+        </Objective-C>
         <Objective-C-extensions>
           <option name="GENERATE_INSTANCE_VARIABLES_FOR_PROPERTIES" value="ASK" />
           <option name="RELEASE_STYLE" value="IVAR" />
@@ -31,8 +42,16 @@
             <pair source="c" header="h" />
           </extensions>
         </Objective-C-extensions>
+        <XML>
+          <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
+        </XML>
+        <codeStyleSettings language="ObjectiveC">
+          <option name="BRACE_STYLE" value="2" />
+          <option name="CLASS_BRACE_STYLE" value="2" />
+          <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
+        </codeStyleSettings>
       </value>
     </option>
-    <option name="PREFERRED_PROJECT_CODE_STYLE" value="Default (1)" />
+    <option name="USE_PER_PROJECT_SETTINGS" value="true" />
   </component>
 </project>

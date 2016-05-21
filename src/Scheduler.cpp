@@ -20,38 +20,178 @@
 #include <unistd.h>
 #include "Scheduler.hpp"
 
-void Scheduler::scheduleTask(const Task& task) {
-        if (updating) {
-            toAdd.push_back(task);
-        } else {
-            tasks.push_back(task);
-        }
+void Scheduler::scheduleTask(const Task& task)
+{
+    // Obtain a lock to avoid the background thread
+    // interfering with us.
+    // TODO check whether a lock_guard would be better here.
+    tasksMux.lock();
+
+    tasks.push(task);
+
+    tasksMux.unlock();
+
+    // If we're in async mode, wake up the background
+    // thread so it starts processing stuff.
+    cv.notify_one();
+}
+
+void Scheduler::callAsap(std::function<void()> toCall, bool immediateReturn)
+{
+    if (immediateReturn)
+    {
+        scheduleTask(Task(clock::now(), std::chrono::milliseconds(0), false, [&](Task& task) { toCall(); }));
     }
+    else
+    {
 
-void Scheduler::update() {
+        // Here, we use a mutex to prevent us from leaving this
+        // method until the task has been executed
+        std::mutex mux;
+        
+        // Lock the mutex
+        mux.lock();
 
-        assert(!updating); // Prevent updateception
+        // Schedule the task immediately.
+        scheduleTask(Task(clock::now(), std::chrono::milliseconds(0), false,
+                [&](Task& task)
+                {
+                    toCall();
 
-        updating = true;
+                    // Only unlock once the task has been completed.
+                    mux.unlock();
 
-        time_point now = clock::now();
-
-        duration delta = lastUpdate - now;
-
-        for (auto itr = tasks.begin(); itr != tasks.end(); ++itr) {
-            if (itr->planned <= now) {
-                itr->callback(now, delta, *itr);
-
-                if (itr->repeats) {
-                    itr->planned += itr->interval;
-                } else {
-                    itr = tasks.erase(itr);
                 }
+            ));
+
+        // The thread will get stuck here until
+        // the mutex was unlocked from the task.
+        mux.lock();
+
+        // Unlock it again immediately.
+        mux.unlock();
+    }
+}
+
+bool Scheduler::isNextTaskDue()
+{
+    tasksMux.lock();
+
+    bool due = (!tasks.empty())
+               && tasks.top().planned <= clock::now();
+
+    tasksMux.unlock();
+
+    return due;
+
+}
+
+void Scheduler::update()
+{
+    while (isNextTaskDue()) {
+        // Lock since we're afecting the queue
+        tasksMux.lock();
+
+        //
+        Task task = tasks.top();
+        tasks.pop();
+
+        tasksMux.unlock();
+
+        task.callback(task);
+
+        if (task.repeats) {
+                task.planned += task.interval;
+                tasksMux.lock();
+                tasks.push(task);
+                tasksMux.unlock();
+            }
+    }
+}
+
+Scheduler::Scheduler(bool async) {
+    stop = false;
+    if (async) {
+        asyncThread.reset(
+                new std::thread([&]()
+          {
+              runAsync();
+          })
+        );
+    }
+}
+
+void Scheduler::runAsync()
+{
+    while (!stop)
+    { // Run until stop requested
+
+        // Obtain a lock on the tasks
+        std::unique_lock<std::mutex> ulock(tasksMux);
+
+        /**
+         * The next block is designed to wait until
+         * the task queue is non-empty and, if so,
+         * until the first task in the queue is due.
+         *
+         * This is similar to
+         *  cv.wait(ulock, isNextTaskDue())
+         *
+         * Except we need custom conditional timed wake-ups.
+         *
+         * About the control flow: when the wait stops,
+         * tasks are executed after restarting the loop.
+         *
+         * Surious wakeups are also dealt with using
+         * the if header guard and the outer while loop.
+         */
+        if ((tasks.empty())
+               || tasks.top().planned > std::__1::chrono::steady_clock::now())
+        {
+            // Check whether we need to wait for any specific tasks
+            // or whether we just need to wait until the queue is modified.
+            bool tasksScheduled = ! tasks.empty();
+
+            if (tasksScheduled)
+            {
+                // Get planned start time of first task
+                time_point next_due = tasks.top().planned;
+
+                cv.wait_until(ulock, next_due);
+            }
+            else
+            {
+                // No tasks are in the queue, we will be notified when
+                // one arrives. Sleep indefinitely.
+                cv.wait(ulock);
+            }
+        } else {
+
+            //
+            Task task = tasks.top();
+            tasks.pop();
+
+            tasksMux.unlock();
+
+            task.callback(task);
+
+            if (task.repeats) {
+                task.planned += task.interval;
+                tasksMux.lock();
+                tasks.push(task);
+                tasksMux.unlock();
             }
         }
-
-        tasks.insert(tasks.end(), toAdd.begin(), toAdd.end());
-        toAdd.clear();
-
-        updating = false;
     }
+}
+
+Scheduler::~Scheduler()
+{
+    stop = true;
+    // If the background trhead is waiting, wake it up.
+    cv.notify_all();
+    if (asyncThread.get() != nullptr)
+    {
+        asyncThread->join();
+    }
+}

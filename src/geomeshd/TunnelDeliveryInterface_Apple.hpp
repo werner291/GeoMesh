@@ -7,7 +7,11 @@
 
 #include <memory>
 #include <sys/kern_control.h>
+#include <functional>
+
 #include "../LocalInterface.hpp"
+
+#include "FileDescriptorNotifier.hpp"
 
 // No need for aome #IF APPLE since this include file is already only used on Apple
 #define TUNInterface_IFNAMSIZ 16
@@ -44,7 +48,9 @@ class TunnelDeliveryInterface_Apple {
 
 public:
 
-    TunnelDeliveryInterface_Apple(LocalInterface *localInterface, const Address &iFaceAddress);
+    TunnelDeliveryInterface_Apple(LocalInterface *localInterface,
+                                  const Address &iFaceAddress,
+                                  FDNotifier& fdnotifier);
 
     /**
      * As the name implies, allocate a new utun interface and set it up so the system can
@@ -61,7 +67,7 @@ public:
     /**
      * Poll the utun interface for new messages.
      */
-    void pollMessages();
+    void pollMessages(int fd);
 
 };
 

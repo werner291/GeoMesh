@@ -5,3 +5,19 @@ doc/doxygen/
 tags
 
 *.DS_Store
+
+*.iml
+
+nbproject/configurations.xml
+
+nbproject/private/CodeAssistancePathMapper.properties
+
+nbproject/private/configurations.xml
+
+nbproject/private/Default.properties
+
+nbproject/private/launcher.properties
+
+nbproject/private/private.xml
+
+nbproject/project.xml

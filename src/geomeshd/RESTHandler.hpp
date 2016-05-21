@@ -5,7 +5,7 @@
 
 #include "json/json/json.h"
 
-#include "HTTPServer.hpp"
+#include "http/HTTPServer.hpp"
 
 /**
  * Represents any object in an encoding-agnostic manner.
@@ -82,6 +82,8 @@ class RESTRequestHandler : public HTTPServer::RequestHandler
     std::map<std::string, RESTResource&> resources;
 
     public:
+
+    RESTRequestHandler() {}
 
     /**
      * \pre !request.empty()

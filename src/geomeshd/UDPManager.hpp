@@ -22,7 +22,7 @@
 
 #include "../LinkManager.hpp"
 #include "../FragmentingLinkEndpoint.hpp"
-#include "../Scheduler.hpp"
+#include "FileDescriptorNotifier.hpp"
 #include <string>
 #include <string.h>
 
@@ -56,7 +56,7 @@ class UDPManager {
     void sendControlMessage(const std::string& msg, struct sockaddr_in& destAddr);
 
 public:
-    UDPManager(LinkManager &linkMgr, int localPort, Scheduler& scheduler);
+    UDPManager(LinkManager &linkMgr, int localPort, FDNotifier &fdnotifier);
 
     /**
      * Send a UDP bridge hello packet to the specified address and port,
@@ -70,7 +70,7 @@ public:
     /**
      * Polls the socket for new packets, and processes them if there are any.
      */
-    void pollMessages();
+    void handleIncoming(int fd);
 
     /**
      * Datagrams directed towards interface 0 need to be processed by this method.

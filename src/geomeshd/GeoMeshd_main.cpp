@@ -57,7 +57,9 @@ namespace po = boost::program_options;
 #include "../Router.hpp"
 #include "../Scheduler.hpp"
 
-#include "HTTPServer.hpp"
+#include "FileDescriptorNotifier.hpp"
+
+#include "http/HTTPServer.hpp"
 #include "RESTHandler.hpp"
 #include "RESTResourceAdapters.hpp"
 
@@ -300,6 +302,8 @@ int main(int argc, char **argv) {
     // Allocate and initialize the scheduler
     Scheduler scheduler(false);
 
+    FDNotifier fdlistener(false);
+
     std::unique_ptr<LocalInterface> ipAdapter;
     std::unique_ptr<TunnelIface> tunnel;
 
@@ -310,18 +314,7 @@ int main(int argc, char **argv) {
     if (vm["local_interface_enable"].as<bool>()) {
 
         ipAdapter.reset(new LocalInterface(router.getLocalHandler(), llm));
-        tunnel.reset(new TunnelIface(ipAdapter.get(), addr));
-
-        tunnel->startTunnelInterface();
-
-        // TODO use a proper select()-based file descriptor listener instead of polling
-        scheduler.scheduleTask(Scheduler::Task(
-                        Scheduler::clock::now(),
-                        std::chrono::milliseconds(50),
-                        true,
-                        [&] (Scheduler::time_point t, Scheduler::duration d, Scheduler::Task& task)
-                            { tunnel->pollMessages(); }
-                    ));
+        tunnel.reset(new TunnelIface(ipAdapter.get(), addr, fdlistener));
     }
 
     std::unique_ptr<UDPManager> udpManager;
@@ -331,7 +324,7 @@ int main(int argc, char **argv) {
         // Create a new UDP bridge manager
         udpManager.reset(new UDPManager(router.getLinkManager(),
                                         vm["udp_port"].as<int>(),
-                                        scheduler
+                                        fdlistener
         ));
 
         // Iterate over all the peers specified in the onfig file and try to connect to them.
@@ -374,15 +367,12 @@ int main(int argc, char **argv) {
         contactsResource.reset(new ContactsResource(contacts));
         rest->addResource("contacts",*contactsResource);
 
-        httpserver.reset(new HTTPServer(9999, "Hello!", *rest));
-        scheduler.scheduleTask(Scheduler::Task(
-                        Scheduler::clock::now(),
-                        std::chrono::milliseconds(50),
-                        true,
-                        [&] (Scheduler::time_point t, Scheduler::duration d,
-                              Scheduler::Task& task)
-                        { httpserver->pollSocket(); }
-                    ));
+        httpserver.reset(new HTTPServer(9999,
+                                        "Hello!",
+                                        *rest,
+                                        fdlistener
+                                       )
+                        );
     }
 
     // For the whole duration of the program, poll for messages and handle time-related things.

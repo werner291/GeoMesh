@@ -10,6 +10,8 @@
 #include "UnixSocketsFunctions.hpp"
 #include "../Logger.hpp"
 
+using namespace std;
+
 int receiveMessage(int sock, uint8_t *buffer, size_t buffSize) {
 
     int nbytes = recvfrom(sock, buffer, buffSize, O_NONBLOCK, NULL, NULL);
@@ -31,10 +33,8 @@ int receiveMessage(int sock, uint8_t *buffer, size_t buffSize) {
     } else {
         int err = errno;
 
-        if (!(err == EWOULDBLOCK || err == EAGAIN)) {
-            Logger::log(LogLevel::ERROR,
-                        "ReceiveMessage: receive error: " + std::string(strerror(err)));
-        }
+        throw runtime_error("ReceiveMessage: receive error: " + std::string
+                                                                     (strerror(err)));
         // Else there was nothing to be read, do nothing
     }
 

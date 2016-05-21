@@ -25,13 +25,22 @@
 #include <chrono>
 #include <functional>
 #include <thread>
+#include <queue>
 #include <assert.h>
 
 /**
- * Scheduler is a class responsible for timing-related functionality.
+ * Scheduler is a class responsible for deciding what happens
+ * when on the scheduler thread.
  *
  * Client code can register tasks to be executed at specific times
  * and intervals, and these will be called when needed.
+ *
+ * You can also use the callAsap() method to execute the task
+ * as soon as possible on the scheduler thread.
+ *
+ * Please note that, like event handlers, tasks should not take
+ * longer than a millisecond or so, as one task executing means
+ * other tasks cannot be executed.
  *
  * Usage:
  *    Call scheduleTask() to add a new task.
@@ -51,7 +60,7 @@ public:
 
     typedef clock::time_point time_point;
     typedef clock::duration duration;
-    typedef std::function<void (time_point currentTime, duration delta, Task& task)> TaskCallback;
+    typedef std::function<void (Task& task)> TaskCallback;
 
     /**
      * Struct representing a task.
@@ -78,59 +87,60 @@ public:
         void cancel() {
             repeats = false;
         }
+
+        bool operator<(const Task& other) const {
+            return other.planned < planned;
+        }
     };
 
 private:
 
-    std::vector<Task> tasks;
+    std::priority_queue<Task, std::vector<Task> > tasks;
 
     // The last time when  update() was last called.
     time_point lastUpdate;
 
-    // Some clients might want to start or stop tasks from the callback, make that safe to do.
-    bool updating = false;
-    std::vector<Task> toAdd;
+    // Set to false to make the background task stop
+    volatile bool stop;
 
-    bool stop;
+    std::unique_ptr<std::thread> asyncThread;
 
-    std::thread* asyncThread;
+    /**
+     * mutex to synchronize access to the task queue.
+     */
+    std::mutex tasksMux;
+
+    std::condition_variable cv;
+
+    bool isNextTaskDue();
+
+    void runAsync();
 
 public:
 
+    Scheduler(bool async);
+
+    ~Scheduler();
+
+    void scheduleTask(const Task& task);
+
     /**
-     * Create a new Scheduler.
+     * Schedule a task on the scheduler thread
+     * as soon as possible.
      *
-     * @param async Whether to start a thread in the background and call tasks
-     *              automatically (please be careful about synchronisation).
-     *              If not, you will have to call the update() function at a
-     *              regular interval.
+     * \param toCall function object to call on the
+     *               Scheduler thread.
+     *
+     * \param immediateReturn
+     *               Whether you want this function to return immediately,
+     *               or when the task has been completed. Warning: calling
+     *               without immediate return from the scheduler thread
+     *               will cause a deadlock state!
      */
-    Scheduler(bool async) {
-	    stop = false;
-        if (async) {
-            asyncThread = new std::thread([&](){
-                std::this_thread::sleep_until(lastUpdate + std::chrono::milliseconds(10));
-                while (!stop) {
-                    update();
-                    
-                }
-            });
-        } else {
-            asyncThread = nullptr;
-        }
-    }
-
-    ~Scheduler() {
-        stop = true;
-        if (asyncThread != nullptr) {
-            asyncThread->join();
-            delete asyncThread;
-        }
-    }
-
-    void scheduleTask(const Task& task); 
+    void callAsap(std::function<void()> toCall, bool immediateReturn = true);
 
     void update();
+
 
 };
 

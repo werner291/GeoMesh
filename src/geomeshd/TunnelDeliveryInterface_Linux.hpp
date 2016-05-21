@@ -22,6 +22,7 @@
 
 #include "../LocalInterface.hpp"
 #include "../Packet.hpp"
+#include "FileDescriptorNotifier.hpp"
 
 #define TUNInterface_IFNAMSIZ 16
 
@@ -43,13 +44,14 @@ class TunnelDeliveryInterface_Linux {
 public:
 
     TunnelDeliveryInterface_Linux(LocalInterface *localInterface,
-            const Address &iFaceAddress);
+                                      const Address &iFaceAddress,
+                                      FDNotifier &fdnotifier);
 
     void startTunnelInterface();
 
     void deliverIPv6Packet(uint8_t* data, size_t length);
 
-    void pollMessages();
+    void pollMessages(int fd);
 
 };
 

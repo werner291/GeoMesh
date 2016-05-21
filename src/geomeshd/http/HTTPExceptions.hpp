@@ -4,6 +4,7 @@
 #define GEOMESH_HTTPEXCEPTION_H
 
 #include <exception>
+#include "HTTPServer.hpp"
 
 class HTTPServer;
 
