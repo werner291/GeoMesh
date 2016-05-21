@@ -27,6 +27,8 @@
 #include <thread>
 #include <queue>
 #include <assert.h>
+#include <mutex>
+#include <condition_variable>
 
 /**
  * Scheduler is a class responsible for deciding what happens

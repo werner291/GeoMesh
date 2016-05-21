@@ -45,7 +45,7 @@ TunnelDeliveryInterface_Linux::TunnelDeliveryInterface_Linux(
     startTunnelInterface();
 
     fdnotifier.addFileDescriptor(
-            mSocketId,
+            fd,
             bind(&TunnelDeliveryInterface_Linux::pollMessages,
                  this,
                  placeholders::_1

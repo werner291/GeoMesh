@@ -67,7 +67,9 @@ void HTTPServer::handleIncomingConnection(int fd) {
 
 	if (clientSocket >= 0) {
 
-		activeRequests.emplace(std::make_pair(fd, HTTPRequest(fd)));
+		activeRequests.emplace(std::piecewise_construct,
+                        std::forward_as_tuple(fd),
+                        std::forward_as_tuple(fd));
 
 		Logger::log(LogLevel::DEBUG, "Acccepted RPC connection.");
 
