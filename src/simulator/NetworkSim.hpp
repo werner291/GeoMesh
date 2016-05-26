@@ -34,7 +34,7 @@ struct Link {
 struct SimulatedNode {
   std::shared_ptr<Router> router;
 
-  inline const Location &getLocation() const {
+  inline const GPSLocation &getLocation() const {
     return router->getLocationMgr().getLocation();
   }
 };
@@ -55,7 +55,7 @@ class NetworkSim {
 
   // void createRelayHubNetwork(int numNodes, int fieldSizeX, int fieldSizeY);
 
-  void handlePacketArrival(int messageType, Address from, Location fromLocation,
+  void handlePacketArrival(int messageType, Address from, GPSLocation fromLocation,
                            uint8_t *message, size_t messageSize);
 
 public:

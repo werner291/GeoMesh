@@ -13,6 +13,9 @@
           <option name="FUNCTION_CALL_ARGUMENTS_NEW_LINE_BEFORE_RPAR" value="true" />
           <option name="FUNCTION_CALL_ARGUMENTS_ALIGN_MULTILINE_PARS" value="true" />
           <option name="FIELDS_PREFIX" value="m" />
+          <option name="INTRODUCE_CONST_VARS" value="true" />
+          <option name="INTRODUCE_CONST_PARAMS" value="true" />
+          <option name="INTRODUCE_AUTO_VARS" value="true" />
         </Objective-C>
         <Objective-C-extensions>
           <option name="GENERATE_INSTANCE_VARIABLES_FOR_PROPERTIES" value="ASK" />
@@ -38,7 +41,7 @@
             <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="DeallocMethod" />
           </class>
           <extensions>
-            <pair source="cpp" header="h" />
+            <pair source="cpp" header="hpp" />
             <pair source="c" header="h" />
           </extensions>
         </Objective-C-extensions>

@@ -18,7 +18,7 @@
  */
 
 #include "../UniqueAddress.hpp"
-#include "../Location.cpp"
+#include "../GPSLocation.cpp"
 
 #include "RESTResourceAdapters.hpp"
 
@@ -62,7 +62,7 @@ RESTObject ContactsResource::post(std::string request,
         throw HTTPException(400,"Invalid address");
     }
 
-    Location loc(posted.properties["latitude"].asDouble(),
+    GPSLocation loc(posted.properties["latitude"].asDouble(),
                  posted.properties["longitude"].asDouble());
 
     time_t expires = posted.properties["expires"].asUInt64();

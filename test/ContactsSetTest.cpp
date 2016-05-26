@@ -18,7 +18,7 @@ TEST(ContactsSetTest, insert_order_duplicates) {
     }
 
     for (const Address& addr : addresses) {
-        auto itr = contacts.insert(ContactsSet::Entry(addr,Location(0,0),0));
+        auto itr = contacts.insert(ContactsSet::Entry(addr,GPSLocation(0,0),0));
 
         EXPECT_EQ(addr, itr->address);
     }
@@ -28,8 +28,8 @@ TEST(ContactsSetTest, insert_order_duplicates) {
     // Add an address twice to see if it correctly prevents duplicates
     Address duplicate = Address::generateRandom();
     addresses.insert(duplicate);
-    contacts.insert(ContactsSet::Entry(duplicate,Location(0,0),0));
-    contacts.insert(ContactsSet::Entry(duplicate,Location(0,0),0));
+    contacts.insert(ContactsSet::Entry(duplicate,GPSLocation(0,0),0));
+    contacts.insert(ContactsSet::Entry(duplicate,GPSLocation(0,0),0));
 
     }
 
@@ -66,7 +66,7 @@ TEST(ContactsSetTest, closest_not_equal_single_entry) {
 
     Address testAddr = Address::fromString("5555:5555:5555:5555:5555:5555:5555:5555");
 
-    contacts.insert(ContactsSet::Entry(testAddr, Location(0,0), 0));
+    contacts.insert(ContactsSet::Entry(testAddr, GPSLocation(0,0), 0));
 
     auto itr = contacts.findClosestEntry(Address::fromString("4444:4444:4444:4444:4444:4444:4444:4444"));
 
@@ -81,7 +81,7 @@ TEST(ContactsSetTest, closest_not_equal_single_entry_part_equal) {
 
     Address testAddr = Address::fromString("5555:5555:5555:5555:5555:5555:5555:5555");
 
-    contacts.insert(ContactsSet::Entry(testAddr, Location(0,0), 0));
+    contacts.insert(ContactsSet::Entry(testAddr, GPSLocation(0,0), 0));
 
     auto itr = contacts.findClosestEntry(Address::fromString("4444:5555:4444:4444:4444:4444:4444:4444"));
 

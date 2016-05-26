@@ -13,7 +13,7 @@
 double t = 0;
 int showConnections = 0;
 
-Location interpolateLocation(const Location &a, const Location &b, float t) {
+GPSLocation interpolateLocation(const GPSLocation &a, const GPSLocation &b, float t) {
 
     double aLon = a.lon;
 
@@ -21,7 +21,7 @@ Location interpolateLocation(const Location &a, const Location &b, float t) {
         aLon -= 360;
     }
 
-    return Location(a.lat * t + b.lat * (1 - t), aLon * t + b.lon * (1 - t));
+    return GPSLocation(a.lat * t + b.lat * (1 - t), aLon * t + b.lon * (1 - t));
 }
 
 void NetworkWidget::draw() {
@@ -43,7 +43,7 @@ void NetworkWidget::draw() {
 
     glLoadIdentity();
 
-    Vector3d camPos = convertLocation(Location(50.3109742,5.3850541));
+    Vector3d camPos = convertLocation(GPSLocation(50.3109742,5.3850541));
 
     gluLookAt(camPos.x * (1 + scale),camPos.y * (1 + scale),camPos.z * (1 + scale),
               0,0,0,
@@ -83,8 +83,8 @@ void NetworkWidget::draw() {
 
     for (const Link &link : netSim.getLinks()) {
 
-        const Location a = link.a->getRouter()->getLocationMgr().getLocation();
-        const Location b = link.b->getRouter()->getLocationMgr().getLocation();
+        const GPSLocation a = link.a->getRouter()->getLocationMgr().getLocation();
+        const GPSLocation b = link.b->getRouter()->getLocationMgr().getLocation();
 
         drawDirectLineBetweenLocations(a, b);
 
@@ -97,7 +97,7 @@ void NetworkWidget::draw() {
 
             if (packet.direction == SimulatedPacket::B) t = 1.f - t;
 
-            Location intermediate = interpolateLocation(link.a->getRouter()->getLocationMgr().getLocation(),
+            GPSLocation intermediate = interpolateLocation(link.a->getRouter()->getLocationMgr().getLocation(),
                                                         link.b->getRouter()->getLocationMgr().getLocation(), t);
 
             Vector3d packetPos = convertLocation(intermediate);
@@ -105,7 +105,7 @@ void NetworkWidget::draw() {
 
             if (packet.data->getMessageType() == MSGTYPE_IPv6) {
 
-                Location dest = packet.data->getDestinationLocation();
+                GPSLocation dest = packet.data->getDestinationLocation();
 
                 if (packet.data->getRoutingMode() == ROUTING_GREEDY) {
                     glColor3f(0.5, 1, 0.5);
@@ -151,7 +151,7 @@ void NetworkWidget::draw() {
 
 }
 
-void NetworkWidget::drawLineBetweenLocations(const Location &a, const Location &b) const {
+void NetworkWidget::drawLineBetweenLocations(const GPSLocation &a, const GPSLocation &b) const {
 
     int steps = a.distanceTo(b) * 5 / EARTH_RAD + 1;
 
@@ -159,7 +159,7 @@ void NetworkWidget::drawLineBetweenLocations(const Location &a, const Location &
     for (int i = 0; i <= steps; i++) {
         float t = i / (float) steps;
 
-        Location intermediate = interpolateLocation(a, b, t);
+        GPSLocation intermediate = interpolateLocation(a, b, t);
 
         Vector3d pt = convertLocation(intermediate);
 
@@ -168,7 +168,7 @@ void NetworkWidget::drawLineBetweenLocations(const Location &a, const Location &
     glEnd();
 }
 
-void NetworkWidget::drawDirectLineBetweenLocations(const Location &a, const Location &b) const {
+void NetworkWidget::drawDirectLineBetweenLocations(const GPSLocation &a, const GPSLocation &b) const {
 
     glBegin(GL_LINES);
 

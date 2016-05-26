@@ -20,7 +20,7 @@ public:
     ContactsSet contacts;
 
     DHTSimplifiedNode(const Address &addr,
-                      const Location &loc,
+                      const GPSLocation &loc,
                       std::function<bool(PacketPtr)> sendPacket = EMPTY_SEND_STRATEGY)
             : addr(addr), vlm(loc), lh(vlm, addr, sendPacket), 
               llm(lh, addr, vlm,contacts), li(lh, llm) 
@@ -36,7 +36,7 @@ TEST(DHTTest, relay_find_preconfigured) {
     // Address/location of the simulated node.
     Address simulatedAddress = Address::fromString(
             "5555:5555:5555:5555:5555:5555:5555:5555");
-    VirtualLocationManager simulatedVLM(Location(0, 0));
+    VirtualLocationManager simulatedVLM(GPSLocation(0, 0));
     ContactsSet contacts;
 
     // Initialize local handler with empty send strategy.
@@ -49,11 +49,11 @@ TEST(DHTTest, relay_find_preconfigured) {
 
     // Give it a contact very close to its own position
     llm.processEntrySuggestion(Address::fromString("5555:5555:5555:5555:5555:5555:5555:5551"),
-                               Location(2, 5), 0);
+                               GPSLocation(2, 5), 0);
 
     // And many random contacts
     for (int i = 0; i < 5000; ++i) {
-        llm.processEntrySuggestion(Address::generateRandom(), Location(0, 0), 0);
+        llm.processEntrySuggestion(Address::generateRandom(), GPSLocation(0, 0), 0);
     }
 
     /*
@@ -65,7 +65,7 @@ TEST(DHTTest, relay_find_preconfigured) {
         EXPECT_EQ(Address::fromString("5555:5555:5555:5555:5555:5555:5555:5551"),
                   packet->getDestinationAddress());
 
-        Location destLoc = packet->getDestinationLocation();
+        GPSLocation destLoc = packet->getDestinationLocation();
 
         EXPECT_NEAR(2, destLoc.lat, 0.01);
         EXPECT_NEAR(5, destLoc.lon, 0.01);
@@ -80,7 +80,7 @@ TEST(DHTTest, relay_find_preconfigured) {
     // Create a FIND_CLOSEST message bound for the simulated node from some random source
     PacketPtr packet = std::make_shared<Packet>(
             Address::generateRandom(),
-            Location(90, 60),
+            GPSLocation(90, 60),
             simulatedAddress,
             simulatedVLM.getLocation(),
             MSGTYPE_DHT_FIND_CLOSEST,
@@ -90,7 +90,7 @@ TEST(DHTTest, relay_find_preconfigured) {
     // Write the lookup message, original requester is random, query is the contact that is really close
     LocationLookupManager::writeLookupMessage(packet->getPayload(),
                                               Address::generateRandom(),
-                                              Location(0, 0),
+                                              GPSLocation(0, 0),
                                               Address::fromString("5555:5555:5555:5555:5555:5555:5555:5551"));
 
     // Simulate handling and reception by LLM.
@@ -99,7 +99,7 @@ TEST(DHTTest, relay_find_preconfigured) {
     // Create another packet, again random sender and bound for simulated node.
     PacketPtr packet2 = std::make_shared<Packet>(
             Address::generateRandom(),
-            Location(90, 60),
+            GPSLocation(90, 60),
             simulatedAddress,
             simulatedVLM.getLocation(),
             MSGTYPE_DHT_FIND_CLOSEST,
@@ -110,7 +110,7 @@ TEST(DHTTest, relay_find_preconfigured) {
     // Send strategy not modified since same output is expected.
     LocationLookupManager::writeLookupMessage(packet->getPayload(),
                                               Address::generateRandom(),
-                                              Location(0, 0),
+                                              GPSLocation(0, 0),
                                               Address::fromString("5555:5555:5555:5555:5555:5555:5555:5541"));
 
     // Simulate reception and handling.
@@ -119,7 +119,7 @@ TEST(DHTTest, relay_find_preconfigured) {
 
 TEST(dhtTest, respond_find) {
 
-    DHTSimplifiedNode node(Address::fromString("5555:5555:5555:5555:5555:5555:5555:5555"), Location(10, -56));
+    DHTSimplifiedNode node(Address::fromString("5555:5555:5555:5555:5555:5555:5555:5555"), GPSLocation(10, -56));
 
     int sent = 0;
     node.lh.setSendPacketStrategy([&](PacketPtr packet) -> bool {
@@ -134,7 +134,7 @@ TEST(dhtTest, respond_find) {
     // Create a FIND_CLOSEST message bound for the simulated node from some random source
     PacketPtr packet = std::make_shared<Packet>(
             Address::generateRandom(),
-            Location(90, 60),
+            GPSLocation(90, 60),
             node.addr,
             node.vlm.getLocation(),
             MSGTYPE_DHT_FIND_CLOSEST,
@@ -144,7 +144,7 @@ TEST(dhtTest, respond_find) {
     // Write the lookup message, original requester is random, query exactly the node
     LocationLookupManager::writeLookupMessage(packet->getPayload(),
                                               Address::generateRandom(),
-                                              Location(0, 0),
+                                              GPSLocation(0, 0),
                                               Address::fromString("5555:5555:5555:5555:5555:5555:5555:5555"));
 
     node.lh.handleLocalPacket(packet);
@@ -155,11 +155,11 @@ TEST(dhtTest, respond_find) {
 
 TEST(dhtTest, refresh_procedure) {
 
-    DHTSimplifiedNode node(Address::fromString("5555:5555:5555:5555:5555:5555:5555:5555"), Location(0, 0));
+    DHTSimplifiedNode node(Address::fromString("5555:5555:5555:5555:5555:5555:5555:5555"), GPSLocation(0, 0));
 
     // And many random contacts
     for (int i = 0; i < 50; ++i) {
-        node.llm.processEntrySuggestion(Address::generateRandom(), Location(0, 0), 0);
+        node.llm.processEntrySuggestion(Address::generateRandom(), GPSLocation(0, 0), 0);
     }
 
     int count = 0;
@@ -186,11 +186,11 @@ TEST(dhtTest, refresh_procedure) {
 
 TEST(dhtTest, local_minimum_response) {
 
-    DHTSimplifiedNode node(Address::fromString("5555:5555:5555:5555:5555:5555:5555:5555"), Location(0, 0));
+    DHTSimplifiedNode node(Address::fromString("5555:5555:5555:5555:5555:5555:5555:5555"), GPSLocation(0, 0));
 
     // And many random contacts
     for (int i = 0; i < 50; ++i) {
-        node.llm.processEntrySuggestion(Address::generateRandom(), Location(0, 0), 0);
+        node.llm.processEntrySuggestion(Address::generateRandom(), GPSLocation(0, 0), 0);
     }
 
     int sent = 0;
@@ -207,7 +207,7 @@ TEST(dhtTest, local_minimum_response) {
     // Create a FIND_CLOSEST message bound for the simulated node from some random source
     PacketPtr packet = std::make_shared<Packet>(
             Address::generateRandom(),
-            Location(90, 60),
+            GPSLocation(90, 60),
             node.addr,
             node.vlm.getLocation(),
             MSGTYPE_DHT_FIND_CLOSEST,
@@ -217,7 +217,7 @@ TEST(dhtTest, local_minimum_response) {
     // Write the lookup message, original requester is random, query exactly the node
     LocationLookupManager::writeLookupMessage(packet->getPayload(),
                                               Address::generateRandom(),
-                                              Location(0, 0),
+                                              GPSLocation(0, 0),
                                               Address::fromString("5555:5555:5555:5555:5555:5555:5555:5554"));
 
     node.lh.handleLocalPacket(packet);
@@ -255,7 +255,7 @@ TEST(DHTTest, routingTest) {
     for (int i = 0; i < MAX_NODES; i++) {
         std::shared_ptr<DHTSimplifiedNode> node = std::make_shared<DHTSimplifiedNode>(
                 Address::generateRandom(), 
-                Location(0, 0),
+                GPSLocation(0, 0),
                 [&](const PacketPtr &packet) -> bool {
 
                     Address destination = packet->getDestinationAddress();
@@ -285,10 +285,10 @@ TEST(DHTTest, routingTest) {
     for (int i = 1; i < nodes.size(); i++) {
         // Add nodes[i-1] to the contacts list of nodes[i], this will serve as the
         // bootstrap node for nodes[i].
-        nodes[i]->llm.processEntrySuggestion(nodes[i - 1]->addr, Location(0, 0), time(nullptr) + 500);
+        nodes[i]->llm.processEntrySuggestion(nodes[i - 1]->addr, GPSLocation(0, 0), time(nullptr) + 500);
     }
 
-    nodes.front()->llm.processEntrySuggestion(nodes.back()->addr, Location(0, 0), time(nullptr) + 500);
+    nodes.front()->llm.processEntrySuggestion(nodes.back()->addr, GPSLocation(0, 0), time(nullptr) + 500);
 
 
     for (int i = 0; i < 10; ++i) {
@@ -309,12 +309,12 @@ TEST(DHTTest, routingTest) {
 	    std::cout << "Testing location lookup of " << target->addr.toString() 
 		    << " by " << origin->addr.toString() << " (initial distance " << abs(a-b) << ")" << std::endl;
     Address addr = target->addr;
-    Location expected = target->vlm.getLocation();
+    GPSLocation expected = target->vlm.getLocation();
 
     bool received = false;
 
     origin->llm.addListener(
-            [&](const Address &address, const Location &loc, time_t expires) {
+            [&](const Address &address, const GPSLocation &loc, time_t expires) {
                 if (address == addr) {
                     if (loc == expected) {
                         std::cout << "Correct location lookup response!" << std::endl;

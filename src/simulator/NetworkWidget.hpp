@@ -11,7 +11,7 @@
 #include <FL/glu.h>
 #include <FL/gl.h>
 #include "NetworkSim.hpp"
-#include "../Location.hpp"
+#include "../GPSLocation.hpp"
 
 class NetworkWidget : public Fl_Gl_Window {
 
@@ -40,9 +40,9 @@ private:
 
     void configureViewport();
 
-    void drawLineBetweenLocations(const Location &a, const Location &b) const;
+    void drawLineBetweenLocations(const GPSLocation &a, const GPSLocation &b) const;
 
-    void drawDirectLineBetweenLocations(const Location &a, const Location &b) const;
+    void drawDirectLineBetweenLocations(const GPSLocation &a, const GPSLocation &b) const;
 };
 
 

@@ -21,7 +21,7 @@
 #include "Packet.hpp"
 
 PacketPtr Packet::createFromIPv6(const uint8_t *IPv6packet, size_t length,
-        const Location &sourceLocation, const Location &destinationLocation) {
+        const GPSLocation &sourceLocation, const GPSLocation &destinationLocation) {
 
     PacketPtr pack(new Packet(length + GEOMESH_PAYLOAD_START));
 
@@ -49,7 +49,7 @@ PacketPtr Packet::createFromIPv6(const uint8_t *IPv6packet, size_t length,
 
 }
 
-PacketPtr Packet::createLocationInfoPacket(const Location &loc,
+PacketPtr Packet::createLocationInfoPacket(const GPSLocation &loc,
         const Address &addr) {
 
     PacketPtr pack(new Packet(500));
@@ -104,9 +104,9 @@ Packet::Packet(const uint8_t *data, size_t length) : Packet(length) {
 }
 
 Packet::Packet(const Address &source,
-                 const Location &sourceLocation,
+                 const GPSLocation &sourceLocation,
                  const Address &destination,
-                 const Location &destinationLocation,
+                 const GPSLocation &destinationLocation,
                  int messageType,
                  size_t payloadSize) 
         : Packet(GEOMESH_PAYLOAD_START + payloadSize) {

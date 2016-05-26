@@ -24,7 +24,7 @@
 
 #include "LocalPacketHandler.hpp"
 #include "LocationLookupManager.hpp"
-#include "Location.hpp"
+#include "GPSLocation.hpp"
 #include "UniqueAddress.hpp"
 
 /**
@@ -49,7 +49,7 @@ public:
         LocalInterface::dataReceivedHandler = dataReceivedHandler;
     }
 
-  void locationLookupCompleted(Address addr, Location loc, time_t expires);
+  void locationLookupCompleted(Address addr, GPSLocation loc, time_t expires);
 
   /**
    * Creates a new GeoMesh packet, copies ipV6packet into it, and writes the
@@ -63,7 +63,7 @@ public:
   /**
    * An IPv6 message was received. Deliver it to the host system.
    */
-  void dataReceived(int messageType, Address from, Location fromLocation,
+  void dataReceived(int messageType, Address from, GPSLocation fromLocation,
                     uint8_t *message, size_t messageSize);
 };
 

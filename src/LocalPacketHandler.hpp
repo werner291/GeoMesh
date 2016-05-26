@@ -36,13 +36,13 @@ class LocalPacketHandler {
 
     typedef std::function<void (int messageType,
                                 Address from,
-                                Location fromLocation,
+                                GPSLocation fromLocation,
                                 uint8_t* message,
                                 size_t messageSize)> LocalPacketListener;
 
     typedef std::function<void (int messageType,
                                 Address destination,
-                                Location destinationLocation,
+                                GPSLocation destinationLocation,
                                 const uint8_t* payload,
                                 size_t payloadSize)> sendPacketWithLocationFunction;
 
@@ -87,7 +87,7 @@ public:
      */
     void sendFromLocal(int messageType,
                        Address destination,
-                       Location destinationLocation,
+                       GPSLocation destinationLocation,
                        const uint8_t* payload,
                        size_t payloadSize);
 

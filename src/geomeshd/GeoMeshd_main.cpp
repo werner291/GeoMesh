@@ -289,10 +289,10 @@ int main(int argc, char **argv) {
 
     std::cout << "Using address: " << addr.toString() << std::endl;
 
-    GreedyRoutingTable table;
+    GeographicRoutingTable table;
     ContactsSet contacts;
 
-    Router router(addr, Location(0, 0), table);
+    Router router(addr, GPSLocation(0, 0), table);
 
     LocationLookupManager llm(router.getLocalHandler(),
                               addr,

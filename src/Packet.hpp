@@ -22,7 +22,7 @@
 #define GEOMESH_PACKET_H
 
 #include <stdint.h>
-#include "Location.hpp"
+#include "GPSLocation.hpp"
 #include "UniqueAddress.hpp"
 #include <assert.h>
 #include <limits.h>
@@ -202,12 +202,12 @@ public:
         header[GEOMESH_HEADER_MESSAGE_TYPE] = routingMode;
     }
 
-    Location getSourceLocation() const {
+    GPSLocation getSourceLocation() const {
 
-        return Location::fromBytes(header + GEOMESH_HEADER_SOURCE_LOCATION);
+        return GPSLocation::fromBytes(header + GEOMESH_HEADER_SOURCE_LOCATION);
     }
 
-    void setSourceLocation(const Location &loc) {
+    void setSourceLocation(const GPSLocation &loc) {
 
         loc.toBytes(header + GEOMESH_HEADER_SOURCE_LOCATION);
     }
@@ -245,11 +245,11 @@ public:
         memcpy(header + GEOMESH_HEADER_DESTINATION_ADDRESS, address.getBytes(), ADDRESS_LENGTH_OCTETS);
     }
 
-    inline Location getDestinationLocation() {
-        return Location::fromBytes(header + GEOMESH_HEADER_DESTINATION_LOCATION);
+    inline GPSLocation getDestinationLocation() {
+        return GPSLocation::fromBytes(header + GEOMESH_HEADER_DESTINATION_LOCATION);
     }
 
-    void setDestinationLocation(const Location &loc) {
+    void setDestinationLocation(const GPSLocation &loc) {
 
         loc.toBytes(header + GEOMESH_HEADER_DESTINATION_LOCATION);
     }
@@ -259,10 +259,10 @@ public:
     void recomputeLocationInfoChecksum();
 
     static PacketPtr createFromIPv6(const uint8_t *IPv6packet, size_t length,
-                                    const Location &sourceLocation,
-                                    const Location &destinationLocation);
+                                    const GPSLocation &sourceLocation,
+                                    const GPSLocation &destinationLocation);
 
-    static PacketPtr createLocationInfoPacket(const Location &loc,
+    static PacketPtr createLocationInfoPacket(const GPSLocation &loc,
                                               const Address &addr);
 
     Packet(const uint8_t *data, size_t length);
@@ -271,9 +271,9 @@ public:
      * Create a packet with a pre-filled header and an empty payload buffer of the specified size.
      */
     Packet(const Address &source,
-           const Location &sourceLocation,
+           const GPSLocation &sourceLocation,
            const Address &destination,
-           const Location &destinationLocation,
+           const GPSLocation &destinationLocation,
            int messageType,
            size_t payloadSize);
 };

@@ -46,7 +46,7 @@ LocalInterface::LocalInterface(LocalPacketHandler& handler,
           std::placeholders::_3));
 }
 
-void LocalInterface::locationLookupCompleted(Address addr, Location loc, time_t expires) {
+void LocalInterface::locationLookupCompleted(Address addr, GPSLocation loc, time_t expires) {
     auto itr = waitingForLocationLookup.find(addr);
 
     if (itr != waitingForLocationLookup.end()) {
@@ -82,7 +82,7 @@ bool LocalInterface::sendIPv6Message(const uint8_t *ipV6packet, int bytes) {
 
 void LocalInterface::dataReceived(int messageType,
                                   Address from,
-                                  Location fromLocation,
+                                  GPSLocation fromLocation,
                                   uint8_t* message,
                                   size_t messageSize) {
 

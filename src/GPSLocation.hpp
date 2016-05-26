@@ -46,7 +46,7 @@ static double inline intAngleToDegrees(int32_t intAngle) {
  *
  * Should sending to different planets be necessary, please open an issue on GitHub.
  */
-class Location {
+class GPSLocation {
 
     /**
      * Convert degrees to radians.
@@ -62,9 +62,9 @@ public:
     double lon; // From -180 to 180 degrees, with 0 at IERS Reference Meridian, + towards East
     double lat; // From -90 to 90 degrees, + towards North
 
-    double distanceTo(const Location& other) const;
+    double distanceTo(const GPSLocation& other) const;
 
-    Location(double lat, double lon) : lon(lon), lat(lat) { }
+    GPSLocation(double lat, double lon) : lon(lon), lat(lat) { }
 
     /**
      * Convert this location infto an std::string representation
@@ -86,21 +86,21 @@ public:
      *
      * This is useful when you need to know how locations are ordered when arranged on a compass.
      */
-    double getDirectionTo(const Location &target) const;
+    double getDirectionTo(const GPSLocation &target) const;
 
-    inline bool operator==(const Location &other) const {
+    inline bool operator==(const GPSLocation &other) const {
         return lon == other.lon && lat == other.lat;
     }
 
     /**
      * Extract a Location from 16 octets of binary information.
      */
-    inline static Location fromBytes(const uint8_t *buffer) {
+    inline static GPSLocation fromBytes(const uint8_t *buffer) {
 
         uint32_t latInt = ntohl(((uint32_t *) buffer)[0]);
         uint32_t lonInt = ntohl(((uint32_t *) buffer)[1]);
 
-        return Location(
+        return GPSLocation(
                 intAngleToDegrees(latInt),
                 intAngleToDegrees(lonInt)
         );
@@ -130,7 +130,7 @@ public:
  * (Lat = 90, Lon = any) = (0,0,1)
  * (Lat = 0, Lon = 90) = (0,1,0)
  */
-Vector3d convertLocation(const Location &loc);
+Vector3d convertLocation(const GPSLocation &loc);
 
 /**
  * Same as convertLocation(const Location &loc),

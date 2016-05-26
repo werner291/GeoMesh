@@ -27,9 +27,9 @@ set(CORE_SRC
     FragmentingLinkEndpoint.cpp 
     PacketFragment.cpp
     PacketDefragmenter.cpp
-    Router.cpp 
-    Location.hpp
-    Location.cpp
+    Router.cpp
+        GPSLocation.hpp
+        GPSLocation.cpp
     Logger.cpp
     LinkManager.cpp
     LocalInterface.hpp
@@ -40,8 +40,8 @@ set(CORE_SRC
     Packet.cpp
     VirtualLocationManager.hpp
     LocationLookupManager.cpp
-    GreedyRoutingTable.hpp
-    GreedyRoutingTable.cpp
+        GeographicRoutingTable.hpp
+        GeographicRoutingTable.cpp
     my_htonll.cpp
     VirtualLocationManager.cpp
     LocalPacketHandler.hpp

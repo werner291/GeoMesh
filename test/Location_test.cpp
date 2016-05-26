@@ -4,7 +4,7 @@
 
 #include <limits.h>
 #include <gtest/gtest.h>
-#include "../src/Location.hpp"
+#include "../src/GPSLocation.hpp"
 
 const double EPSILON = 0.00000001;
 
@@ -37,7 +37,7 @@ TEST(location_unit_carthesian, equator_back) {
 
 TEST(location_distance, self_proximity) {
 
-    Location a(0,0);
+    GPSLocation a(0,0);
 
     EXPECT_NEAR(0, a.distanceTo(a), EPSILON);
 
@@ -45,9 +45,9 @@ TEST(location_distance, self_proximity) {
 
 TEST(location_distance, semicircle_equatorial) {
 
-    Location a(0,0);
+    GPSLocation a(0,0);
 
-    Location b(180,0);
+    GPSLocation b(180,0);
 
     EXPECT_NEAR(EARTH_RAD * M_PI, a.distanceTo(b), EPSILON);
 
@@ -55,9 +55,9 @@ TEST(location_distance, semicircle_equatorial) {
 
 TEST(location_distance, quartcircle_equatorial) {
 
-    Location a(0,0);
+    GPSLocation a(0,0);
 
-    Location b(90,0);
+    GPSLocation b(90,0);
 
     EXPECT_NEAR(EARTH_RAD * M_PI / 2, a.distanceTo(b), EPSILON);
 
@@ -65,9 +65,9 @@ TEST(location_distance, quartcircle_equatorial) {
 
 TEST(location_distance, semicircle_polar) {
 
-    Location a(0,90);
+    GPSLocation a(0,90);
 
-    Location b(0,-90);
+    GPSLocation b(0,-90);
 
     EXPECT_NEAR(EARTH_RAD * M_PI, a.distanceTo(b), EPSILON);
 
@@ -75,36 +75,36 @@ TEST(location_distance, semicircle_polar) {
 
 TEST(location_direction, north) {
 
-    Location a(0,0);
+    GPSLocation a(0,0);
 
-    Location b(45,0);
+    GPSLocation b(45,0);
 
     EXPECT_NEAR(a.getDirectionTo(b), 0, EPSILON);
 }
 
 TEST(location_direction, east) {
 
-    Location a(0,0);
+    GPSLocation a(0,0);
 
-    Location b(0,10);
+    GPSLocation b(0,10);
 
     EXPECT_NEAR(a.getDirectionTo(b), M_PI/2, EPSILON);
 }
 
 TEST(location_direction, west) {
 
-    Location a(0,0);
+    GPSLocation a(0,0);
 
-    Location b(0,-15);
+    GPSLocation b(0,-15);
 
     EXPECT_NEAR(a.getDirectionTo(b), -M_PI/2, EPSILON);
 }
 
 TEST(location_direction, south) {
 
-    Location a(0,0);
+    GPSLocation a(0,0);
 
-    Location b(-80,0);
+    GPSLocation b(-80,0);
 
     EXPECT_NEAR(std::abs(a.getDirectionTo(b)), M_PI, EPSILON);
 }
@@ -159,13 +159,13 @@ TEST(location_int_angles, to_and_back_minus_90) {
 
 TEST(location_serialisation, ser_deser) {
 
-    Location loc(5, 10);
+    GPSLocation loc(5, 10);
 
     uint8_t buffer[8];
 
     loc.toBytes(buffer);
 
-    Location locDeser = Location::fromBytes(buffer);
+    GPSLocation locDeser = GPSLocation::fromBytes(buffer);
 
     EXPECT_NEAR(loc.lat, locDeser.lat, 0.01);
     EXPECT_NEAR(loc.lon, locDeser.lon, 0.01);

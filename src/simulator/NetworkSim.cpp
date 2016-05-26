@@ -2,7 +2,7 @@
 // Created by Werner Kroneman on 22-01-16.
 //
 #include "NetworkSim.hpp"
-#include "../Location.hpp"
+#include "../GPSLocation.hpp"
 #include "../Logger.hpp"
 #include "../Router.hpp"
 #include "rapidxml/rapidxml.hpp"
@@ -64,7 +64,7 @@ template <typename T> T clip(const T &n, const T &lower, const T &upper) {
 std::shared_ptr<Router> NetworkSim::newNodeAt(double lat, double lon) {
 
   std::shared_ptr<Router> newRouter(
-      new Router(Address::generateRandom(), Location(lat, lon)));
+      new Router(Address::generateRandom(), GPSLocation(lat, lon)));
 
   newRouter->getLocalHandler().addLocalPacketListener(
       std::bind(&NetworkSim::handlePacketArrival, this, std::placeholders::_1,
@@ -124,7 +124,7 @@ bool NetworkSim::sendMessage(std::string message, int startNodeID,
 }
 
 void NetworkSim::handlePacketArrival(int messageType, Address from,
-                                     Location fromLocation, uint8_t *message,
+                                     GPSLocation fromLocation, uint8_t *message,
                                      size_t messageSize) {
   packetsReceived += 1;
 

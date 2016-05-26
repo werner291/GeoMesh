@@ -18,10 +18,10 @@
  */
 
 #include <cmath>
-#include "Location.hpp"
+#include "GPSLocation.hpp"
 
 // Haversine formula based on JavaScript implementation found on http://www.movable-type.co.uk/scripts/latlong.html
-double Location::distanceTo(const Location& other) const {
+double GPSLocation::distanceTo(const GPSLocation& other) const {
 
     double lat1 = rad(lat);
     double lat2 = rad(other.lat);
@@ -39,7 +39,7 @@ double Location::distanceTo(const Location& other) const {
 
 // Warning: This is rally only a measure suitable for the face routing algorithm
 // The only thing that is important is that the directional order is kept.
-double Location::getDirectionTo(const Location &target) const {
+double GPSLocation::getDirectionTo(const GPSLocation &target) const {
 
     // Convert to carthesian coordinates, Z+ is the axis goign from the South to the North Pole
     // These don't need to be multiplied by the radius, since we just want the angle.
@@ -89,7 +89,7 @@ double Location::getDirectionTo(const Location &target) const {
 
 }
 
-Vector3d convertLocation(const Location &loc) {
+Vector3d convertLocation(const GPSLocation &loc) {
     return convertLocation(loc.lat,loc.lon);
 }
 

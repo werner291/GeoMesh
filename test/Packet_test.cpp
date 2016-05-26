@@ -11,14 +11,14 @@ const double SMALL = 0.00001;
 
 TEST(location_info, location_info_checksum) {
 
-    Location loc(5, 90);
+    GPSLocation loc(5, 90);
     Address addr = Address::generateRandom();
 
     PacketPtr pack = Packet::createLocationInfoPacket(loc, addr);
 
     EXPECT_EQ(pack->verifyLocationInformation(), true);
 
-    Location packetLoc = pack->getSourceLocation();
+    GPSLocation packetLoc = pack->getSourceLocation();
 
     EXPECT_NEAR(packetLoc.lat, loc.lat, SMALL);
     EXPECT_NEAR(packetLoc.lon, loc.lon, SMALL);

@@ -17,18 +17,18 @@
  * along with GeoMesh.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "GreedyRoutingTable.hpp"
+#include "GeographicRoutingTable.hpp"
 
-const double GreedyRoutingTable::PRUNING_COEFFICIENT = 0.1;
+const double GeographicRoutingTable::PRUNING_COEFFICIENT = 0.1;
 
-int GreedyRoutingTable::getGreedyInterface(int fromInterface, const Location &destination, double maxDistance) {
+int GeographicRoutingTable::getGreedyInterface(int fromInterface, const GPSLocation &destination, double maxDistance) {
 
     // A simple linear search for the closest item.
     // Perhaps I could use something lika a KD-tree to accelerate things?
-    auto bestCandidate = GreedyRoutingTable::mGreedyRoutingTable.end();
+    auto bestCandidate = GeographicRoutingTable::mGreedyRoutingTable.end();
     double bestDistance = maxDistance;
 
-    for (auto itr = GreedyRoutingTable::mGreedyRoutingTable.begin(); itr != GreedyRoutingTable::mGreedyRoutingTable.end(); itr++) {
+    for (auto itr = GeographicRoutingTable::mGreedyRoutingTable.begin(); itr != GeographicRoutingTable::mGreedyRoutingTable.end(); itr++) {
         double distance = itr->target.distanceTo(destination);
         if (distance < bestDistance) {
             bestCandidate = itr;
@@ -36,19 +36,19 @@ int GreedyRoutingTable::getGreedyInterface(int fromInterface, const Location &de
         }
     }
 
-    if (bestCandidate == GreedyRoutingTable::mGreedyRoutingTable.end()) {
+    if (bestCandidate == GeographicRoutingTable::mGreedyRoutingTable.end()) {
         return -1;
     }
 
     return bestCandidate->iFaceID;
 }
 
-bool GreedyRoutingTable::insertIfUseful(Location suggestionTarget, int iFaceID, int hops, const Location& referenceLoc) {
+bool GeographicRoutingTable::insertIfUseful(GPSLocation suggestionTarget, int iFaceID, int hops, const GPSLocation& referenceLoc) {
 
     // Always insert if empty.
     if (mGreedyRoutingTable.empty()) {
 
-        mGreedyRoutingTable.push_back(GreedyRoutingTableEntry {
+        mGreedyRoutingTable.push_back(Entry {
                 suggestionTarget, iFaceID, hops
         });
 
@@ -73,7 +73,7 @@ bool GreedyRoutingTable::insertIfUseful(Location suggestionTarget, int iFaceID, 
     // Insert only if they are different enough.
     if (bestRuleDistance > suggestionDistanceFromMe * PRUNING_COEFFICIENT) {
 
-        mGreedyRoutingTable.push_back(GreedyRoutingTableEntry {
+        mGreedyRoutingTable.push_back(Entry {
                 suggestionTarget, iFaceID, hops
         });
 

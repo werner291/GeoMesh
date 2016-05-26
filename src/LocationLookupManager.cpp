@@ -23,7 +23,7 @@
 #include <string.h>
 #include "VirtualLocationManager.hpp"
 
-bool LocationLookupManager::processEntrySuggestion(const Address& address, const Location& loc, time_t expires) {
+bool LocationLookupManager::processEntrySuggestion(const Address& address, const GPSLocation& loc, time_t expires) {
 
 	if (address != selfAddress) {
 		// Do not add ourselves as a contact
@@ -42,7 +42,7 @@ bool LocationLookupManager::processEntrySuggestion(const Address& address, const
     return true;
 }
 
-void LocationLookupManager::addEntry(const Address& address, const Location& loc, time_t expires) {
+void LocationLookupManager::addEntry(const Address& address, const GPSLocation& loc, time_t expires) {
 
     contacts.insert(ContactsSet::Entry(address,loc,expires));
 }
@@ -140,7 +140,7 @@ LocationLookupManager::LocationLookupManager(LocalPacketHandler& localHandler,
 
 void LocationLookupManager::handleDHTPacket(int messageType,
                                             Address from,
-                                            Location fromLocation,
+                                            GPSLocation fromLocation,
                                             uint8_t* message,
                                             size_t messageSize) {
 
@@ -163,7 +163,7 @@ void LocationLookupManager::handleDHTPacket(int messageType,
                 // No contacts are closer than the current node, respond with our own contact info.
                 Address requesterAddress = Address::fromBytes(message 
                                                + FIND_CLOSEST_REQUESTER);
-                Location requesterLocation = Location::fromBytes(message 
+                GPSLocation requesterLocation = GPSLocation::fromBytes(message
                                       + FIND_CLOSEST_REQUESTER_LOCATION);
 
                 localHandler.sendFromLocal(MSGTYPE_DHT_FIND_RESPONSE,

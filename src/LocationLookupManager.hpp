@@ -29,14 +29,14 @@
 #include <exception>
 #include <set>
 
-static const int FIND_CLOSEST_QUERY = ADDRESS_LENGTH_OCTETS + Location::SERIALIZED_SIZE;
+static const int FIND_CLOSEST_QUERY = ADDRESS_LENGTH_OCTETS + GPSLocation::SERIALIZED_SIZE;
 
 static const int FIND_CLOSEST_REQUESTER = 0;
 
 static const int FIND_CLOSEST_REQUESTER_LOCATION = ADDRESS_LENGTH_OCTETS;
 
 static const int FIND_CLOSEST_MESSAGE_SIZE = ADDRESS_LENGTH_OCTETS
-                                                + Location::SERIALIZED_SIZE
+                                                + GPSLocation::SERIALIZED_SIZE
                                                 + ADDRESS_LENGTH_OCTETS;
 
 class LocalPacketHandler;
@@ -45,7 +45,7 @@ class LocationLookupManager {
 
     static const int REDUNDANCY_LEVEL = 2;
 
-    typedef std::function< void (const Address& address, const Location& loc,
+    typedef std::function< void (const Address& address, const GPSLocation& loc,
             time_t expires) > Listener;
 
     std::vector< Listener > updateListeners;
@@ -62,7 +62,7 @@ class LocationLookupManager {
 
     void handleDHTPacket(int messageType,
                          Address from,
-                         Location fromLocation,
+                         GPSLocation fromLocation,
                          uint8_t* message,
                          size_t messageSize);
 
@@ -72,7 +72,7 @@ public:
                           const VirtualLocationManager &locationMgr,
                           ContactsSet& contacts);
 
-    bool processEntrySuggestion(const Address& address, const Location& loc, time_t expires);
+    bool processEntrySuggestion(const Address& address, const GPSLocation& loc, time_t expires);
 
     void processRoutingTableCopy(const uint8_t* bytes, size_t length);
 
@@ -99,14 +99,14 @@ public:
     /**
      * Add this entry directly to the routing table.
      */
-    void addEntry(const Address& address, const Location& loc, time_t expires);
+    void addEntry(const Address& address, const GPSLocation& loc, time_t expires);
 
-    static void writeLookupMessage(uint8_t* buffer, Address requester, Location requesterLocation, Address query) {
+    static void writeLookupMessage(uint8_t* buffer, Address requester, GPSLocation requesterLocation, Address query) {
         memcpy(buffer, requester.getBytes(), ADDRESS_LENGTH_OCTETS);
 
         requesterLocation.toBytes(buffer + ADDRESS_LENGTH_OCTETS);
 
-        memcpy(buffer + ADDRESS_LENGTH_OCTETS + Location::SERIALIZED_SIZE,
+        memcpy(buffer + ADDRESS_LENGTH_OCTETS + GPSLocation::SERIALIZED_SIZE,
                query.getBytes(),
                ADDRESS_LENGTH_OCTETS);
     }

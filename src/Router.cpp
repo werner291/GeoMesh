@@ -93,7 +93,7 @@ bool Router::forwardPacket(PacketPtr data, int fromIface) {
         // Else, try to route according to location
     }
 
-    Location destination = data->getDestinationLocation();
+    GPSLocation destination = data->getDestinationLocation();
 
     int routingMode = data->getRoutingMode();
 
@@ -142,7 +142,7 @@ bool Router::processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket)
         return false; 
     }
 
-    Location peerLocation = suggestionPacket->getSourceLocation();
+    GPSLocation peerLocation = suggestionPacket->getSourceLocation();
 
     int hops = suggestionPacket->getLocationInfoHopCount();
 
@@ -184,7 +184,7 @@ void Router::sendLocationInfo(int interface) {
 
 }
 
-bool Router::routeGreedy(PacketPtr data, int fromIface, Location destination) {
+bool Router::routeGreedy(PacketPtr data, int fromIface, GPSLocation destination) {
 
     int outInteface = greedyRoutingTable.getGreedyInterface(fromIface, destination,
                                                             destination.distanceTo(locationMgr.getLocation()));
@@ -207,7 +207,7 @@ int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
 
-bool Router::canSwitchFaceToGreedy(PacketPtr data, Location destination) {
+bool Router::canSwitchFaceToGreedy(PacketPtr data, GPSLocation destination) {
 
     double bestDistance = data->getPacketFaceRoutingClosestDistance();
 
@@ -219,7 +219,7 @@ bool Router::canSwitchFaceToGreedy(PacketPtr data, Location destination) {
 
 }
 
-bool Router::routeFaceBegin(PacketPtr data, int fromIface, Location destination) {
+bool Router::routeFaceBegin(PacketPtr data, int fromIface, GPSLocation destination) {
 
     data->setRoutingMode(ROUTING_FACE_RIGHT);
 
@@ -266,7 +266,7 @@ bool Router::routeFaceBegin(PacketPtr data, int fromIface, Location destination)
 
 }
 
-bool Router::routeFaceRelay(PacketPtr data, int fromIface, Location destination) {
+bool Router::routeFaceRelay(PacketPtr data, int fromIface, GPSLocation destination) {
 
     double distanceFromTarget = locationMgr.getLocation().distanceTo(destination);
 
@@ -305,7 +305,7 @@ bool Router::routeFaceRelay(PacketPtr data, int fromIface, Location destination)
     }
 }
 
-Router::Router(Address uniqueaddress, Location location, GreedyRoutingTable& greedyRoutingTable) :
+Router::Router(Address uniqueaddress, GPSLocation location, GeographicRoutingTable& greedyRoutingTable) :
         uniqueaddress(uniqueaddress),
         locationMgr(location),
         localHandler(locationMgr, uniqueaddress, std::bind(&Router::handleMessage, this, std::placeholders::_1, 0)),

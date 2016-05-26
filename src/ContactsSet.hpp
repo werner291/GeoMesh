@@ -22,7 +22,7 @@
 
 #include "UniqueAddress.hpp"
 
-#include "Location.hpp"
+#include "GPSLocation.hpp"
 
 #include "my_htonll.hpp"
 
@@ -32,20 +32,20 @@ public:
     struct Entry {
 
         Address address;
-        Location location;
+        GPSLocation location;
         time_t expires;
 
-        const static size_t SERIALIZED_SIZE = ADDRESS_LENGTH_OCTETS + Location::SERIALIZED_SIZE + 8;
+        const static size_t SERIALIZED_SIZE = ADDRESS_LENGTH_OCTETS + GPSLocation::SERIALIZED_SIZE + 8;
 
-        Entry(const Address& addr, const Location& loc, const time_t& expires) :
+        Entry(const Address& addr, const GPSLocation& loc, const time_t& expires) :
                 address(addr), location(loc), expires(0) {}
 
         Entry(const uint8_t* bytes) :
                 address(Address::fromBytes(bytes)),
-                location(Location::fromBytes(bytes+ADDRESS_LENGTH_OCTETS))
+                location(GPSLocation::fromBytes(bytes+ADDRESS_LENGTH_OCTETS))
         {
             expires = my_htonll(* reinterpret_cast<const uint64_t*>(bytes +
-                    ADDRESS_LENGTH_OCTETS + Location::SERIALIZED_SIZE));
+                    ADDRESS_LENGTH_OCTETS + GPSLocation::SERIALIZED_SIZE));
         }
 
         void toBytes(uint8_t* buffer) {

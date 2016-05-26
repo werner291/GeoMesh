@@ -36,7 +36,7 @@ void LocalPacketHandler::handleLocalPacket(PacketPtr packet) {
     }
 }
 
-void LocalPacketHandler::sendFromLocal(int messageType, Address destination, Location destinationLocation,
+void LocalPacketHandler::sendFromLocal(int messageType, Address destination, GPSLocation destinationLocation,
                                        const uint8_t *payload, size_t payloadSize) {
 
     assert(payloadSize <= MAX_PAYLOAD_SIZE);

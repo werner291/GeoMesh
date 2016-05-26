@@ -20,33 +20,33 @@
 #ifndef GEOMESH_VIRTUALLOCATIONMANAGER_H
 #define GEOMESH_VIRTUALLOCATIONMANAGER_H
 
-#include "Location.hpp"
+#include "GPSLocation.hpp"
 #include <vector>
 
 class VirtualLocationManager {
 
 public:
     class VirtualLocationListener {
-        friend VirtualLocationManager;
-        virtual void virtualLocationChanged(const Location& newLocation) = 0;
+        friend class VirtualLocationManager;
+        virtual void virtualLocationChanged(const GPSLocation& newLocation) = 0;
 
     };
 
 protected:
     std::vector<VirtualLocationListener*> listeners;
 
-    Location loc;
+    GPSLocation loc;
 
 public:
 
-    VirtualLocationManager(const Location& anchorLocation) : loc(anchorLocation) {
+    VirtualLocationManager(const GPSLocation& anchorLocation) : loc(anchorLocation) {
     }
 
-    const Location &getLocation() const {
+    const GPSLocation &getLocation() const {
         return loc;
     }
 
-    void setLoc(const Location &loc, bool notifyListeners = true) {
+    void setLoc(const GPSLocation &loc, bool notifyListeners = true) {
         VirtualLocationManager::loc = loc;
 
         if (notifyListeners) {

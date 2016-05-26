@@ -20,12 +20,12 @@
 #ifndef MESHNETSIM_ROUTER_H
 #define MESHNETSIM_ROUTER_H
 
-#include "Location.hpp"
+#include "GPSLocation.hpp"
 #include "AbstractLinkEndpoint.hpp"
 #include "LocalInterface.hpp"
 #include "LinkManager.hpp"
 #include "UniqueAddress.hpp"
-#include "GreedyRoutingTable.hpp"
+#include "GeographicRoutingTable.hpp"
 #include "LocalPacketHandler.hpp"
 
 #include <set>
@@ -39,7 +39,7 @@ struct LocalRoutingTableEntry {
 struct DirectionalEntry {
     int iFaceID;
     double heading;
-    Location loc;
+    GPSLocation loc;
 
     bool operator<(const DirectionalEntry& other) const {
         return this->heading < other.heading;
@@ -75,7 +75,7 @@ private:
 
     LinkManager linkMgr;
 
-    GreedyRoutingTable& greedyRoutingTable;
+    GeographicRoutingTable& greedyRoutingTable;
 
     std::set<DirectionalEntry> mFaceRoutingTable;
 
@@ -93,7 +93,7 @@ public:
         return uniqueaddress;
     }
 
-    Router(Address uniqueaddress, Location location, GreedyRoutingTable& greedyRoutingTable);
+    Router(Address uniqueaddress, GPSLocation location, GeographicRoutingTable& greedyRoutingTable);
 
     ~Router() {
     }
@@ -115,22 +115,22 @@ public:
 
     bool processRoutingSuggestion(int fromIface, PacketPtr suggestionPacket);
 
-    bool routeGreedy(PacketPtr data, int fromIface, Location destination);
+    bool routeGreedy(PacketPtr data, int fromIface, GPSLocation destination);
 
     void greedyToFace(PacketPtr data);
 
-    bool routeFaceBegin(PacketPtr data, int fromIface, Location destination);
+    bool routeFaceBegin(PacketPtr data, int fromIface, GPSLocation destination);
 
     /**
      * Check whether a packet that is currently in face routing mode
      * can be switched back into greedy routing mode.
      */
-    bool canSwitchFaceToGreedy(PacketPtr data, Location destination);
+    bool canSwitchFaceToGreedy(PacketPtr data, GPSLocation destination);
 
     /**
      * Relay a packet that is currently in face routing mode. Will NOT change the routing mode.
      */
-    bool routeFaceRelay(PacketPtr data, int fromIface, Location destination);
+    bool routeFaceRelay(PacketPtr data, int fromIface, GPSLocation destination);
 
     const VirtualLocationManager &getLocationMgr() const {
         return locationMgr;
