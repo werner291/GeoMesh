@@ -7,13 +7,13 @@
 
 void HTTPResponse::writeTo(int fd)
 {
-    std::__1::stringstream strstr;
+    std::stringstream strstr;
 
     strstr << "HTTP/1.1 " << status << " " << statusLine << "\r\n";
 
-    setHeader("Content-Length:", std::__1::to_string(body.str().length()));
+    setHeader("Content-Length:", std::to_string(body.str().length()));
 
-    for (std::__1::pair<std::__1::string, std::__1::string> header : headers)
+    for (std::pair<std::string, std::string> header : headers)
     {
         strstr << header.first << ": " << header.second << "\r\n";
     }

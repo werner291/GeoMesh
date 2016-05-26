@@ -146,7 +146,7 @@ void Scheduler::runAsync()
          * the if header guard and the outer while loop.
          */
         if ((tasks.empty())
-               || tasks.top().planned > std::__1::chrono::steady_clock::now())
+               || tasks.top().planned > std::chrono::steady_clock::now())
         {
             // Check whether we need to wait for any specific tasks
             // or whether we just need to wait until the queue is modified.

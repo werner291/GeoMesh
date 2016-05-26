@@ -75,7 +75,7 @@ public:
      *
      * \param password The password to access the service.
      */
-    HTTPServer(int port, std::__1::string password, RequestHandler &requestHandler,
+    HTTPServer(int port, std::string password, RequestHandler &requestHandler,
                FDNotifier &fdnotifier);
 
     void handleConnectionData(int fd);

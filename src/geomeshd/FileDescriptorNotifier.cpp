@@ -5,6 +5,7 @@
 #include "FileDescriptorNotifier.hpp"
 #include "../Logger.hpp"
 
+#include <string.h>
 #include <assert.h>
 
 using namespace std;
